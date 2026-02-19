@@ -23,7 +23,7 @@
 export type UiMode = 'CUSTOM' | 'MATERIAL';
 
 // ▼▼▼ CHANGE THIS VALUE TO SWITCH UI LIBRARIES EVERYWHERE ▼▼▼
-export const UI_MODE: UiMode = 'MATERIAL';
+export const UI_MODE: UiMode = 'CUSTOM';
 // ▲▲▲ CHANGE THIS VALUE TO SWITCH UI LIBRARIES EVERYWHERE ▲▲▲
 
 /**
