@@ -21,19 +21,26 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20.11.1
           cache: npm
+
       - name: Install dependencies
         run: npm ci
+
       - name: Build
-        run: npm run build -- --configuration production --base-href "/Brassring-CommonUI-POC/" && cp dist/br-ui-framework/index.html dist/br-ui-framework/404.html
+        run: |
+          npm run build -- --configuration production --base-href "/Brassring-CommonUI-POC/"
+          cp dist/br-ui-framework/browser/index.html dist/br-ui-framework/browser/404.html
+          touch dist/br-ui-framework/browser/.nojekyll
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist/br-ui-framework
+          path: dist/br-ui-framework/browser
 
   deploy:
     runs-on: ubuntu-latest
