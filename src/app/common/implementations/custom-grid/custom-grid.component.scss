@@ -1,0 +1,148 @@
+/* ─── Custom Grid Styles ────────────────────────────────── */
+.custom-grid-wrapper {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    background: #fff;
+}
+
+.grid-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+
+    h3 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    .badge {
+        background: rgba(255, 255, 255, 0.25);
+        padding: 2px 10px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+}
+
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+
+    thead {
+        background: #f8f9fb;
+
+        th {
+            text-align: left;
+            padding: 14px 16px;
+            font-weight: 600;
+            color: #4a5568;
+            border-bottom: 2px solid #e2e8f0;
+            white-space: nowrap;
+            user-select: none;
+
+            &.sortable {
+                cursor: pointer;
+                transition: background 0.2s;
+
+                &:hover {
+                    background: #edf2f7;
+                }
+            }
+
+            .th-content {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .sort-icon {
+                font-size: 12px;
+                opacity: 0.5;
+            }
+        }
+    }
+
+    tbody {
+        tr {
+            transition: background 0.15s;
+
+            &:hover {
+                background: #f0f4ff;
+            }
+
+            &.even {
+                background: #fafbfc;
+
+                &:hover {
+                    background: #f0f4ff;
+                }
+            }
+
+            td {
+                padding: 12px 16px;
+                color: #2d3748;
+                border-bottom: 1px solid #edf2f7;
+            }
+        }
+    }
+
+    &.striped tbody tr.even {
+        background: #f7f8fc;
+    }
+}
+
+.empty-message {
+    text-align: center;
+    color: #a0aec0;
+    padding: 40px 16px !important;
+    font-style: italic;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 14px 20px;
+    background: #f8f9fb;
+    border-top: 1px solid #e2e8f0;
+
+    .page-btn {
+        background: #667eea;
+        color: #fff;
+        border: none;
+        padding: 6px 16px;
+        border-radius: 6px;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover:not(:disabled) {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        &:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+        }
+    }
+
+    .page-info {
+        font-size: 13px;
+        color: #718096;
+        font-weight: 500;
+    }
+}

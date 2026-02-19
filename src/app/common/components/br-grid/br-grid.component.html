@@ -1,0 +1,14 @@
+<!--
+  BR-GRID FAÇADE TEMPLATE
+  ─────────────────────────
+  Conditionally renders the correct implementation based on UI_MODE.
+  Consumer code NEVER sees this switch — they only write <br-grid>.
+-->
+
+<!-- CUSTOM implementation -->
+<br-custom-grid *ngIf="uiMode === 'CUSTOM'" [config]="customConfig">
+</br-custom-grid>
+
+<!-- MATERIAL implementation -->
+<br-material-grid *ngIf="uiMode === 'MATERIAL'" [config]="materialConfig">
+</br-material-grid>

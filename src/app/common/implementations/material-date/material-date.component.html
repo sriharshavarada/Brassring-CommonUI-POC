@@ -1,0 +1,13 @@
+<!-- Material Date: Angular Material Datepicker Implementation -->
+<div class="material-date-wrapper">
+    <mat-form-field appearance="outline" class="date-field">
+        <mat-label>{{ config?.label }}<span class="required-marker" *ngIf="config?.required"> *</span></mat-label>
+        <input matInput [matDatepicker]="picker" [ngModel]="config?.value" (ngModelChange)="onDateChange($event)"
+            [min]="config?.minDate" [max]="config?.maxDate" [disabled]="config?.disabled || false"
+            [required]="config?.required || false" [placeholder]="config?.placeholder || ''">
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+        <mat-hint *ngIf="config?.errorMessage">{{ config.errorMessage }}</mat-hint>
+    </mat-form-field>
+    <span class="badge">Material</span>
+</div>

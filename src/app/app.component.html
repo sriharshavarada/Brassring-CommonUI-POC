@@ -1,0 +1,52 @@
+<!-- App Shell — Navigation + Router Outlet -->
+<div class="app-shell">
+  <!-- Top Navigation Bar -->
+  <nav class="top-nav">
+    <div class="nav-brand">
+      <span class="brand-icon">🔧</span>
+      <span class="brand-text">BR UI Framework</span>
+      <span class="brand-sub">POC</span>
+    </div>
+
+    <div class="nav-links">
+      <a routerLink="/users" routerLinkActive="active" class="nav-link">
+        <span class="nav-icon">👥</span>
+        Users
+      </a>
+      <a routerLink="/orders" routerLinkActive="active" class="nav-link">
+        <span class="nav-icon">📦</span>
+        Orders
+      </a>
+    </div>
+
+    <div class="nav-mode">
+      <span class="mode-dot" [class.custom]="currentMode === 'CUSTOM'"
+        [class.material]="currentMode === 'MATERIAL'"></span>
+      <span class="mode-text">{{ currentMode }} Mode</span>
+    </div>
+  </nav>
+
+  <!-- Banner showing architecture info -->
+  <div class="architecture-banner">
+    <div class="banner-content">
+      <span class="banner-icon">🏗️</span>
+      <span>
+        <strong>Architecture Demo:</strong>
+        Switch <code>UI_MODE</code> in
+        <code>common/config/ui-mode.config.ts</code>
+        between <code>'CUSTOM'</code> and <code>'MATERIAL'</code>
+        — all screens update automatically with <strong>zero consumer code changes</strong>.
+      </span>
+    </div>
+  </div>
+
+  <!-- Page Content -->
+  <main class="page-content">
+    <router-outlet></router-outlet>
+  </main>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <span>BR UI Abstraction Framework — Façade + Adapter + Strategy Pattern</span>
+  </footer>
+</div>

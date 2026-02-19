@@ -1,0 +1,14 @@
+<!--
+  BR-DATE FAÇADE TEMPLATE
+  ─────────────────────────
+  Conditionally renders the correct implementation based on UI_MODE.
+  Consumer code NEVER sees this switch — they only write <br-date>.
+-->
+
+<!-- CUSTOM implementation -->
+<br-custom-date *ngIf="uiMode === 'CUSTOM'" [config]="customConfig" (dateChange)="onCustomDateChange($event)">
+</br-custom-date>
+
+<!-- MATERIAL implementation -->
+<br-material-date *ngIf="uiMode === 'MATERIAL'" [config]="materialConfig" (dateChange)="onMaterialDateChange($event)">
+</br-material-date>

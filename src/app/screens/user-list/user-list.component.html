@@ -1,0 +1,37 @@
+<!-- User List Screen — Uses ONLY <br-grid> and <br-date> -->
+<div class="screen-container">
+    <!-- Screen Header -->
+    <div class="screen-header">
+        <div class="header-content">
+            <h1>👥 User Management</h1>
+            <p class="subtitle">Manage team members and their roles</p>
+        </div>
+        <div class="mode-indicator">
+            <span class="mode-label">Active UI Mode</span>
+            <span class="mode-value" [class.custom]="currentMode === 'CUSTOM'"
+                [class.material]="currentMode === 'MATERIAL'">
+                {{ currentMode }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Date Filter — using <br-date> -->
+    <div class="filter-section">
+        <h3>📅 Filters</h3>
+        <br-date [config]="joinDateConfig" (dateChange)="onJoinDateChange($event)">
+        </br-date>
+    </div>
+
+    <!-- Grid — using <br-grid> -->
+    <div class="grid-section">
+        <br-grid [config]="gridConfig"></br-grid>
+    </div>
+
+    <!-- Code Note -->
+    <div class="code-note">
+        <strong>💡 Developer Note:</strong> This screen uses only <code>&lt;br-grid&gt;</code> and
+        <code>&lt;br-date&gt;</code>. When you switch <code>UI_MODE</code> from
+        <code>'CUSTOM'</code> to <code>'MATERIAL'</code>, this file does NOT change — only the
+        rendering underneath changes automatically.
+    </div>
+</div>

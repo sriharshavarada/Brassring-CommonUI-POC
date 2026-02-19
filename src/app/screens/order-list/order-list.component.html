@@ -1,0 +1,41 @@
+<!-- Order List Screen — Uses ONLY <br-grid> and <br-date> -->
+<div class="screen-container">
+    <!-- Screen Header -->
+    <div class="screen-header">
+        <div class="header-content">
+            <h1>📦 Order Management</h1>
+            <p class="subtitle">Track orders, shipments, and deliveries</p>
+        </div>
+        <div class="mode-indicator">
+            <span class="mode-label">Active UI Mode</span>
+            <span class="mode-value" [class.custom]="currentMode === 'CUSTOM'"
+                [class.material]="currentMode === 'MATERIAL'">
+                {{ currentMode }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Date Filters — using <br-date> -->
+    <div class="filter-section">
+        <h3>📅 Filters</h3>
+        <div class="filter-row">
+            <br-date [config]="orderDateConfig" (dateChange)="onOrderDateChange($event)">
+            </br-date>
+            <br-date [config]="deliveryDateConfig" (dateChange)="onDeliveryDateChange($event)">
+            </br-date>
+        </div>
+    </div>
+
+    <!-- Grid — using <br-grid> -->
+    <div class="grid-section">
+        <br-grid [config]="gridConfig"></br-grid>
+    </div>
+
+    <!-- Code Note -->
+    <div class="code-note">
+        <strong>💡 Developer Note:</strong> Notice this screen uses TWO <code>&lt;br-date&gt;</code>
+        instances and one <code>&lt;br-grid&gt;</code> — all with different configs but the same
+        generic JSON schema. Switching <code>UI_MODE</code> changes ALL of them simultaneously,
+        with <strong>zero changes</strong> to this component.
+    </div>
+</div>

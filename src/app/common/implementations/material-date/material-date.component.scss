@@ -1,0 +1,28 @@
+/* ─── Material Date Styles ──────────────────────────────── */
+.material-date-wrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    max-width: 360px;
+
+    .date-field {
+        flex: 1;
+    }
+
+    .badge {
+        margin-top: 12px;
+        background: linear-gradient(135deg, #43a047, #1b5e20);
+        color: #fff;
+        padding: 3px 10px;
+        border-radius: 8px;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .required-marker {
+        color: #e53e3e;
+    }
+}
