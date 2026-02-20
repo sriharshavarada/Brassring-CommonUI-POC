@@ -1,0 +1,24 @@
+<div class="mat-modal-backdrop" *ngIf="config.isOpen" (click)="onBackdropClick()">
+    <div class="mat-elevation-z8" [ngClass]="modalClasses" (click)="$event.stopPropagation()">
+
+        <div class="modal-header">
+            <h2 mat-dialog-title *ngIf="config.title">{{ config.title }}</h2>
+            <button mat-icon-button *ngIf="config.uiConfig.showCloseButton" (click)="onCloseClick()" class="close-btn">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+
+        <div mat-dialog-content>
+            <p *ngIf="config.subtitle" class="subtitle text-secondary">{{ config.subtitle }}</p>
+            <div [innerHTML]="config.content"></div>
+        </div>
+
+        <div mat-dialog-actions align="end" *ngIf="config.actions && config.actions.length > 0">
+            <button *ngFor="let action of config.actions" mat-button
+                [color]="action.type === 'primary' ? 'primary' : (action.type === 'danger' ? 'warn' : '')"
+                [disabled]="action.disabled" (click)="onActionClick(action.id, action.label)">
+                {{ action.label }}
+            </button>
+        </div>
+    </div>
+</div>

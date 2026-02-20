@@ -1,0 +1,9 @@
+<!-- CUSTOM implementation -->
+<br-custom-modal *ngIf="uiMode === 'CUSTOM'" [config]="customConfig" (action)="onModalAction($event)"
+    (close)="onModalClose()">
+</br-custom-modal>
+
+<!-- MATERIAL implementation -->
+<br-material-modal *ngIf="uiMode === 'MATERIAL'" [config]="materialConfig" (action)="onModalAction($event)"
+    (close)="onModalClose()">
+</br-material-modal>

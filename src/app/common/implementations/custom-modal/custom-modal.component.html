@@ -1,0 +1,44 @@
+<div class="modal-overlay" 
+     *ngIf="config.isOpen" 
+     (click)="onBackdropClick()" 
+     [ngClass]="overlayClasses" 
+     [ngStyle]="overlayStyles">
+    
+    <div class="modal-container" 
+         (click)="$event.stopPropagation()" 
+         [ngClass]="modalClasses">
+        
+        <!-- Header -->
+        <div class="modal-header">
+            <div class="header-content">
+                <h2 class="modal-title" *ngIf="config.title">{{ config.title }}</h2>
+                <p class="modal-subtitle" *ngIf="config.subtitle">{{ config.subtitle }}</p>
+            </div>
+            <button type="button" 
+                    class="close-button" 
+                    *ngIf="config.uiConfig.showCloseButton" 
+                    (click)="onCloseClick()">
+                ✕
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+            <!-- Allow HTML content via [innerHTML] or simple projection if we were using ng-content -->
+            <div [innerHTML]="config.content"></div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer" *ngIf="config.actions && config.actions.length > 0">
+            <button *ngFor="let action of config.actions"
+                    type="button" 
+                    class="action-button" 
+                    [class]="'btn-' + (action.type || 'secondary')"
+                    [disabled]="action.disabled"
+                    (click)="onActionClick(action.id, action.label)">
+                <span class="icon" *ngIf="action.icon">{{ action.icon }}</span>
+                {{ action.label }}
+            </button>
+        </div>
+    </div>
+</div>

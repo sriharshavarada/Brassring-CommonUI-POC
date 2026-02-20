@@ -20,6 +20,7 @@
 // ─── Wrapper Components (Façades) ────────────────────────────
 export { BrGridComponent } from './components/br-grid/br-grid.component';
 export { BrDateComponent } from './components/br-date/br-date.component';
+export { BrModalComponent } from './components/br-modal/br-modal.component';
 
 // ─── Configuration Models (JSON Schemas) ─────────────────────
 export type {
@@ -37,8 +38,9 @@ export type {
     BrGridFilterRule,
 } from './models/grid-config.model';
 export type { BrDateConfig, BrDateUiConfig } from './models/date-config.model';
+export type { BrModalConfig, BrModalUiConfig, BrModalAction, BrModalActionEvent } from './models/modal-config.model';
 
 // ─── UI Mode Config (for display/debug purposes) ────────────
 export { UI_MODE_BY_CONTROL } from './config/ui-mode.config';
 export { UI_MODE } from './config/ui-mode.config';
-export type { UiMode, DateUiMode, UiModeByControl } from './config/ui-mode.config';
+export type { UiMode, DateUiMode, ModalUiMode, UiModeByControl } from './config/ui-mode.config';

@@ -23,15 +23,19 @@
 
 export type UiMode = 'CUSTOM' | 'MATERIAL' | 'CANVAS';
 export type DateUiMode = 'CUSTOM' | 'MATERIAL';
+export type ModalUiMode = 'CUSTOM' | 'MATERIAL';
+
 export interface UiModeByControl {
     grid: UiMode;
     date: DateUiMode;
+    modal: ModalUiMode;
 }
 
 // ▼▼▼ CHANGE THESE VALUES TO SWITCH CONTROL LIBRARIES ▼▼▼
 export const UI_MODE_BY_CONTROL: UiModeByControl = {
     grid: 'CUSTOM',
     date: 'MATERIAL',
+    modal: 'CUSTOM',
 };
 // ▲▲▲ CHANGE THESE VALUES TO SWITCH CONTROL LIBRARIES ▲▲▲
 

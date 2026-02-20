@@ -1,0 +1,29 @@
+<div class="demo-container">
+    <header class="demo-header">
+        <h1>Generic Modal Abstraction</h1>
+        <p>Demonstrating the <code>br-modal</code> component which wraps multiple implementations.</p>
+    </header>
+
+    <div class="demo-actions">
+        <button class="demo-btn primary" (click)="openInfoModal()">Open Info Modal</button>
+        <button class="demo-btn secondary" (click)="openConfirmModal()">Open Confirm Modal</button>
+        <button class="demo-btn danger" (click)="openDeleteModal()">Open Delete Modal</button>
+    </div>
+
+    <section class="code-preview">
+        <h3>Sample: <code>deleteModalConfig</code></h3>
+        <p>This is the JSON data currently being passed to the <code>[config]</code> input of the Delete Modal:</p>
+        <pre><code class="json">{{ deleteModalConfig | json }}</code></pre>
+    </section>
+
+    <!-- Generic Modals -->
+    <br-modal [config]="infoModalConfig" (action)="onModalAction($event, 'info')" (close)="onModalClose('info')">
+    </br-modal>
+
+    <br-modal [config]="confirmModalConfig" (action)="onModalAction($event, 'confirm')"
+        (close)="onModalClose('confirm')">
+    </br-modal>
+
+    <br-modal [config]="deleteModalConfig" (action)="onModalAction($event, 'delete')" (close)="onModalClose('delete')">
+    </br-modal>
+</div>

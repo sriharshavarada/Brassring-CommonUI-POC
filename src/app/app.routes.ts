@@ -16,4 +16,9 @@ export const routes: Routes = [
         loadComponent: () =>
             import('./screens/order-list/order-list.component').then(m => m.OrderListComponent),
     },
+    {
+        path: 'modals',
+        loadComponent: () =>
+            import('./screens/modal-demo/modal-demo.component').then(m => m.ModalDemoComponent),
+    },
 ];
