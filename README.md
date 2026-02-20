@@ -61,6 +61,8 @@ For more information on using the Angular CLI, including detailed command refere
 
 ## Documentation
 
+- Project handoff (start here):
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/docs/00-project-handoff-so-far.md`
 - High-level architecture:
   - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/docs/01-high-level-architecture.md`
 - Runtime flow (browser URL to rendered controls):
