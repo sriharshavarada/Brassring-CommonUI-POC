@@ -11,6 +11,18 @@
  * ============================================================
  */
 
+export interface BrModalField {
+    id: string;
+    type: 'text' | 'number' | 'radio' | 'checkbox' | 'select' | 'textarea' | 'date';
+    label: string;
+    value?: any;
+    placeholder?: string;
+    options?: { label: string; value: any }[]; // For radio, select
+    required?: boolean;
+    disabled?: boolean;
+    colSpan?: 1 | 2; // Simple layout support: 1 col or 2 col span
+}
+
 export interface BrModalAction {
     id: string;
     label: string;
@@ -44,6 +56,12 @@ export interface BrModalConfig {
      */
     content?: string;
 
+    /**
+     * Generic form fields to render in the modal body.
+     * If provided, these will be rendered after the 'content' HTML.
+     */
+    fields?: BrModalField[];
+
     /** Footer actions */
     actions?: BrModalAction[];
 
@@ -54,4 +72,7 @@ export interface BrModalConfig {
 export interface BrModalActionEvent {
     actionId: string;
     label?: string;
+    /** Current values of all fields in the modal, keyed by field ID */
+    fieldValues?: Record<string, any>;
 }
+

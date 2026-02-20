@@ -8,7 +8,7 @@
  * ============================================================
  */
 
-import { BrModalConfig, BrModalUiConfig, BrModalAction } from '../models/modal-config.model';
+import { BrModalConfig, BrModalUiConfig, BrModalAction, BrModalField } from '../models/modal-config.model';
 
 // ─── Custom Modal adapted output ──────────────────────────────
 export interface CustomModalInput {
@@ -16,6 +16,7 @@ export interface CustomModalInput {
     title: string;
     subtitle: string;
     content: string;
+    fields: BrModalField[];
     actions: BrModalAction[];
     uiConfig: Required<Omit<BrModalUiConfig, 'tokens' | 'className'>> & {
         className: string;
@@ -29,6 +30,7 @@ export interface MaterialModalInput {
     title: string;
     subtitle: string;
     content: string;
+    fields: BrModalField[];
     actions: BrModalAction[];
     uiConfig: Required<Omit<BrModalUiConfig, 'tokens' | 'className'>> & {
         className: string;
@@ -47,6 +49,7 @@ export class ModalAdapter {
             title: config.title || '',
             subtitle: config.subtitle || '',
             content: config.content || '',
+            fields: config.fields || [],
             actions: config.actions || [],
             uiConfig: {
                 size: config.uiConfig?.size ?? 'md',
@@ -69,6 +72,7 @@ export class ModalAdapter {
             title: config.title || '',
             subtitle: config.subtitle || '',
             content: config.content || '',
+            fields: config.fields || [],
             actions: config.actions || [],
             uiConfig: {
                 size: config.uiConfig?.size ?? 'md',
@@ -80,3 +84,4 @@ export class ModalAdapter {
         };
     }
 }
+

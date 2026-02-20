@@ -62,6 +62,16 @@
                 background: #dc2626;
             }
         }
+
+        &.accent {
+            background: #059669;
+            color: white;
+
+            &:hover {
+                background: #047857;
+            }
+        }
+
     }
 }
 

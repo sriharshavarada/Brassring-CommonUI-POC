@@ -10,8 +10,61 @@
 
         <div mat-dialog-content>
             <p *ngIf="config.subtitle" class="subtitle text-secondary">{{ config.subtitle }}</p>
-            <div [innerHTML]="config.content"></div>
+            <div [innerHTML]="config.content" *ngIf="config.content"></div>
+
+            <div class="modal-fields-container" *ngIf="config.fields && config.fields.length > 0">
+                <div *ngFor="let field of config.fields" [class]="'field-wrapper col-' + (field.colSpan || 1)">
+
+                    <!-- Text / Number / Date Input -->
+                    <mat-form-field appearance="outline" class="full-width"
+                        *ngIf="['text', 'number', 'date'].includes(field.type)">
+                        <mat-label>{{ field.label }}</mat-label>
+                        <input matInput [type]="field.type === 'date' ? 'date' : field.type"
+                            [placeholder]="field.placeholder || ''" [(ngModel)]="fieldValues[field.id]"
+                            [name]="field.id" [required]="field.required || false" [disabled]="field.disabled || false">
+                    </mat-form-field>
+
+                    <!-- Textarea -->
+                    <mat-form-field appearance="outline" class="full-width" *ngIf="field.type === 'textarea'">
+                        <mat-label>{{ field.label }}</mat-label>
+                        <textarea matInput [placeholder]="field.placeholder || ''" [(ngModel)]="fieldValues[field.id]"
+                            [name]="field.id" [required]="field.required || false"
+                            [disabled]="field.disabled || false"></textarea>
+                    </mat-form-field>
+
+                    <!-- Select -->
+                    <mat-form-field appearance="outline" class="full-width" *ngIf="field.type === 'select'">
+                        <mat-label>{{ field.label }}</mat-label>
+                        <mat-select [(ngModel)]="fieldValues[field.id]" [name]="field.id"
+                            [required]="field.required || false" [disabled]="field.disabled || false">
+                            <mat-option *ngFor="let opt of field.options" [value]="opt.value">
+                                {{ opt.label }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+
+                    <!-- Radio -->
+                    <div *ngIf="field.type === 'radio'" class="radio-group-container">
+                        <label class="field-label">{{ field.label }}</label>
+                        <mat-radio-group [(ngModel)]="fieldValues[field.id]" [name]="field.id"
+                            [disabled]="field.disabled || false">
+                            <mat-radio-button *ngFor="let opt of field.options" [value]="opt.value">
+                                {{ opt.label }}
+                            </mat-radio-button>
+                        </mat-radio-group>
+                    </div>
+
+                    <!-- Checkbox -->
+                    <div *ngIf="field.type === 'checkbox'" class="checkbox-container">
+                        <mat-checkbox [(ngModel)]="fieldValues[field.id]" [name]="field.id"
+                            [disabled]="field.disabled || false">
+                            {{ field.label }}
+                        </mat-checkbox>
+                    </div>
+                </div>
+            </div>
         </div>
+
 
         <div mat-dialog-actions align="end" *ngIf="config.actions && config.actions.length > 0">
             <button *ngFor="let action of config.actions" mat-button

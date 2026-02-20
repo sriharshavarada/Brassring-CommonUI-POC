@@ -1,23 +1,15 @@
-<div class="modal-overlay" 
-     *ngIf="config.isOpen" 
-     (click)="onBackdropClick()" 
-     [ngClass]="overlayClasses" 
-     [ngStyle]="overlayStyles">
-    
-    <div class="modal-container" 
-         (click)="$event.stopPropagation()" 
-         [ngClass]="modalClasses">
-        
+<div class="modal-overlay" *ngIf="config.isOpen" (click)="onBackdropClick()" [ngClass]="overlayClasses"
+    [ngStyle]="overlayStyles">
+
+    <div class="modal-container" (click)="$event.stopPropagation()" [ngClass]="modalClasses">
+
         <!-- Header -->
         <div class="modal-header">
             <div class="header-content">
                 <h2 class="modal-title" *ngIf="config.title">{{ config.title }}</h2>
                 <p class="modal-subtitle" *ngIf="config.subtitle">{{ config.subtitle }}</p>
             </div>
-            <button type="button" 
-                    class="close-button" 
-                    *ngIf="config.uiConfig.showCloseButton" 
-                    (click)="onCloseClick()">
+            <button type="button" class="close-button" *ngIf="config.uiConfig.showCloseButton" (click)="onCloseClick()">
                 ✕
             </button>
         </div>
@@ -25,17 +17,57 @@
         <!-- Body -->
         <div class="modal-body">
             <!-- Allow HTML content via [innerHTML] or simple projection if we were using ng-content -->
-            <div [innerHTML]="config.content"></div>
+            <div [innerHTML]="config.content" *ngIf="config.content"></div>
+
+            <div class="modal-fields-container" *ngIf="config.fields && config.fields.length > 0">
+                <div *ngFor="let field of config.fields" [class]="'field-wrapper col-' + (field.colSpan || 1)">
+
+                    <label [for]="field.id" class="field-label">{{ field.label }}</label>
+
+                    <!-- Text / Number / Date Input -->
+                    <input *ngIf="['text', 'number', 'date'].includes(field.type)" [id]="field.id" [type]="field.type"
+                        class="form-control" [placeholder]="field.placeholder || ''" [(ngModel)]="fieldValues[field.id]"
+                        [required]="field.required || false" [disabled]="field.disabled || false">
+
+                    <!-- Textarea -->
+                    <textarea *ngIf="field.type === 'textarea'" [id]="field.id" class="form-control"
+                        [placeholder]="field.placeholder || ''" [(ngModel)]="fieldValues[field.id]"
+                        [required]="field.required || false" [disabled]="field.disabled || false"></textarea>
+
+                    <!-- Select -->
+                    <select *ngIf="field.type === 'select'" [id]="field.id" class="form-control"
+                        [(ngModel)]="fieldValues[field.id]" [required]="field.required || false"
+                        [disabled]="field.disabled || false">
+                        <option *ngFor="let opt of field.options" [value]="opt.value">
+                            {{ opt.label }}
+                        </option>
+                    </select>
+
+                    <!-- Radio -->
+                    <div *ngIf="field.type === 'radio'" class="radio-group">
+                        <div *ngFor="let opt of field.options" class="radio-item">
+                            <input type="radio" [id]="field.id + '_' + opt.value" [name]="field.id" [value]="opt.value"
+                                [(ngModel)]="fieldValues[field.id]" [disabled]="field.disabled || false">
+                            <label [for]="field.id + '_' + opt.value">{{ opt.label }}</label>
+                        </div>
+                    </div>
+
+                    <!-- Checkbox -->
+                    <div *ngIf="field.type === 'checkbox'" class="checkbox-item">
+                        <input type="checkbox" [id]="field.id" [(ngModel)]="fieldValues[field.id]"
+                            [disabled]="field.disabled || false">
+                        <label [for]="field.id">{{ field.label }}</label>
+                    </div>
+                </div>
+            </div>
         </div>
+
 
         <!-- Footer -->
         <div class="modal-footer" *ngIf="config.actions && config.actions.length > 0">
-            <button *ngFor="let action of config.actions"
-                    type="button" 
-                    class="action-button" 
-                    [class]="'btn-' + (action.type || 'secondary')"
-                    [disabled]="action.disabled"
-                    (click)="onActionClick(action.id, action.label)">
+            <button *ngFor="let action of config.actions" type="button" class="action-button"
+                [class]="'btn-' + (action.type || 'secondary')" [disabled]="action.disabled"
+                (click)="onActionClick(action.id, action.label)">
                 <span class="icon" *ngIf="action.icon">{{ action.icon }}</span>
                 {{ action.label }}
             </button>

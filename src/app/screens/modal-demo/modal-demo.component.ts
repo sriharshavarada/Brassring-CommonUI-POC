@@ -75,6 +75,44 @@ export class ModalDemoComponent {
         }
     };
 
+    // Config for a Generic Form Modal
+    dynamicFormModalConfig: BrModalConfig = {
+        isOpen: false,
+        title: 'User Profile Update',
+        subtitle: 'Enter the details to update your generic profile.',
+        content: '<p>Please fill out the following system-generated fields:</p>',
+        fields: [
+            { id: 'firstName', type: 'text', label: 'First Name', placeholder: 'Enter first name', required: true, colSpan: 1 },
+            { id: 'lastName', type: 'text', label: 'Last Name', placeholder: 'Enter last name', required: true, colSpan: 1 },
+            { id: 'email', type: 'text', label: 'Email Address', placeholder: 'john.doe@example.com', colSpan: 2 },
+            { id: 'birthDate', type: 'date', label: 'Date of Birth', colSpan: 1 },
+            {
+                id: 'userRole', type: 'select', label: 'System Role', colSpan: 1, options: [
+                    { label: 'Administrator', value: 'admin' },
+                    { label: 'Editor', value: 'editor' },
+                    { label: 'Viewer', value: 'viewer' }
+                ]
+            },
+            { id: 'biography', type: 'textarea', label: 'Short Bio', placeholder: 'Tell us about yourself...', colSpan: 2 },
+            {
+                id: 'notificationType', type: 'radio', label: 'Contact Preference', colSpan: 1, options: [
+                    { label: 'Email', value: 'email' },
+                    { label: 'SMS', value: 'sms' },
+                    { label: 'None', value: 'none' }
+                ]
+            },
+            { id: 'subscribe', type: 'checkbox', label: 'Subscribe to newsletter', colSpan: 1 }
+        ],
+        actions: [
+            { id: 'cancel', label: 'Cancel', type: 'ghost' },
+            { id: 'save', label: 'Save Changes', type: 'primary' }
+        ],
+        uiConfig: {
+            size: 'lg',
+            showCloseButton: true
+        }
+    };
+
     openInfoModal() {
         this.infoModalConfig = { ...this.infoModalConfig, isOpen: true };
     }
@@ -87,12 +125,26 @@ export class ModalDemoComponent {
         this.deleteModalConfig = { ...this.deleteModalConfig, isOpen: true };
     }
 
-    onModalAction(event: BrModalActionEvent, type: 'info' | 'confirm' | 'delete') {
+    openFormModal() {
+        this.dynamicFormModalConfig = { ...this.dynamicFormModalConfig, isOpen: true };
+    }
+
+    onModalAction(event: BrModalActionEvent, type: 'info' | 'confirm' | 'delete' | 'form') {
         console.log(`Modal Action [${type}]:`, event);
+
+        if (event.fieldValues) {
+            console.log('Submitted Field Values:', event.fieldValues);
+        }
+
         if (type === 'info') {
             this.infoModalConfig = { ...this.infoModalConfig, isOpen: false };
         } else if (type === 'confirm') {
             this.confirmModalConfig = { ...this.confirmModalConfig, isOpen: false };
+        } else if (type === 'form') {
+            if (event.actionId === 'save') {
+                alert(`Form Saved! Check console for values.\nName: ${event.fieldValues?.['firstName']} ${event.fieldValues?.['lastName']}`);
+            }
+            this.dynamicFormModalConfig = { ...this.dynamicFormModalConfig, isOpen: false };
         } else {
             // Delete logic
             if (event.actionId === 'delete') {
@@ -102,14 +154,17 @@ export class ModalDemoComponent {
         }
     }
 
-    onModalClose(type: 'info' | 'confirm' | 'delete') {
+    onModalClose(type: 'info' | 'confirm' | 'delete' | 'form') {
         console.log(`Modal Closed [${type}]`);
         if (type === 'info') {
             this.infoModalConfig = { ...this.infoModalConfig, isOpen: false };
         } else if (type === 'confirm') {
             this.confirmModalConfig = { ...this.confirmModalConfig, isOpen: false };
+        } else if (type === 'form') {
+            this.dynamicFormModalConfig = { ...this.dynamicFormModalConfig, isOpen: false };
         } else {
             this.deleteModalConfig = { ...this.deleteModalConfig, isOpen: false };
         }
     }
+
 }

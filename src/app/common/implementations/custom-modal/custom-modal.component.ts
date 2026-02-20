@@ -7,22 +7,37 @@
  * ============================================================
  */
 
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { CustomModalInput } from '../../adapters/modal.adapter';
 import { BrModalActionEvent } from '../../models/modal-config.model';
 
 @Component({
     selector: 'br-custom-modal',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, FormsModule],
     templateUrl: './custom-modal.component.html',
     styleUrls: ['./custom-modal.component.scss'],
 })
-export class CustomModalComponent {
+export class CustomModalComponent implements OnChanges {
     @Input() config!: CustomModalInput;
     @Output() action = new EventEmitter<BrModalActionEvent>();
     @Output() close = new EventEmitter<void>();
+
+    /** Local state for form field values */
+    fieldValues: Record<string, any> = {};
+
+    ngOnChanges(changes: SimpleChanges): void {
+        if (changes['config'] && this.config?.fields) {
+            // Initialize or update field values from config
+            this.config.fields.forEach(field => {
+                if (this.fieldValues[field.id] === undefined) {
+                    this.fieldValues[field.id] = field.value ?? (field.type === 'checkbox' ? false : '');
+                }
+            });
+        }
+    }
 
     get overlayClasses(): string[] {
         const classes = [];
@@ -47,8 +62,14 @@ export class CustomModalComponent {
     }
 
     onActionClick(actionId: string, label: string): void {
-        this.action.emit({ actionId, label });
+
+        this.action.emit({
+            actionId,
+            label,
+            fieldValues: { ...this.fieldValues }
+        });
     }
+
 
     onBackdropClick(): void {
         if (this.config.uiConfig.isDismissible) {

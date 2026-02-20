@@ -8,12 +8,13 @@
         <button class="demo-btn primary" (click)="openInfoModal()">Open Info Modal</button>
         <button class="demo-btn secondary" (click)="openConfirmModal()">Open Confirm Modal</button>
         <button class="demo-btn danger" (click)="openDeleteModal()">Open Delete Modal</button>
+        <button class="demo-btn primary accent" (click)="openFormModal()">Open Dynamic Form Modal</button>
     </div>
 
     <section class="code-preview">
-        <h3>Sample: <code>deleteModalConfig</code></h3>
-        <p>This is the JSON data currently being passed to the <code>[config]</code> input of the Delete Modal:</p>
-        <pre><code class="json">{{ deleteModalConfig | json }}</code></pre>
+        <h3>Sample: <code>dynamicFormModalConfig</code></h3>
+        <p>This is the JSON data passed to the <code>[config]</code> input of the Dynamic Form Modal:</p>
+        <pre><code class="json">{{ dynamicFormModalConfig | json }}</code></pre>
     </section>
 
     <!-- Generic Modals -->
@@ -26,4 +27,8 @@
 
     <br-modal [config]="deleteModalConfig" (action)="onModalAction($event, 'delete')" (close)="onModalClose('delete')">
     </br-modal>
+
+    <br-modal [config]="dynamicFormModalConfig" (action)="onModalAction($event, 'form')" (close)="onModalClose('form')">
+    </br-modal>
+
 </div>
