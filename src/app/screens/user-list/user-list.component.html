@@ -24,7 +24,7 @@
 
     <!-- Grid — using <br-grid> -->
     <div class="grid-section">
-        <br-grid [config]="gridConfig"></br-grid>
+        <br-grid [config]="gridConfig" (action)="onGridAction($event)"></br-grid>
     </div>
 
     <!-- Code Note -->

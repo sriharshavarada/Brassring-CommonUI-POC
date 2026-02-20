@@ -22,6 +22,7 @@ import {
     BrGridComponent,
     BrDateComponent,
     BrGridConfig,
+    BrGridActionEvent,
     BrDateConfig,
     UI_MODE
 } from '../../common';
@@ -68,6 +69,67 @@ export class UserListComponent {
         pageSize: 5,
         sorting: true,
         striped: true,
+        toolbar: {
+            showSort: true,
+            showFilter: true,
+            showSearch: true,
+            showRefresh: true,
+            showColumnSettings: true,
+            showShare: true,
+            showViewMode: true,
+            primaryActionLabel: 'Add User',
+            primaryActions: [
+                { id: 'add-single', label: 'Add User' },
+                { id: 'add-bulk', label: 'Bulk Import' },
+            ],
+        },
+        selectionActions: [
+            { id: 'activate', label: 'Activate' },
+            { id: 'deactivate', label: 'Deactivate' },
+            { id: 'export', label: 'Export Selected' },
+        ],
+        contextMenuActions: [
+            { id: 'view', label: 'View Profile' },
+            { id: 'edit', label: 'Edit User' },
+            { id: 'reset-password', label: 'Reset Password' },
+            { id: 'disable', label: 'Disable User' },
+        ],
+        personalization: {
+            availableColumns: [
+                { field: 'id', label: 'User ID', group: 'Core' },
+                { field: 'name', label: 'Name', group: 'Core' },
+                { field: 'email', label: 'Email', group: 'Core' },
+                { field: 'role', label: 'Role', group: 'Access' },
+                { field: 'status', label: 'Status', group: 'Access' },
+            ],
+            selectedColumns: ['id', 'name', 'email', 'role', 'status'],
+            maxSelectedColumns: 8,
+            searchPlaceholder: 'Search user columns',
+        },
+        defaultSort: [{ field: 'name', direction: 'asc' }],
+        defaultFilters: [{ field: 'status', operator: 'contains', value: 'Active' }],
+        features: {
+            enableRowSelection: true,
+            enableSelectionActions: true,
+            enableContextMenu: true,
+            enableRowActionButton: true,
+            enableColumnPersonalization: true,
+            enableColumnVisibilityToggle: true,
+            enableColumnReorder: true,
+            enableSorting: true,
+            sortLevels: 3,
+            enableFiltering: true,
+            filterLevels: 3,
+            enableSearch: true,
+            enableRefresh: true,
+            enableShare: true,
+            enableViewMode: true,
+            enablePrimaryAction: true,
+            enablePrimaryActionMenu: true,
+            showPaginationSizeSelector: true,
+            showPaginationSummary: true,
+            showPaginationNavigation: true,
+        },
     };
 
     /**
@@ -87,5 +149,10 @@ export class UserListComponent {
     /** Handle date change events generically */
     onJoinDateChange(value: string): void {
         console.log('[UserList] Join date changed:', value);
+    }
+
+    onGridAction(event: BrGridActionEvent): void {
+        // Business actions should be handled by screen/service code.
+        console.log('[UserList] Grid action:', event);
     }
 }

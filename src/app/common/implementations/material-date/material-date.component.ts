@@ -36,6 +36,30 @@ export class MaterialDateComponent {
     @Input() config!: MaterialDateInput;
     @Output() dateChange = new EventEmitter<Date | null>();
 
+    get wrapperClasses(): string[] {
+        const classes = [
+            `density-${this.config.uiConfig.density}`,
+            `size-${this.config.uiConfig.size}`,
+            `variant-${this.config.uiConfig.variant}`,
+        ];
+        if (this.config.uiConfig.className) {
+            classes.push(this.config.uiConfig.className);
+        }
+        return classes;
+    }
+
+    get wrapperStyles(): Record<string, string> {
+        const styles: Record<string, string> = {};
+        Object.entries(this.config.uiConfig.tokens || {}).forEach(([key, value]) => {
+            styles[`--date-${key}`] = String(value);
+        });
+        return styles;
+    }
+
+    get appearance(): 'outline' | 'fill' {
+        return this.config.uiConfig.variant === 'filled' ? 'fill' : 'outline';
+    }
+
     onDateChange(value: Date | null): void {
         this.dateChange.emit(value);
     }

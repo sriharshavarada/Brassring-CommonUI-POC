@@ -4,18 +4,24 @@
     align-items: flex-start;
     gap: 10px;
     max-width: 360px;
+    --date-fieldWidth: 1fr;
+    --date-badgeMarginTop: 12px;
+    --date-badgeSize: 10px;
+    --date-scale: 1;
 
     .date-field {
-        flex: 1;
+        flex: var(--date-fieldWidth);
+        transform: scale(var(--date-scale));
+        transform-origin: left center;
     }
 
     .badge {
-        margin-top: 12px;
+        margin-top: var(--date-badgeMarginTop);
         background: linear-gradient(135deg, #43a047, #1b5e20);
         color: #fff;
         padding: 3px 10px;
         border-radius: 8px;
-        font-size: 10px;
+        font-size: var(--date-badgeSize);
         font-weight: 600;
         letter-spacing: 0.5px;
         text-transform: uppercase;
@@ -24,5 +30,37 @@
 
     .required-marker {
         color: #e53e3e;
+    }
+}
+
+.density-compact {
+    --date-scale: 0.92;
+}
+
+.density-comfortable {
+    --date-scale: 1;
+}
+
+.density-spacious {
+    --date-scale: 1.06;
+}
+
+.size-sm {
+    max-width: 280px;
+}
+
+.size-md {
+    max-width: 360px;
+}
+
+.size-lg {
+    max-width: 460px;
+}
+
+.variant-plain {
+    ::ng-deep .mat-mdc-text-field-wrapper {
+        background: transparent !important;
+        border-bottom: 1px solid #d2d7e6;
+        border-radius: 0 !important;
     }
 }

@@ -1,17 +1,17 @@
 <!-- Custom Date: Native HTML Date Input -->
-<div class="custom-date-wrapper">
-    <label class="date-label" *ngIf="config?.label">
+<div class="custom-date-wrapper" [ngClass]="wrapperClasses" [ngStyle]="wrapperStyles">
+    <label class="date-label" *ngIf="config.label">
         {{ config.label }}
-        <span class="required-marker" *ngIf="config?.required">*</span>
+        <span class="required-marker" *ngIf="config.required">*</span>
     </label>
     <div class="input-container">
-        <span class="input-icon">📅</span>
-        <input type="date" class="date-input" [ngModel]="config?.value" (ngModelChange)="onDateChange($event)"
-            [attr.min]="config?.minDate" [attr.max]="config?.maxDate" [disabled]="config?.disabled || false"
-            [required]="config?.required || false" [placeholder]="config?.placeholder || ''" />
-        <span class="badge">Custom</span>
+        <span class="input-icon" *ngIf="config.uiConfig.showIcon">📅</span>
+        <input type="date" class="date-input" [ngModel]="config.value" (ngModelChange)="onDateChange($event)"
+            [attr.min]="config.minDate" [attr.max]="config.maxDate" [disabled]="config.disabled"
+            [required]="config.required" [placeholder]="config.placeholder" />
+        <span class="badge" *ngIf="config.uiConfig.showBadge">Custom</span>
     </div>
-    <span class="error-text" *ngIf="config?.errorMessage">
+    <span class="error-text" *ngIf="config.errorMessage">
         {{ config.errorMessage }}
     </span>
 </div>

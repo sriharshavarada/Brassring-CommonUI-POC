@@ -20,6 +20,7 @@ import {
     BrGridComponent,
     BrDateComponent,
     BrGridConfig,
+    BrGridActionEvent,
     BrDateConfig,
     UI_MODE
 } from '../../common';
@@ -64,6 +65,69 @@ export class OrderListComponent {
         pageSize: 5,
         sorting: true,
         striped: true,
+        toolbar: {
+            showSort: true,
+            showFilter: true,
+            showSearch: true,
+            showRefresh: true,
+            showColumnSettings: true,
+            showShare: true,
+            showViewMode: true,
+            primaryActionLabel: 'Add Order',
+            primaryActions: [
+                { id: 'new-order', label: 'New Order' },
+                { id: 'clone-order', label: 'Clone Selected' },
+            ],
+        },
+        selectionActions: [
+            { id: 'ship', label: 'Ship' },
+            { id: 'mark-delivered', label: 'Mark Delivered' },
+            { id: 'cancel', label: 'Cancel Order' },
+        ],
+        contextMenuActions: [
+            { id: 'open', label: 'Open Details' },
+            { id: 'edit', label: 'Edit Order' },
+            { id: 'save-as-new', label: 'Save As New' },
+            { id: 'status', label: 'Update Status' },
+        ],
+        personalization: {
+            availableColumns: [
+                { field: 'orderId', label: 'Order Number', group: 'Order' },
+                { field: 'customer', label: 'Customer', group: 'Order' },
+                { field: 'product', label: 'Product', group: 'Order' },
+                { field: 'amount', label: 'Amount', group: 'Finance' },
+                { field: 'date', label: 'Order Date', group: 'Timeline' },
+                { field: 'status', label: 'Status', group: 'Timeline' },
+            ],
+            selectedColumns: ['orderId', 'customer', 'product', 'amount', 'date', 'status'],
+            maxSelectedColumns: 10,
+            searchPlaceholder: 'Search order columns',
+        },
+        defaultSort: [{ field: 'date', direction: 'desc' }],
+        defaultFilters: [{ field: 'status', operator: 'contains', value: 'Pending' }],
+        features: {
+            enableTopBar: false,
+            enableRowSelection: false,
+            enableSelectionActions: false,
+            enableContextMenu: false,
+            enableRowActionButton: false,
+            enableColumnPersonalization: false,
+            enableColumnVisibilityToggle: false,
+            enableColumnReorder: false,
+            enableSorting: true,
+            sortLevels: 4,
+            enableFiltering: false,
+            filterLevels: 2,
+            enableSearch: false,
+            enableRefresh: false,
+            enableShare: false,
+            enableViewMode: false,
+            enablePrimaryAction: false,
+            enablePrimaryActionMenu: false,
+            showPaginationSizeSelector: true,
+            showPaginationSummary: true,
+            showPaginationNavigation: true,
+        },
     };
 
     /**
@@ -95,5 +159,10 @@ export class OrderListComponent {
 
     onDeliveryDateChange(value: string): void {
         console.log('[OrderList] Delivery date changed:', value);
+    }
+
+    onGridAction(event: BrGridActionEvent): void {
+        // Business actions should be handled by screen/service code.
+        console.log('[OrderList] Grid action:', event);
     }
 }

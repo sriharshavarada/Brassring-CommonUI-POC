@@ -6,9 +6,13 @@
 -->
 
 <!-- CUSTOM implementation -->
-<br-custom-grid *ngIf="uiMode === 'CUSTOM'" [config]="customConfig">
+<br-custom-grid *ngIf="uiMode === 'CUSTOM'" [config]="customConfig" (action)="onGridAction($event)">
 </br-custom-grid>
 
 <!-- MATERIAL implementation -->
-<br-material-grid *ngIf="uiMode === 'MATERIAL'" [config]="materialConfig">
+<br-material-grid *ngIf="uiMode === 'MATERIAL'" [config]="materialConfig" (action)="onGridAction($event)">
 </br-material-grid>
+
+<!-- CANVAS implementation -->
+<br-canvas-grid *ngIf="uiMode === 'CANVAS'" [config]="canvasConfig" (action)="onGridAction($event)">
+</br-canvas-grid>

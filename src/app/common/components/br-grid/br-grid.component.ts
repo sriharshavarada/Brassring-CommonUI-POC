@@ -16,21 +16,27 @@
  * ============================================================
  */
 
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { UI_MODE } from '../../config/ui-mode.config';
-import { BrGridConfig } from '../../models/grid-config.model';
-import { GridAdapter, CustomGridInput, MaterialGridInput } from '../../adapters/grid.adapter';
+import { UI_MODE_BY_CONTROL } from '../../config/ui-mode.config';
+import { BrGridActionEvent, BrGridConfig } from '../../models/grid-config.model';
+import {
+    GridAdapter,
+    CustomGridInput,
+    MaterialGridInput,
+    CanvasGridInput,
+} from '../../adapters/grid.adapter';
 
 // Implementation components
 import { CustomGridComponent } from '../../implementations/custom-grid/custom-grid.component';
 import { MaterialGridComponent } from '../../implementations/material-grid/material-grid.component';
+import { CanvasGridComponent } from '../../implementations/canvas-grid/canvas-grid.component';
 
 @Component({
     selector: 'br-grid',
     standalone: true,
-    imports: [CommonModule, CustomGridComponent, MaterialGridComponent],
+    imports: [CommonModule, CustomGridComponent, MaterialGridComponent, CanvasGridComponent],
     templateUrl: './br-grid.component.html',
     styleUrls: ['./br-grid.component.scss'],
 })
@@ -40,22 +46,30 @@ export class BrGridComponent implements OnChanges {
      * Consumer screens pass this and nothing else.
      */
     @Input() config!: BrGridConfig;
+    @Output() action = new EventEmitter<BrGridActionEvent>();
 
     /** Resolved at compile-time from the central config */
-    uiMode = UI_MODE;
+    uiMode = UI_MODE_BY_CONTROL.grid;
 
     /** Adapted configs for each implementation */
     customConfig!: CustomGridInput;
     materialConfig!: MaterialGridInput;
+    canvasConfig!: CanvasGridInput;
 
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['config'] && this.config) {
             // Transform generic config through the appropriate adapter
             if (this.uiMode === 'CUSTOM') {
                 this.customConfig = GridAdapter.toCustom(this.config);
-            } else {
+            } else if (this.uiMode === 'MATERIAL') {
                 this.materialConfig = GridAdapter.toMaterial(this.config);
+            } else {
+                this.canvasConfig = GridAdapter.toCanvas(this.config);
             }
         }
+    }
+
+    onGridAction(event: BrGridActionEvent): void {
+        this.action.emit(event);
     }
 }

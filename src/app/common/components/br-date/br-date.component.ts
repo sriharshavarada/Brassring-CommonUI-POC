@@ -22,7 +22,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { UI_MODE } from '../../config/ui-mode.config';
+import { UI_MODE_BY_CONTROL } from '../../config/ui-mode.config';
 import { BrDateConfig } from '../../models/date-config.model';
 import { DateAdapter as BrDateAdapter, CustomDateInput, MaterialDateInput } from '../../adapters/date.adapter';
 
@@ -50,7 +50,7 @@ export class BrDateComponent implements OnChanges {
     @Output() dateChange = new EventEmitter<string>();
 
     /** Resolved at compile-time from the central config */
-    uiMode = UI_MODE;
+    uiMode = UI_MODE_BY_CONTROL.date;
 
     /** Adapted configs for each implementation */
     customConfig!: CustomDateInput;

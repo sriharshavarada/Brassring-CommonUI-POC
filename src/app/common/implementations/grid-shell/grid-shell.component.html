@@ -1,0 +1,299 @@
+<div class="grid-shell" [class.material-variant]="variant === 'material'" [class.canvas-variant]="variant === 'canvas'" [class.custom-variant]="variant === 'custom'" [class.zoom-mode]="zoomMode" [ngClass]="rootClasses" [ngStyle]="rootStyles">
+  <div class="grid-title" *ngIf="config.title">
+    <h3>{{ config.title }}</h3>
+    <span class="badge" *ngIf="config.uiConfig.showBadge">{{ variant }}</span>
+  </div>
+
+  <div class="top-toolbar custom-toolbar" *ngIf="config.features.enableTopBar && selectionCount === 0 && isCustomVariant" [class.search-mode]="searchOpen">
+    <div class="custom-toolbar-main">
+      <div class="custom-pill-actions" *ngIf="!searchOpen && !zoomMode">
+        <button class="pill-btn" type="button" *ngIf="config.toolbar.showSort && config.features.enableSorting" (click)="openSortModal($event)">
+          Sort <span class="badge-count" *ngIf="activeSortCount > 0">{{ activeSortCount }}</span>
+        </button>
+        <button class="pill-btn" type="button" *ngIf="config.toolbar.showFilter && config.features.enableFiltering" (click)="openFilterModal($event)">
+          Filter <span class="badge-count" *ngIf="activeFilterCount > 0">{{ activeFilterCount }}</span>
+        </button>
+        <button class="pill-btn" type="button" *ngIf="config.toolbar.showColumnSettings && config.features.enableColumnPersonalization" (click)="openColumnsPanel($event)">Columns</button>
+      </div>
+
+      <div class="search-wrap custom-search" *ngIf="searchOpen">
+        <span class="search-icon">⌕</span>
+        <input type="text" [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()" placeholder="Type to search rows..." />
+        <button class="icon-btn" type="button" (click)="toggleSearch()">✕</button>
+      </div>
+    </div>
+
+    <div class="right-actions">
+      <button class="icon-btn" *ngIf="config.toolbar.showSearch && config.features.enableSearch" type="button" title="Search" (click)="toggleSearch()">⌕</button>
+      <button class="icon-btn" *ngIf="config.toolbar.showRefresh && config.features.enableRefresh" type="button" title="Refresh" (click)="refreshGrid()">↻</button>
+      <button class="icon-btn" *ngIf="config.toolbar.showShare && config.features.enableShare" type="button" title="Share">⇪</button>
+      <button class="icon-btn" *ngIf="config.toolbar.showViewMode && config.features.enableViewMode" type="button" title="Big Text Mode" (click)="toggleZoomMode()">⌗</button>
+      <button class="add-btn" *ngIf="config.features.enablePrimaryAction" type="button" (click)="onToolbarPrimaryClick()">{{ config.toolbar.primaryActionLabel }}</button>
+      <button class="add-dropdown" *ngIf="config.features.enablePrimaryActionMenu" type="button" (click)="togglePrimaryActionMenu($event)">⌄</button>
+      <div class="primary-action-menu" *ngIf="showPrimaryActionMenu && config.features.enablePrimaryActionMenu" (click)="$event.stopPropagation()">
+        <button *ngFor="let action of config.toolbar.primaryActions; trackBy: trackByAction" type="button" (click)="onToolbarPrimaryMenuAction(action)">{{ action.label }}</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="top-toolbar material-toolbar" *ngIf="config.features.enableTopBar && selectionCount === 0 && isMaterialVariant" [class.search-mode]="searchOpen">
+    <div class="material-left" *ngIf="!searchOpen">
+      <button class="seg-btn" type="button" *ngIf="config.toolbar.showSort && config.features.enableSorting" (click)="openSortModal($event)">Sort</button>
+      <button class="seg-btn" type="button" *ngIf="config.toolbar.showFilter && config.features.enableFiltering" (click)="openFilterModal($event)">Filter</button>
+      <button class="seg-btn" type="button" *ngIf="config.toolbar.showColumnSettings && config.features.enableColumnPersonalization" (click)="openColumnsPanel($event)">Personalize</button>
+    </div>
+
+    <div class="search-wrap material-search" *ngIf="searchOpen">
+      <span class="search-icon">⌕</span>
+      <input type="text" [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()" placeholder="Search records" />
+      <button class="icon-btn" type="button" (click)="toggleSearch()">✕</button>
+    </div>
+
+    <div class="right-actions">
+      <button class="icon-btn" *ngIf="config.toolbar.showSearch && config.features.enableSearch" type="button" title="Search" (click)="toggleSearch()">⌕</button>
+      <button class="icon-btn" *ngIf="config.toolbar.showRefresh && config.features.enableRefresh" type="button" title="Refresh" (click)="refreshGrid()">↻</button>
+      <button class="icon-btn" *ngIf="config.toolbar.showShare && config.features.enableShare" type="button" title="Share">⇪</button>
+      <button class="icon-btn" *ngIf="config.toolbar.showViewMode && config.features.enableViewMode" type="button" title="Big Text Mode" (click)="toggleZoomMode()">⌗</button>
+      <button class="add-btn" *ngIf="config.features.enablePrimaryAction" type="button" (click)="onToolbarPrimaryClick()">{{ config.toolbar.primaryActionLabel }}</button>
+      <button class="add-dropdown" *ngIf="config.features.enablePrimaryActionMenu" type="button" (click)="togglePrimaryActionMenu($event)">⌄</button>
+      <div class="primary-action-menu" *ngIf="showPrimaryActionMenu && config.features.enablePrimaryActionMenu" (click)="$event.stopPropagation()">
+        <button *ngFor="let action of config.toolbar.primaryActions; trackBy: trackByAction" type="button" (click)="onToolbarPrimaryMenuAction(action)">{{ action.label }}</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="top-toolbar canvas-toolbar" *ngIf="config.features.enableTopBar && selectionCount === 0 && isCanvasVariant" [class.search-mode]="searchOpen">
+    <div class="left-actions" *ngIf="!searchOpen && !zoomMode">
+      <button class="toolbar-btn text-btn" type="button" *ngIf="config.toolbar.showSort && config.features.enableSorting" (click)="openSortModal($event)">
+        <span>Sort</span>
+        <span class="icon">⇅</span>
+      </button>
+      <button class="toolbar-btn text-btn" type="button" *ngIf="config.toolbar.showFilter && config.features.enableFiltering" (click)="openFilterModal($event)">
+        <span>Filter</span>
+        <span class="icon">⚲</span>
+      </button>
+    </div>
+    <div class="search-wrap" *ngIf="searchOpen">
+      <span class="search-icon">⌕</span>
+      <input type="text" [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()" placeholder="Search" />
+      <button class="icon-btn" type="button" (click)="toggleSearch()">✕</button>
+    </div>
+    <div class="right-actions">
+      <button class="icon-btn" *ngIf="config.toolbar.showSearch && config.features.enableSearch" type="button" title="Search" (click)="toggleSearch()">⌕</button>
+      <button class="icon-btn" *ngIf="config.toolbar.showRefresh && config.features.enableRefresh" type="button" title="Refresh" (click)="refreshGrid()">↻</button>
+      <button class="icon-btn" *ngIf="config.toolbar.showColumnSettings && config.features.enableColumnPersonalization" type="button" title="Columns" (click)="openColumnsPanel($event)">⚙</button>
+      <button class="icon-btn" *ngIf="config.toolbar.showShare && config.features.enableShare" type="button" title="Share">⇪</button>
+      <button class="icon-btn" *ngIf="config.toolbar.showViewMode && config.features.enableViewMode" type="button" title="Big Text Mode" (click)="toggleZoomMode()">⌗</button>
+      <button class="add-btn" *ngIf="config.features.enablePrimaryAction" type="button" (click)="onToolbarPrimaryClick()">{{ config.toolbar.primaryActionLabel }}</button>
+      <button class="add-dropdown" *ngIf="config.features.enablePrimaryActionMenu" type="button" (click)="togglePrimaryActionMenu($event)">⌄</button>
+      <div class="primary-action-menu" *ngIf="showPrimaryActionMenu && config.features.enablePrimaryActionMenu" (click)="$event.stopPropagation()">
+        <button *ngFor="let action of config.toolbar.primaryActions; trackBy: trackByAction" type="button" (click)="onToolbarPrimaryMenuAction(action)">{{ action.label }}</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="selection-bar" *ngIf="config.features.enableTopBar && selectionCount > 0 && config.features.enableRowSelection && config.features.enableSelectionActions">
+    <div class="selection-actions">
+      <button class="selection-btn" type="button" *ngFor="let action of config.selectionActions; trackBy: trackByAction" (click)="onSelectionActionClick(action)">
+        {{ action.label }}
+      </button>
+    </div>
+    <div class="selection-meta">{{ selectionCount }} req selected</div>
+  </div>
+
+  <div class="table-wrap">
+    <table class="grid-table">
+      <thead>
+        <tr>
+          <th class="checkbox-col" *ngIf="config.features.enableRowSelection">
+            <input type="checkbox" [checked]="isAllPageSelected" [indeterminate]="isSomePageSelected && !isAllPageSelected" (change)="toggleSelectAllOnPage($any($event.target).checked)" />
+          </th>
+          <th *ngFor="let field of visibleColumnFields; trackBy: trackByField">
+            <div class="header-cell">
+              <span>{{ getColumnHeader(field) }}</span>
+              <span class="header-arrow">⌄</span>
+            </div>
+          </th>
+          <th class="menu-col" *ngIf="config.features.enableRowActionButton"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of pageRows; trackBy: trackByRow" [class.selected]="selectedRowIds.has(row.__rowId)" (contextmenu)="onRowContextMenu($event, row.__rowId)">
+          <td class="checkbox-col" *ngIf="config.features.enableRowSelection">
+            <input type="checkbox" [checked]="selectedRowIds.has(row.__rowId)" (change)="toggleRowSelection(row.__rowId, $any($event.target).checked)" />
+          </td>
+          <td *ngFor="let field of visibleColumnFields; trackBy: trackByField">
+            {{ getCellValue(row, field) }}
+          </td>
+          <td class="menu-col" *ngIf="config.features.enableRowActionButton">
+            <button class="row-menu-btn" type="button" (click)="openContextMenuFromButton($event, row.__rowId)">⋮</button>
+          </td>
+        </tr>
+        <tr *ngIf="pageRows.length === 0">
+          <td class="empty-cell" [attr.colspan]="visibleColumnFields.length + (config.features.enableRowSelection ? 1 : 0) + (config.features.enableRowActionButton ? 1 : 0)">
+            {{ config.emptyMessage || 'No data available' }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pagination custom-pagination" *ngIf="config.pagination && isCustomVariant">
+    <div class="custom-page-left" *ngIf="config.features.showPaginationNavigation">
+      <button type="button" class="nav-pill" [disabled]="currentPage === 1" (click)="prevPage()">Prev</button>
+      <button type="button" class="nav-pill" [disabled]="currentPage === totalPages" (click)="nextPage()">Next</button>
+    </div>
+    <div class="custom-page-middle" *ngIf="config.features.showPaginationSummary">
+      <span>Page {{ currentPage }} of {{ totalPages }}</span>
+      <span class="dot">•</span>
+      <span>{{ startItem }}-{{ endItem }} / {{ totalRows }}</span>
+    </div>
+    <div class="custom-page-right" *ngIf="config.features.showPaginationSizeSelector">
+      <label for="customPageSize">Rows</label>
+      <select id="customPageSize" [ngModel]="pageSize" (ngModelChange)="setPageSize($event)">
+        <option *ngFor="let size of pageSizeOptions" [ngValue]="size">{{ size }}</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="pagination material-pagination" *ngIf="config.pagination && isMaterialVariant">
+    <div class="page-summary" *ngIf="config.features.showPaginationSummary">Rows {{ startItem }}-{{ endItem }} of {{ totalRows }}</div>
+    <div class="material-page-right">
+      <label for="materialPageSize" *ngIf="config.features.showPaginationSizeSelector">Rows per page</label>
+      <select id="materialPageSize" *ngIf="config.features.showPaginationSizeSelector" [ngModel]="pageSize" (ngModelChange)="setPageSize($event)">
+        <option *ngFor="let size of pageSizeOptions" [ngValue]="size">{{ size }}</option>
+      </select>
+      <ng-container *ngIf="config.features.showPaginationNavigation">
+        <button type="button" class="nav-btn" [disabled]="currentPage === 1" (click)="firstPage()">⏮</button>
+        <button type="button" class="nav-btn" [disabled]="currentPage === 1" (click)="prevPage()">◀</button>
+        <span>{{ currentPage }} / {{ totalPages }}</span>
+        <button type="button" class="nav-btn" [disabled]="currentPage === totalPages" (click)="nextPage()">▶</button>
+        <button type="button" class="nav-btn" [disabled]="currentPage === totalPages" (click)="lastPage()">⏭</button>
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="pagination canvas-pagination" *ngIf="config.pagination && isCanvasVariant">
+    <div class="page-control" *ngIf="config.features.showPaginationSizeSelector">
+      <label for="pageSize">Items per page:</label>
+      <select id="pageSize" [ngModel]="pageSize" (ngModelChange)="setPageSize($event)">
+        <option *ngFor="let size of pageSizeOptions" [ngValue]="size">{{ size }}</option>
+      </select>
+    </div>
+
+    <div class="page-summary" *ngIf="config.features.showPaginationSummary">Showing {{ startItem }} to {{ endItem }} of {{ totalRows }}</div>
+
+    <div class="page-nav" *ngIf="config.features.showPaginationNavigation">
+      <button type="button" class="nav-btn" [disabled]="currentPage === 1" (click)="prevPage()">◀</button>
+      <span>{{ currentPage }} of {{ totalPages }} pages</span>
+      <button type="button" class="nav-btn" [disabled]="currentPage === totalPages" (click)="nextPage()">▶</button>
+    </div>
+  </div>
+
+  <div class="context-menu" *ngIf="showContextMenu && config.features.enableContextMenu" [style.left.px]="contextX" [style.top.px]="contextY" (click)="$event.stopPropagation()">
+    <button type="button" *ngFor="let action of config.contextMenuActions; trackBy: trackByAction" (click)="onContextActionClick(action)">{{ action.label }}</button>
+    <button type="button" class="close-btn" (click)="closeContextMenu($event)">Close</button>
+  </div>
+
+  <div class="overlay" *ngIf="showSortModal && config.features.enableSorting" (click)="closeSortModal()">
+    <div class="sort-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Sort Options</h2>
+        <button type="button" class="close-icon" (click)="closeSortModal()">✕</button>
+      </div>
+
+      <div class="sort-group" *ngFor="let criterion of sortCriteria; let i = index">
+        <label>{{ i === 0 ? 'Sort by:' : 'Then by:' }}</label>
+        <select [(ngModel)]="criterion.field">
+          <option value="">Select column</option>
+          <option *ngFor="let col of allColumns" [value]="col.field">{{ col.header }}</option>
+        </select>
+
+        <div class="sort-direction">
+          <label><input type="radio" [name]="'direction-' + i" value="asc" [(ngModel)]="criterion.direction" />Ascending</label>
+          <label><input type="radio" [name]="'direction-' + i" value="desc" [(ngModel)]="criterion.direction" />Descending</label>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="apply-btn" (click)="applySortCriteria()">Apply Sort</button>
+        <button type="button" class="ghost-btn" (click)="clearSortCriteria()">Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" *ngIf="showFilterModal && config.features.enableFiltering" (click)="closeFilterModal()">
+    <div class="sort-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Filter Options</h2>
+        <button type="button" class="close-icon" (click)="closeFilterModal()">✕</button>
+      </div>
+
+      <div class="sort-group" *ngFor="let criterion of filterCriteria; let i = index">
+        <label>{{ i === 0 ? 'Filter by:' : 'Then by:' }}</label>
+        <div class="filter-row">
+          <select [(ngModel)]="criterion.field">
+            <option value="">Select column</option>
+            <option *ngFor="let col of allColumns" [value]="col.field">{{ col.header }}</option>
+          </select>
+          <select [(ngModel)]="criterion.operator" class="operator-select">
+            <option value="contains">Contains</option>
+            <option value="equals">Equals</option>
+            <option value="startsWith">Starts With</option>
+            <option value="endsWith">Ends With</option>
+          </select>
+          <input type="text" [(ngModel)]="criterion.value" placeholder="Value" />
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="apply-btn" (click)="applyFilterCriteria()">Apply Filter</button>
+        <button type="button" class="ghost-btn" (click)="clearFilterCriteria()">Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" *ngIf="showColumnsPanel && config.features.enableColumnPersonalization" (click)="closeColumnsPanel()">
+    <div class="columns-panel" (click)="$event.stopPropagation()">
+      <div class="panel-header">
+        <h2>Personalize Columns</h2>
+        <button type="button" class="close-icon" (click)="closeColumnsPanel()">✕</button>
+      </div>
+
+      <div class="panel-content">
+        <div class="panel-left">
+          <h3>Select Columns</h3>
+          <input type="text" [placeholder]="config.personalization.searchPlaceholder" [(ngModel)]="columnSearch" />
+
+          <div class="column-list">
+            <label *ngFor="let col of filteredColumnOptions">
+              <input type="checkbox" [disabled]="!config.features.enableColumnVisibilityToggle" [checked]="visibleColumnFields.includes(col.field)" (change)="toggleColumn(col.field)" />
+              {{ col.group ? '[' + col.group + '] ' : '' }}{{ col.label || col.field }}
+            </label>
+          </div>
+        </div>
+
+        <div class="panel-right">
+          <h3>Order Columns</h3>
+          <p>You may have up to {{ config.personalization.maxSelectedColumns }} fields for this display.</p>
+
+          <div class="selected-columns">
+            <div class="selected-item" *ngFor="let field of visibleColumnFields; let i = index">
+              <span>{{ getColumnGroup(field) ? '[' + getColumnGroup(field) + '] ' : '' }}{{ getColumnHeader(field) }}</span>
+              <div class="order-actions">
+                <button type="button" [disabled]="i === 0 || !config.features.enableColumnReorder" (click)="moveColumn(field, -1)">↑</button>
+                <button type="button" [disabled]="i === visibleColumnFields.length - 1 || !config.features.enableColumnReorder" (click)="moveColumn(field, 1)">↓</button>
+                <button type="button" [disabled]="!config.features.enableColumnVisibilityToggle" (click)="removeColumn(field)">✕</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-actions">
+        <button type="button" class="ghost-btn" (click)="closeColumnsPanel()">Cancel</button>
+        <button type="button" class="apply-btn" (click)="saveColumns()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>

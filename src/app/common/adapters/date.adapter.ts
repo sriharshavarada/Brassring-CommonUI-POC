@@ -11,7 +11,7 @@
  * ============================================================
  */
 
-import { BrDateConfig } from '../models/date-config.model';
+import { BrDateConfig, BrDateUiConfig } from '../models/date-config.model';
 
 // ─── Custom Date adapted output ──────────────────────────────
 export interface CustomDateInput {
@@ -23,6 +23,10 @@ export interface CustomDateInput {
     placeholder: string;
     required: boolean;
     errorMessage: string;
+    uiConfig: Required<Omit<BrDateUiConfig, 'tokens' | 'className'>> & {
+        className: string;
+        tokens: Record<string, string | number>;
+    };
 }
 
 // ─── Material Date adapted output ────────────────────────────
@@ -35,6 +39,10 @@ export interface MaterialDateInput {
     placeholder: string;
     required: boolean;
     errorMessage: string;
+    uiConfig: Required<Omit<BrDateUiConfig, 'tokens' | 'className'>> & {
+        className: string;
+        tokens: Record<string, string | number>;
+    };
 }
 
 export class DateAdapter {
@@ -53,6 +61,15 @@ export class DateAdapter {
             placeholder: config.placeholder ?? 'Select a date',
             required: config.required ?? false,
             errorMessage: config.errorMessage ?? '',
+            uiConfig: {
+                density: config.uiConfig?.density ?? 'comfortable',
+                size: config.uiConfig?.size ?? 'md',
+                variant: config.uiConfig?.variant ?? 'outline',
+                showBadge: config.uiConfig?.showBadge ?? true,
+                showIcon: config.uiConfig?.showIcon ?? true,
+                className: config.uiConfig?.className ?? '',
+                tokens: config.uiConfig?.tokens ?? {},
+            },
         };
     }
 
@@ -70,6 +87,15 @@ export class DateAdapter {
             placeholder: config.placeholder ?? 'Select a date',
             required: config.required ?? false,
             errorMessage: config.errorMessage ?? '',
+            uiConfig: {
+                density: config.uiConfig?.density ?? 'comfortable',
+                size: config.uiConfig?.size ?? 'md',
+                variant: config.uiConfig?.variant ?? 'outline',
+                showBadge: config.uiConfig?.showBadge ?? true,
+                showIcon: config.uiConfig?.showIcon ?? true,
+                className: config.uiConfig?.className ?? '',
+                tokens: config.uiConfig?.tokens ?? {},
+            },
         };
     }
 

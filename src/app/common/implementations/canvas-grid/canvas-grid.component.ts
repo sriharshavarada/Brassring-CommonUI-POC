@@ -1,18 +1,18 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { MaterialGridInput } from '../../adapters/grid.adapter';
+import { CanvasGridInput } from '../../adapters/grid.adapter';
 import { BrGridActionEvent } from '../../models/grid-config.model';
 import { GridShellComponent } from '../grid-shell/grid-shell.component';
 
 @Component({
-  selector: 'br-material-grid',
+  selector: 'br-canvas-grid',
   standalone: true,
   imports: [CommonModule, GridShellComponent],
-  templateUrl: './material-grid.component.html',
-  styleUrls: ['./material-grid.component.scss'],
+  templateUrl: './canvas-grid.component.html',
+  styleUrls: ['./canvas-grid.component.scss'],
 })
-export class MaterialGridComponent {
-  @Input() config!: MaterialGridInput;
+export class CanvasGridComponent {
+  @Input() config!: CanvasGridInput;
   @Output() action = new EventEmitter<BrGridActionEvent>();
 }

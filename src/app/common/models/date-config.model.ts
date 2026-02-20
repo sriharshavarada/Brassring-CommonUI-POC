@@ -35,4 +35,17 @@ export interface BrDateConfig {
 
     /** Error message to display */
     errorMessage?: string;
+
+    /** Visual configuration for the date control renderer */
+    uiConfig?: BrDateUiConfig;
+}
+
+export interface BrDateUiConfig {
+    density?: 'compact' | 'comfortable' | 'spacious';
+    size?: 'sm' | 'md' | 'lg';
+    variant?: 'outline' | 'filled' | 'plain';
+    showBadge?: boolean;
+    showIcon?: boolean;
+    className?: string;
+    tokens?: Record<string, string | number>;
 }

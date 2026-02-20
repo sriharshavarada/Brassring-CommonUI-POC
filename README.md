@@ -58,3 +58,12 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
 # Brassring-CommonUI-POC
+
+## Documentation
+
+- High-level architecture:
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/docs/01-high-level-architecture.md`
+- Runtime flow (browser URL to rendered controls):
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/docs/02-runtime-flow-browser-to-control.md`
+- Consumer integration guide:
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/docs/03-consumer-integration-guide.md`
