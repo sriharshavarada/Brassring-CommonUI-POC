@@ -1,0 +1,27 @@
+<div class="workbench">
+  <div class="head">
+    <h3>{{ title }}</h3>
+    <div class="actions">
+      <button type="button" class="btn ghost" (click)="collapseAll()">Collapse All</button>
+      <button type="button" class="btn ghost" (click)="expandAll()">Expand All</button>
+    </div>
+  </div>
+
+  <div class="editor-grid">
+    <div class="panel">
+      <div class="panel-title">Raw JSON</div>
+      <textarea class="raw-editor" [value]="editorText" (input)="onRawInput($any($event.target).value)"
+        (blur)="onRawBlur()"></textarea>
+      <p class="error" *ngIf="parseError">Invalid JSON: {{ parseError }}</p>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Tree Editor</div>
+      <div class="tree-panel">
+        <app-json-tree-node [isRoot]="true" [keyLabel]="'root'" [value]="model" [path]="[]" [depth]="0"
+          [collapsedPaths]="collapsedPaths" (nodeChange)="onNodeChange($event)">
+        </app-json-tree-node>
+      </div>
+    </div>
+  </div>
+</div>

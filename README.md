@@ -69,3 +69,12 @@ For more information on using the Angular CLI, including detailed command refere
   - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/docs/02-runtime-flow-browser-to-control.md`
 - Consumer integration guide:
   - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/docs/03-consumer-integration-guide.md`
+
+## In-App Guides
+
+- Developer playground: `http://localhost:4200/playground`
+  - Change control modes (`grid`, `date`, `modal`) at runtime.
+  - Edit JSON configs for `br-grid`, `br-date`, `br-modal` and apply live.
+  - Inspect emitted action events.
+- Docs page: `http://localhost:4200/docs`
+  - Quick consumption instructions and event wiring examples.

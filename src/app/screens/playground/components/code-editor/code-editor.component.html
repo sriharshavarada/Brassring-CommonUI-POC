@@ -1,0 +1,11 @@
+<div class="code-shell">
+  <div #lineArea class="line-col">
+    <div class="ln" *ngFor="let line of lineNumbers">{{ line }}</div>
+  </div>
+
+  <div class="editor-col">
+    <pre #highlightArea class="highlight-layer" [innerHTML]="highlightedCode + '\n'"></pre>
+    <textarea #inputArea class="input-layer" [value]="value" (input)="onInput($any($event.target).value)"
+      (scroll)="onScroll()" spellcheck="false"></textarea>
+  </div>
+</div>

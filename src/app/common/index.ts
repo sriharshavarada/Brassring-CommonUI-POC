@@ -44,3 +44,6 @@ export type { BrModalConfig, BrModalUiConfig, BrModalAction, BrModalActionEvent 
 export { UI_MODE_BY_CONTROL } from './config/ui-mode.config';
 export { UI_MODE } from './config/ui-mode.config';
 export type { UiMode, DateUiMode, ModalUiMode, UiModeByControl } from './config/ui-mode.config';
+
+// ─── Runtime Mode Service ──────────────────────────────────
+export { RuntimeUiConfigService } from './services/runtime-ui-config.service';

@@ -18,13 +18,15 @@
 
 import {
     Component, Input, Output, EventEmitter,
-    OnChanges, SimpleChanges
+    OnChanges, OnDestroy, OnInit, SimpleChanges
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Subject, takeUntil } from 'rxjs';
 
-import { UI_MODE_BY_CONTROL } from '../../config/ui-mode.config';
+import { DateUiMode } from '../../config/ui-mode.config';
 import { BrDateConfig } from '../../models/date-config.model';
 import { DateAdapter as BrDateAdapter, CustomDateInput, MaterialDateInput } from '../../adapters/date.adapter';
+import { RuntimeUiConfigService } from '../../services/runtime-ui-config.service';
 
 // Implementation components
 import { CustomDateComponent } from '../../implementations/custom-date/custom-date.component';
@@ -37,7 +39,7 @@ import { MaterialDateComponent } from '../../implementations/material-date/mater
     templateUrl: './br-date.component.html',
     styleUrls: ['./br-date.component.scss'],
 })
-export class BrDateComponent implements OnChanges {
+export class BrDateComponent implements OnInit, OnChanges, OnDestroy {
     /**
      * The ONLY input — a library-agnostic JSON config.
      * Consumer screens pass this and nothing else.
@@ -49,20 +51,29 @@ export class BrDateComponent implements OnChanges {
      */
     @Output() dateChange = new EventEmitter<string>();
 
-    /** Resolved at compile-time from the central config */
-    uiMode = UI_MODE_BY_CONTROL.date;
+    /** Resolved at runtime from config service */
+    uiMode: DateUiMode = 'CUSTOM';
 
     /** Adapted configs for each implementation */
     customConfig!: CustomDateInput;
     materialConfig!: MaterialDateInput;
+    private readonly destroy$ = new Subject<void>();
+
+    constructor(private readonly runtimeUiConfig: RuntimeUiConfigService) { }
+
+    ngOnInit(): void {
+        this.uiMode = this.runtimeUiConfig.getModesSnapshot().date;
+        this.runtimeUiConfig.modes$
+            .pipe(takeUntil(this.destroy$))
+            .subscribe((modes) => {
+                this.uiMode = modes.date;
+                this.adaptConfig();
+            });
+    }
 
     ngOnChanges(changes: SimpleChanges): void {
         if (changes['config'] && this.config) {
-            if (this.uiMode === 'CUSTOM') {
-                this.customConfig = BrDateAdapter.toCustom(this.config);
-            } else {
-                this.materialConfig = BrDateAdapter.toMaterial(this.config);
-            }
+            this.adaptConfig();
         }
     }
 
@@ -73,5 +84,19 @@ export class BrDateComponent implements OnChanges {
 
     onMaterialDateChange(value: Date | null): void {
         this.dateChange.emit(value ? value.toISOString().split('T')[0] : '');
+    }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
+
+    private adaptConfig(): void {
+        if (!this.config) return;
+        if (this.uiMode === 'CUSTOM') {
+            this.customConfig = BrDateAdapter.toCustom(this.config);
+        } else {
+            this.materialConfig = BrDateAdapter.toMaterial(this.config);
+        }
     }
 }

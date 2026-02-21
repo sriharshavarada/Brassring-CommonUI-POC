@@ -1,0 +1,51 @@
+<div class="docs-page">
+  <header class="docs-header">
+    <h1>Consumer Docs</h1>
+    <p>This section explains how any team can consume `br-grid`, `br-date`, and `br-modal` in their own app.</p>
+  </header>
+
+  <section class="doc-card">
+    <h2>Quick Start</h2>
+    <ol>
+      <li>Import the façade components from the common layer only.</li>
+      <li>Pass library-agnostic JSON (`BrGridConfig`, `BrDateConfig`, `BrModalConfig`).</li>
+      <li>Handle emitted events in your feature component or service.</li>
+      <li>Switch rendering mode from Playground or mode config without touching consumer screens.</li>
+    </ol>
+  </section>
+
+  <section class="doc-card">
+    <h2>Usage Example</h2>
+    <pre><code>&lt;br-grid [config]="gridConfig" (action)="onGridAction($event)"&gt;&lt;/br-grid&gt;
+&lt;br-date [config]="dateConfig" (dateChange)="onDateChange($event)"&gt;&lt;/br-date&gt;
+&lt;br-modal [config]="modalConfig" (action)="onModalAction($event)"&gt;&lt;/br-modal&gt;</code></pre>
+  </section>
+
+  <section class="doc-card">
+    <h2>Event Wiring Pattern</h2>
+    <pre><code>onGridAction(event: BrGridActionEvent) &#123;
+  if (event.actionId === 'save') &#123;
+    this.api.saveSelection(event.selectedRows).subscribe();
+  &#125;
+&#125;
+
+onModalAction(event: BrModalActionEvent) &#123;
+  if (event.actionId === 'confirm') &#123;
+    this.api.confirm(event.fieldValues).subscribe();
+  &#125;
+&#125;</code></pre>
+  </section>
+
+  <section class="doc-card">
+    <h2>Full Project Documents</h2>
+    <p>Reference docs in repo: <code>{{ repoPath }}</code></p>
+    <ul>
+      <li><code>00-project-handoff-so-far.md</code></li>
+      <li><code>01-high-level-architecture.md</code></li>
+      <li><code>02-runtime-flow-browser-to-control.md</code></li>
+      <li><code>03-consumer-integration-guide.md</code></li>
+    </ul>
+  </section>
+
+  <a routerLink="/playground" class="link-btn">Open Developer Playground</a>
+</div>

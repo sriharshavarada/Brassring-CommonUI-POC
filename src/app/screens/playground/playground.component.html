@@ -1,0 +1,233 @@
+<div class="playground-page">
+  <header class="page-header">
+    <h1>Developer Playground</h1>
+    <p>Consistent playgrounds with live config + live consumer file code (TS/HTML/SCSS).</p>
+  </header>
+
+  <section class="mode-panel">
+    <div class="mode-item">
+      <label for="grid-mode">Grid Mode</label>
+      <select id="grid-mode" [ngModel]="modes.grid" (ngModelChange)="setGridMode($event)">
+        <option *ngFor="let mode of gridModes" [ngValue]="mode">{{ mode }}</option>
+      </select>
+    </div>
+
+    <div class="mode-item">
+      <label for="date-mode">Date Mode</label>
+      <select id="date-mode" [ngModel]="modes.date" (ngModelChange)="setDateMode($event)">
+        <option *ngFor="let mode of dateModes" [ngValue]="mode">{{ mode }}</option>
+      </select>
+    </div>
+
+    <div class="mode-item">
+      <label for="modal-mode">Modal Mode</label>
+      <select id="modal-mode" [ngModel]="modes.modal" (ngModelChange)="setModalMode($event)">
+        <option *ngFor="let mode of modalModes" [ngValue]="mode">{{ mode }}</option>
+      </select>
+    </div>
+
+    <button type="button" class="btn ghost" (click)="resetModes()">Reset Defaults</button>
+    <a routerLink="/docs" class="btn link">Open Docs</a>
+  </section>
+
+  <section class="tab-panel">
+    <button type="button" class="tab-btn" [class.active]="activeTab === 'grid'" (click)="activeTab = 'grid'">
+      Grid Playground
+    </button>
+    <button type="button" class="tab-btn" [class.active]="activeTab === 'date'" (click)="activeTab = 'date'">
+      Date Playground
+    </button>
+    <button type="button" class="tab-btn" [class.active]="activeTab === 'modal'" (click)="activeTab = 'modal'">
+      Modal Playground
+    </button>
+  </section>
+
+  <section class="workspace" *ngIf="activeTab === 'grid'">
+    <article class="editor-card full">
+      <div class="card-head">
+        <h2>Grid Playground</h2>
+        <div class="actions">
+          <button type="button" class="btn ghost" (click)="toggleConfigPanel('grid')">
+            {{ gridConfigCollapsed ? 'Show Config Editor' : 'Hide Config Editor' }}
+          </button>
+          <button type="button" class="btn ghost" (click)="toggleCodePanel('grid')">
+            {{ gridCode.collapsed ? 'Show Code Studio' : 'Hide Code Studio' }}
+          </button>
+        </div>
+      </div>
+
+      <div class="preset-row">
+        <span class="preset-label">Grid Presets:</span>
+        <button type="button" class="preset-btn" *ngFor="let preset of gridPresets"
+          [class.active]="activeGridPreset === preset" (click)="selectGridPreset(preset)">
+          {{ gridPresetLabels[preset] }}
+        </button>
+      </div>
+
+      <app-json-workbench *ngIf="!gridConfigCollapsed" title="Grid Config" [value]="gridConfig"
+        (valueChange)="onGridConfigChange($event)">
+      </app-json-workbench>
+
+      <section class="code-studio" *ngIf="!gridCode.collapsed">
+        <div class="code-head">
+          <h3>Consumer Code</h3>
+          <div class="code-actions">
+            <button type="button" class="btn" (click)="applyCode('grid')">Apply Code</button>
+            <button type="button" class="btn ghost" (click)="resetCode('grid')">Reset</button>
+          </div>
+        </div>
+        <div class="file-tabs">
+          <button type="button" class="file-tab" *ngFor="let file of codeFiles" [class.active]="gridCode.activeFile === file"
+            (click)="setCodeFile('grid', file)">{{ file.toUpperCase() }}</button>
+        </div>
+        <app-code-editor [language]="codeLanguage(gridCode.activeFile)"
+          [value]="gridCode.activeFile === 'ts' ? gridCode.ts : (gridCode.activeFile === 'html' ? gridCode.html : gridCode.scss)"
+          (valueChange)="onCodeEditorChange('grid', $event)">
+        </app-code-editor>
+        <p class="code-error" *ngIf="codeError.grid">{{ codeError.grid }}</p>
+      </section>
+
+      <div class="preview full-preview grid-live-preview">
+        <style [textContent]="gridCode.appliedScss"></style>
+        <ng-container *ngIf="!codeError.grid; else gridPreviewError">
+          <div [innerHTML]="gridCode.htmlBefore"></div>
+          <br-grid [config]="gridConfig" (action)="onGridAction($event)"></br-grid>
+          <div [innerHTML]="gridCode.htmlAfter"></div>
+        </ng-container>
+        <ng-template #gridPreviewError>
+          <div class="preview-error">{{ codeError.grid }}</div>
+        </ng-template>
+      </div>
+    </article>
+  </section>
+
+  <section class="workspace" *ngIf="activeTab === 'date'">
+    <article class="editor-card full">
+      <div class="card-head">
+        <h2>Date Playground</h2>
+        <div class="actions">
+          <button type="button" class="btn ghost" (click)="toggleConfigPanel('date')">
+            {{ dateConfigCollapsed ? 'Show Config Editor' : 'Hide Config Editor' }}
+          </button>
+          <button type="button" class="btn ghost" (click)="toggleCodePanel('date')">
+            {{ dateCode.collapsed ? 'Show Code Studio' : 'Hide Code Studio' }}
+          </button>
+        </div>
+      </div>
+
+      <div class="preset-row">
+        <span class="preset-label">Date Presets:</span>
+        <button type="button" class="preset-btn" *ngFor="let preset of datePresets"
+          [class.active]="activeDatePreset === preset" (click)="selectDatePreset(preset)">
+          {{ datePresetLabels[preset] }}
+        </button>
+      </div>
+
+      <app-json-workbench *ngIf="!dateConfigCollapsed" title="Date Config" [value]="dateConfig"
+        (valueChange)="onDateConfigChange($event)">
+      </app-json-workbench>
+
+      <section class="code-studio" *ngIf="!dateCode.collapsed">
+        <div class="code-head">
+          <h3>Consumer Code</h3>
+          <div class="code-actions">
+            <button type="button" class="btn" (click)="applyCode('date')">Apply Code</button>
+            <button type="button" class="btn ghost" (click)="resetCode('date')">Reset</button>
+          </div>
+        </div>
+        <div class="file-tabs">
+          <button type="button" class="file-tab" *ngFor="let file of codeFiles" [class.active]="dateCode.activeFile === file"
+            (click)="setCodeFile('date', file)">{{ file.toUpperCase() }}</button>
+        </div>
+        <app-code-editor [language]="codeLanguage(dateCode.activeFile)"
+          [value]="dateCode.activeFile === 'ts' ? dateCode.ts : (dateCode.activeFile === 'html' ? dateCode.html : dateCode.scss)"
+          (valueChange)="onCodeEditorChange('date', $event)">
+        </app-code-editor>
+        <p class="code-error" *ngIf="codeError.date">{{ codeError.date }}</p>
+      </section>
+
+      <div class="preview full-preview date-live-preview">
+        <style [textContent]="dateCode.appliedScss"></style>
+        <ng-container *ngIf="!codeError.date; else datePreviewError">
+          <div [innerHTML]="dateCode.htmlBefore"></div>
+          <br-date [config]="dateConfig" (dateChange)="onDateChange($event)"></br-date>
+          <div [innerHTML]="dateCode.htmlAfter"></div>
+        </ng-container>
+        <ng-template #datePreviewError>
+          <div class="preview-error">{{ codeError.date }}</div>
+        </ng-template>
+      </div>
+    </article>
+  </section>
+
+  <section class="workspace" *ngIf="activeTab === 'modal'">
+    <article class="editor-card full">
+      <div class="card-head">
+        <h2>Modal Playground</h2>
+        <div class="actions">
+          <button type="button" class="btn ghost" (click)="toggleConfigPanel('modal')">
+            {{ modalConfigCollapsed ? 'Show Config Editor' : 'Hide Config Editor' }}
+          </button>
+          <button type="button" class="btn ghost" (click)="toggleCodePanel('modal')">
+            {{ modalCode.collapsed ? 'Show Code Studio' : 'Hide Code Studio' }}
+          </button>
+          <button type="button" class="btn secondary" (click)="openModalPreview()">Open Current Modal</button>
+        </div>
+      </div>
+
+      <div class="preset-row">
+        <span class="preset-label">Modal Presets:</span>
+        <button type="button" class="preset-btn" *ngFor="let preset of modalPresets"
+          [class.active]="activeModalPreset === preset" (click)="selectModalPreset(preset)">
+          {{ modalPresetLabels[preset] }}
+        </button>
+      </div>
+
+      <app-json-workbench *ngIf="!modalConfigCollapsed" title="Modal Config" [value]="modalConfig"
+        (valueChange)="onModalConfigChange($event)">
+      </app-json-workbench>
+
+      <section class="code-studio" *ngIf="!modalCode.collapsed">
+        <div class="code-head">
+          <h3>Consumer Code</h3>
+          <div class="code-actions">
+            <button type="button" class="btn" (click)="applyCode('modal')">Apply Code</button>
+            <button type="button" class="btn ghost" (click)="resetCode('modal')">Reset</button>
+          </div>
+        </div>
+        <div class="file-tabs">
+          <button type="button" class="file-tab" *ngFor="let file of codeFiles" [class.active]="modalCode.activeFile === file"
+            (click)="setCodeFile('modal', file)">{{ file.toUpperCase() }}</button>
+        </div>
+        <app-code-editor [language]="codeLanguage(modalCode.activeFile)"
+          [value]="modalCode.activeFile === 'ts' ? modalCode.ts : (modalCode.activeFile === 'html' ? modalCode.html : modalCode.scss)"
+          (valueChange)="onCodeEditorChange('modal', $event)">
+        </app-code-editor>
+        <p class="code-error" *ngIf="codeError.modal">{{ codeError.modal }}</p>
+      </section>
+
+      <div class="preview full-preview modal-live-preview">
+        <style [textContent]="modalCode.appliedScss"></style>
+        <ng-container *ngIf="!codeError.modal; else modalPreviewError">
+          <div [innerHTML]="modalCode.htmlBefore"></div>
+          <br-modal [config]="modalConfig" (action)="onModalAction($event)" (close)="closeModalPreview()"></br-modal>
+          <div [innerHTML]="modalCode.htmlAfter"></div>
+        </ng-container>
+        <ng-template #modalPreviewError>
+          <div class="preview-error">{{ codeError.modal }}</div>
+        </ng-template>
+      </div>
+    </article>
+  </section>
+
+  <section class="event-panel">
+    <div class="card-head">
+      <h2>Event Log</h2>
+      <button type="button" class="btn ghost" (click)="clearEventLog()">Clear</button>
+    </div>
+    <div class="log-list">
+      <p *ngIf="eventLog.length === 0" class="empty">No events yet.</p>
+      <p *ngFor="let entry of eventLog">{{ entry }}</p>
+    </div>
+  </section>
+</div>

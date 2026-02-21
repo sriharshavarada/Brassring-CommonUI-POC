@@ -1,0 +1,64 @@
+.docs-page {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.docs-header {
+  h1 {
+    margin: 0;
+  }
+
+  p {
+    margin: 8px 0 0;
+    color: #4a5568;
+  }
+}
+
+.doc-card {
+  background: #fff;
+  border: 1px solid #d8dee9;
+  border-radius: 10px;
+  padding: 14px;
+
+  h2 {
+    margin: 0 0 10px;
+    font-size: 18px;
+  }
+
+  p,
+  li {
+    color: #2d3748;
+    line-height: 1.5;
+  }
+
+  pre {
+    margin: 0;
+    padding: 10px;
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    overflow: auto;
+  }
+
+  code {
+    font-family: 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+    font-size: 12px;
+  }
+}
+
+.link-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #fff;
+  background: #2b6cb0;
+}

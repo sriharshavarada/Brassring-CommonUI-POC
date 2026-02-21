@@ -21,12 +21,25 @@
         <span class="nav-icon">🗖</span>
         Modals
       </a>
+      <a routerLink="/playground" routerLinkActive="active" class="nav-link">
+        <span class="nav-icon">🧪</span>
+        Playground
+      </a>
+      <a routerLink="/docs" routerLinkActive="active" class="nav-link">
+        <span class="nav-icon">📘</span>
+        Docs
+      </a>
     </div>
 
     <div class="nav-mode">
-      <span class="mode-dot" [class.custom]="currentMode === 'CUSTOM'"
-        [class.material]="currentMode === 'MATERIAL'"></span>
-      <span class="mode-text">{{ currentMode }} Mode</span>
+      <span class="mode-dot" [class.custom]="runtimeUiConfig.getModesSnapshot().grid === 'CUSTOM'"
+        [class.material]="runtimeUiConfig.getModesSnapshot().grid === 'MATERIAL'"
+        [class.canvas]="runtimeUiConfig.getModesSnapshot().grid === 'CANVAS'"></span>
+      <span class="mode-text">
+        G: {{ runtimeUiConfig.getModesSnapshot().grid }} |
+        D: {{ runtimeUiConfig.getModesSnapshot().date }} |
+        M: {{ runtimeUiConfig.getModesSnapshot().modal }}
+      </span>
     </div>
   </nav>
 
@@ -36,9 +49,9 @@
       <span class="banner-icon">🏗️</span>
       <span>
         <strong>Architecture Demo:</strong>
-        Switch <code>UI_MODE</code> in
+        Switch modes from <code>/playground</code> (or set defaults in
         <code>common/config/ui-mode.config.ts</code>
-        between <code>'CUSTOM'</code> and <code>'MATERIAL'</code>
+        for each control)
         — all screens update automatically with <strong>zero consumer code changes</strong>.
       </span>
     </div>

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { UI_MODE } from './common';
+import { RuntimeUiConfigService } from './common';
 
 @Component({
   selector: 'br-root',
@@ -12,5 +12,6 @@ import { UI_MODE } from './common';
 })
 export class AppComponent {
   title = 'BR UI Framework POC';
-  currentMode = UI_MODE;
+
+  constructor(public readonly runtimeUiConfig: RuntimeUiConfigService) { }
 }

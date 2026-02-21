@@ -1,0 +1,50 @@
+<div class="node-line" [style.padding-left.px]="depth * 16">
+  <button type="button" class="toggle" *ngIf="isComposite" (click)="toggleCollapse()">
+    {{ isCollapsed ? '+' : '-' }}
+  </button>
+  <span class="toggle-spacer" *ngIf="!isComposite"></span>
+
+  <span class="node-key" *ngIf="!isRoot">{{ keyLabel }}:</span>
+
+  <ng-container *ngIf="isComposite; else primitiveNode">
+    <span class="token">{{ isArray ? '[' : '{' }}</span>
+    <span class="meta">{{ isArray ? (value?.length || 0) + ' items' : objectKeys(value).length + ' keys' }}</span>
+  </ng-container>
+
+  <ng-template #primitiveNode>
+    <ng-container [ngSwitch]="typeLabel">
+      <label class="inline-bool" *ngSwitchCase="'boolean'">
+        <input type="checkbox" [ngModel]="value" (ngModelChange)="onBooleanChange($event)" />
+        <span>{{ value }}</span>
+      </label>
+
+      <input *ngSwitchCase="'number'" class="inline-input" type="number" [ngModel]="value"
+        (ngModelChange)="onNumberChange($event)" />
+
+      <input *ngSwitchDefault class="inline-input" type="text" [ngModel]="displayValue"
+        (ngModelChange)="onTextChange($event)" />
+    </ng-container>
+    <span class="type-pill">{{ typeLabel }}</span>
+  </ng-template>
+</div>
+
+<ng-container *ngIf="isComposite && !isCollapsed">
+  <ng-container *ngIf="isArray; else objectChildren">
+    <app-json-tree-node *ngFor="let item of value; let i = index; trackBy: trackByIndex" [keyLabel]="'[' + i + ']'"
+      [value]="item" [path]="childPath(i)" [depth]="depth + 1" [collapsedPaths]="collapsedPaths"
+      (nodeChange)="nodeChange.emit($event)">
+    </app-json-tree-node>
+  </ng-container>
+
+  <ng-template #objectChildren>
+    <app-json-tree-node *ngFor="let key of objectKeys(value); trackBy: trackByKey" [keyLabel]="key" [value]="value[key]"
+      [path]="childPath(key)" [depth]="depth + 1" [collapsedPaths]="collapsedPaths"
+      (nodeChange)="nodeChange.emit($event)">
+    </app-json-tree-node>
+  </ng-template>
+
+  <div class="node-line closing" [style.padding-left.px]="depth * 16">
+    <span class="toggle-spacer"></span>
+    <span class="token">{{ isArray ? ']' : '}' }}</span>
+  </div>
+</ng-container>
