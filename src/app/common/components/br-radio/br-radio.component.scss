@@ -1,0 +1,33 @@
+.br-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.br-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1f2a3d;
+}
+
+.br-radio-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.br-radio-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 14px;
+  color: #1f2a3d;
+}
+
+.br-radio-input {
+  accent-color: #2563eb;
+}
+
+.br-material-radio {
+  margin-right: 14px;
+}

@@ -1,0 +1,60 @@
+.br-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  padding: 12px;
+  background: #f8fafc;
+}
+
+.br-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mode-pill {
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  color: #166534;
+  background: #dcfce7;
+  border: 1px solid #86efac;
+}
+
+.br-material-radio-group {
+  display: grid;
+  gap: 8px;
+  padding: 4px;
+  border-radius: 10px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+}
+
+.br-material-radio {
+  margin-right: 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.br-material-radio:hover {
+  background: #f1f5f9;
+}
+
+:host ::ng-deep .br-material-radio .mdc-form-field {
+  width: 100%;
+}
+
+:host ::ng-deep .br-material-radio .mdc-label {
+  font-weight: 500;
+}

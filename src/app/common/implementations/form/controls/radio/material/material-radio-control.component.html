@@ -1,0 +1,13 @@
+<div class="br-radio-group">
+  <label class="br-label">{{ config.label }} <span class="mode-pill">MATERIAL</span></label>
+  <mat-radio-group class="br-material-radio-group" [ngModel]="config.value" (ngModelChange)="valueChange.emit($event)">
+    <mat-radio-button
+      *ngFor="let opt of config.options"
+      [value]="opt.value"
+      [disabled]="config.disabled"
+      class="br-material-radio"
+    >
+      {{ opt.label }}
+    </mat-radio-button>
+  </mat-radio-group>
+</div>

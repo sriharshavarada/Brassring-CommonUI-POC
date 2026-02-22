@@ -9,21 +9,42 @@
     </div>
 
     <div class="nav-links">
-      <a routerLink="/users" routerLinkActive="active" class="nav-link">
-        <span class="nav-icon">👥</span>
-        Users
-      </a>
-      <a routerLink="/orders" routerLinkActive="active" class="nav-link">
-        <span class="nav-icon">📦</span>
-        Orders
-      </a>
-      <a routerLink="/modals" routerLinkActive="active" class="nav-link">
-        <span class="nav-icon">🗖</span>
-        Modals
-      </a>
+      <details #pagesMenuRef class="nav-menu" routerLinkActive="active" [open]="pagesMenuOpen">
+        <summary class="nav-link menu-trigger" (click)="togglePagesMenu($event)">
+          <span class="nav-icon">🗂️</span>
+          Pages
+          <span class="caret">▾</span>
+        </summary>
+        <div class="menu-panel">
+          <a routerLink="/users" routerLinkActive="active" class="menu-item" (click)="closeMenus()">
+            <span class="nav-icon">👥</span>
+            Users
+          </a>
+          <a routerLink="/orders" routerLinkActive="active" class="menu-item" (click)="closeMenus()">
+            <span class="nav-icon">📦</span>
+            Orders
+          </a>
+          <a routerLink="/add-user" routerLinkActive="active" class="menu-item" (click)="closeMenus()">
+            <span class="nav-icon">➕</span>
+            Add User
+          </a>
+          <a routerLink="/add-order" routerLinkActive="active" class="menu-item" (click)="closeMenus()">
+            <span class="nav-icon">🧾</span>
+            Add Order
+          </a>
+          <a routerLink="/modals" routerLinkActive="active" class="menu-item" (click)="closeMenus()">
+            <span class="nav-icon">🗖</span>
+            Modals
+          </a>
+        </div>
+      </details>
       <a routerLink="/playground" routerLinkActive="active" class="nav-link">
         <span class="nav-icon">🧪</span>
         Playground
+      </a>
+      <a routerLink="/modes" routerLinkActive="active" class="nav-link">
+        <span class="nav-icon">🎛️</span>
+        Modes
       </a>
       <a routerLink="/docs" routerLinkActive="active" class="nav-link">
         <span class="nav-icon">📘</span>
@@ -31,16 +52,36 @@
       </a>
     </div>
 
-    <div class="nav-mode">
-      <span class="mode-dot" [class.custom]="runtimeUiConfig.getModesSnapshot().grid === 'CUSTOM'"
-        [class.material]="runtimeUiConfig.getModesSnapshot().grid === 'MATERIAL'"
-        [class.canvas]="runtimeUiConfig.getModesSnapshot().grid === 'CANVAS'"></span>
-      <span class="mode-text">
-        G: {{ runtimeUiConfig.getModesSnapshot().grid }} |
-        D: {{ runtimeUiConfig.getModesSnapshot().date }} |
-        M: {{ runtimeUiConfig.getModesSnapshot().modal }}
-      </span>
-    </div>
+    <details #modesMenuRef class="mode-menu" [open]="modesMenuOpen">
+      <summary class="mode-summary" (click)="toggleModesMenu($event)">
+        <span class="mode-dot" [class.custom]="modes.grid === 'CUSTOM'" [class.material]="modes.grid === 'MATERIAL'"
+          [class.canvas]="modes.grid === 'CANVAS'"></span>
+        <span class="mode-label">Modes</span>
+        <span class="mode-chip mode-chip-grid">G: {{ modes.grid }}</span>
+        <span class="mode-chip mode-chip-date">D: {{ modes.date }}</span>
+        <span class="mode-count">+7</span>
+        <span class="caret">▾</span>
+      </summary>
+
+      <div class="mode-panel">
+        <div class="mode-panel-head">
+          <strong>Active UI Modes</strong>
+          <a routerLink="/modes" (click)="closeMenus()">Manage</a>
+        </div>
+
+        <div class="mode-grid-summary">
+          <div class="mode-kv"><span>Grid</span><b>{{ modes.grid }}</b></div>
+          <div class="mode-kv"><span>Date</span><b>{{ modes.date }}</b></div>
+          <div class="mode-kv"><span>Modal Pop-up</span><b>{{ modes.modal }}</b></div>
+          <div class="mode-kv"><span>Text</span><b>{{ modes.text }}</b></div>
+          <div class="mode-kv"><span>Single</span><b>{{ modes.singleSelect }}</b></div>
+          <div class="mode-kv"><span>Multi</span><b>{{ modes.multiSelect }}</b></div>
+          <div class="mode-kv"><span>Checkbox</span><b>{{ modes.checkbox }}</b></div>
+          <div class="mode-kv"><span>Radio</span><b>{{ modes.radio }}</b></div>
+          <div class="mode-kv"><span>Auto</span><b>{{ modes.autocomplete }}</b></div>
+        </div>
+      </div>
+    </details>
   </nav>
 
   <!-- Banner showing architecture info -->
@@ -49,7 +90,7 @@
       <span class="banner-icon">🏗️</span>
       <span>
         <strong>Architecture Demo:</strong>
-        Switch modes from <code>/playground</code> (or set defaults in
+        Switch modes from <code>/modes</code> or from local playground controls (or set defaults in
         <code>common/config/ui-mode.config.ts</code>
         for each control)
         — all screens update automatically with <strong>zero consumer code changes</strong>.

@@ -1,0 +1,5 @@
+<div class="br-control br-text-control">
+  <label class="br-label">{{ config.label }}</label>
+  <input class="br-input" type="text" [placeholder]="config.placeholder" [disabled]="config.disabled"
+    [required]="config.required" [ngModel]="config.value" (ngModelChange)="valueChange.emit($event)" />
+</div>

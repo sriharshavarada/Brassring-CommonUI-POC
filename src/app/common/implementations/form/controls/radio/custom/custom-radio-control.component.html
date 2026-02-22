@@ -1,0 +1,23 @@
+<div class="br-radio-group">
+  <label class="br-label">{{ config.label }} <span class="mode-pill">CUSTOM</span></label>
+  <div class="br-radio-options">
+    <label
+      class="br-radio-option"
+      [class.is-selected]="config.value === opt.value"
+      [class.is-disabled]="!!config.disabled"
+      *ngFor="let opt of config.options"
+    >
+      <input
+        class="br-radio-input"
+        type="radio"
+        [name]="config.name"
+        [value]="opt.value"
+        [disabled]="config.disabled"
+        [checked]="config.value === opt.value"
+        (change)="valueChange.emit(opt.value)"
+      />
+      <span class="br-radio-dot" aria-hidden="true"></span>
+      <span class="br-radio-text">{{ opt.label }}</span>
+    </label>
+  </div>
+</div>

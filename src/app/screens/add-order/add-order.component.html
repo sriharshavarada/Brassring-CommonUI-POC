@@ -1,0 +1,25 @@
+<div class="form-page">
+  <header class="form-header">
+    <h1>Add Order</h1>
+    <p>Order creation layout using common date/controls wrappers.</p>
+  </header>
+
+  <section class="form-card">
+    <h2>Order Details</h2>
+    <div class="form-grid">
+      <div class="field"><br-text [config]="orderCodeConfig" (valueChange)="updateOrderCode($event)"></br-text></div>
+      <div class="field"><br-text [config]="customerConfig" (valueChange)="updateCustomer($event)"></br-text></div>
+      <div class="field"><br-text [config]="amountConfig" (valueChange)="updateAmount($event)"></br-text></div>
+      <div class="field"><br-single-select [config]="statusConfig" (valueChange)="updateStatus($event)"></br-single-select></div>
+      <div class="field"><br-date [config]="orderDateConfig" (dateChange)="updateOrderDate($event)"></br-date></div>
+      <div class="field"><br-date [config]="deliveryDateConfig" (dateChange)="updateDeliveryDate($event)"></br-date></div>
+      <div class="field full"><br-checkbox [config]="expeditedConfig" (valueChange)="updateExpedited($event)"></br-checkbox></div>
+    </div>
+
+    <div class="actions">
+      <button type="button" class="btn primary" (click)="submit()">Save Order</button>
+    </div>
+  </section>
+
+  <p class="result" *ngIf="submitMessage">{{ submitMessage }}</p>
+</div>

@@ -1,0 +1,9 @@
+<br-custom-autocomplete-control *ngIf="mode === 'CUSTOM' && customConfig as cfg"
+  [config]="cfg"
+  (valueChange)="valueChange.emit($event)">
+</br-custom-autocomplete-control>
+
+<br-material-autocomplete-control *ngIf="mode === 'MATERIAL' && materialConfig as cfg"
+  [config]="cfg"
+  (valueChange)="valueChange.emit($event)">
+</br-material-autocomplete-control>

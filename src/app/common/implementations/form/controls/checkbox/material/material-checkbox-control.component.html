@@ -1,0 +1,4 @@
+<mat-checkbox class="br-material-checkbox" [disabled]="config.disabled" [ngModel]="config.checked"
+  (ngModelChange)="valueChange.emit($event)">
+  {{ config.label }}
+</mat-checkbox>

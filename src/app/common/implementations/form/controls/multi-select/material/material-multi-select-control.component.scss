@@ -1,0 +1,46 @@
+.br-material-field {
+  width: 100%;
+}
+
+:host ::ng-deep .br-material-field .mat-mdc-select-value-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+:host ::ng-deep .br-material-field .mat-mdc-option .mdc-label {
+  width: 100%;
+}
+
+:host ::ng-deep .br-material-field .mat-mdc-option .mat-mdc-checkbox {
+  width: 100%;
+}
+
+:host ::ng-deep .br-multi-select-panel .mat-pseudo-checkbox {
+  display: none !important;
+}
+
+.br-selected-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.br-chip {
+  border: 1px solid #d1d5db;
+  background: #f8fafc;
+  color: #1f2937;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.chip-close {
+  font-weight: 700;
+  line-height: 1;
+}

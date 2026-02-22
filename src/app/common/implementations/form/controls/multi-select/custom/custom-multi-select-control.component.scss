@@ -1,0 +1,121 @@
+.br-control {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+}
+
+.br-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1f2a3d;
+}
+
+.br-multi-trigger {
+  min-height: 42px;
+  border-radius: 10px;
+  border: 1px solid #c8d5e6;
+  padding: 8px 12px;
+  font-size: 14px;
+  background: #fff;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.br-multi-trigger:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.br-multi-trigger:disabled {
+  background: #f1f5f9;
+  color: #64748b;
+  cursor: not-allowed;
+}
+
+.trigger-text {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.trigger-caret {
+  color: #475569;
+  font-size: 12px;
+  transition: transform 120ms ease;
+}
+
+.trigger-caret.open {
+  transform: rotate(180deg);
+}
+
+.br-options-panel {
+  position: absolute;
+  top: 74px;
+  left: 0;
+  right: 0;
+  z-index: 4;
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.15);
+  max-height: 220px;
+  overflow: auto;
+  padding: 6px;
+}
+
+.br-option-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.br-option-row:hover {
+  background: #f8fafc;
+}
+
+.br-option-row input[type='checkbox'] {
+  accent-color: #2563eb;
+  width: 16px;
+  height: 16px;
+}
+
+.br-selected-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.br-chip {
+  border: 1px solid #bfdbfe;
+  background: #eff6ff;
+  color: #1e3a8a;
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.chip-close {
+  font-weight: 700;
+  line-height: 1;
+}
+
+.br-chip:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

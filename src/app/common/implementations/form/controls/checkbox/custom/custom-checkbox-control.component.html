@@ -1,0 +1,5 @@
+<label class="br-checkbox-row">
+  <input class="br-checkbox" type="checkbox" [disabled]="config.disabled" [ngModel]="config.checked"
+    (ngModelChange)="valueChange.emit($event)" />
+  <span>{{ config.label }}</span>
+</label>

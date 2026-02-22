@@ -31,9 +31,9 @@ import {
 import { RuntimeUiConfigService } from '../../services/runtime-ui-config.service';
 
 // Implementation components
-import { CustomGridComponent } from '../../implementations/custom-grid/custom-grid.component';
-import { MaterialGridComponent } from '../../implementations/material-grid/material-grid.component';
-import { CanvasGridComponent } from '../../implementations/canvas-grid/canvas-grid.component';
+import { CustomGridComponent } from '../../implementations/grid/custom/custom-grid.component';
+import { MaterialGridComponent } from '../../implementations/grid/material/material-grid.component';
+import { CanvasGridComponent } from '../../implementations/grid/canvas/canvas-grid.component';
 
 @Component({
     selector: 'br-grid',

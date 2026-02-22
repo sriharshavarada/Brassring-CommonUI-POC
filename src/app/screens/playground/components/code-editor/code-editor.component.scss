@@ -42,6 +42,8 @@
   min-height: 360px;
   max-height: 360px;
   height: 360px;
+  scrollbar-width: thin;
+  scrollbar-color: #5a6472 #1f2430;
 }
 
 .highlight-layer {
@@ -62,6 +64,29 @@
   -webkit-user-select: text;
   -moz-user-select: text;
   white-space: pre;
+}
+
+.highlight-layer::-webkit-scrollbar,
+.input-layer::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.highlight-layer::-webkit-scrollbar-track,
+.input-layer::-webkit-scrollbar-track {
+  background: #1f2430;
+}
+
+.highlight-layer::-webkit-scrollbar-thumb,
+.input-layer::-webkit-scrollbar-thumb {
+  background: #5a6472;
+  border-radius: 999px;
+  border: 2px solid #1f2430;
+}
+
+.highlight-layer::-webkit-scrollbar-thumb:hover,
+.input-layer::-webkit-scrollbar-thumb:hover {
+  background: #738095;
 }
 
 :host ::ng-deep .tok-keyword { color: #569cd6; }

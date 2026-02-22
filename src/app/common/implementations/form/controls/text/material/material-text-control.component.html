@@ -1,0 +1,5 @@
+<mat-form-field appearance="outline" class="br-material-field">
+  <mat-label>{{ config.label }}</mat-label>
+  <input matInput [placeholder]="config.placeholder" [disabled]="config.disabled"
+    [required]="config.required" [ngModel]="config.value" (ngModelChange)="valueChange.emit($event)" />
+</mat-form-field>

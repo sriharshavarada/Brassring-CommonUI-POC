@@ -1,0 +1,9 @@
+<br-custom-single-select-control *ngIf="mode === 'CUSTOM' && customConfig as cfg"
+  [config]="cfg"
+  (valueChange)="valueChange.emit($event)">
+</br-custom-single-select-control>
+
+<br-material-single-select-control *ngIf="mode === 'MATERIAL' && materialConfig as cfg"
+  [config]="cfg"
+  (valueChange)="valueChange.emit($event)">
+</br-material-single-select-control>

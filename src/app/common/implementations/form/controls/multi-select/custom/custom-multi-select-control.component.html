@@ -1,0 +1,25 @@
+<div class="br-control br-multi-select-control">
+  <label class="br-label">{{ config.label }}</label>
+  <button type="button" class="br-multi-trigger" [disabled]="config.disabled" (click)="togglePanel()">
+    <span class="trigger-text" *ngIf="selectedLabels.length === 0">Select options</span>
+    <span class="trigger-text" *ngIf="selectedLabels.length > 0">{{ selectedLabels.join(', ') }}</span>
+    <span class="trigger-caret" [class.open]="panelOpen">▾</span>
+  </button>
+
+  <div class="br-options-panel" *ngIf="panelOpen">
+    <label class="br-option-row" *ngFor="let opt of config.options">
+      <input type="checkbox" [checked]="isSelected(opt.value)" [disabled]="config.disabled" (change)="toggleValue(opt.value)" />
+      <span>{{ opt.label }}</span>
+    </label>
+  </div>
+
+  <div class="br-selected-chips" *ngIf="selectedValues.length > 0">
+    <ng-container *ngFor="let opt of config.options">
+      <button type="button" class="br-chip" *ngIf="isSelected(opt.value)" (click)="removeValue(opt.value, $event)"
+        [disabled]="config.disabled">
+        <span>{{ opt.label }}</span>
+        <span class="chip-close">x</span>
+      </button>
+    </ng-container>
+  </div>
+</div>

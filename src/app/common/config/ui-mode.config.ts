@@ -24,11 +24,19 @@
 export type UiMode = 'CUSTOM' | 'MATERIAL' | 'CANVAS';
 export type DateUiMode = 'CUSTOM' | 'MATERIAL';
 export type ModalUiMode = 'CUSTOM' | 'MATERIAL';
+export type ControlUiMode = 'CUSTOM' | 'MATERIAL';
+export type FormUiMode = ControlUiMode;
 
 export interface UiModeByControl {
     grid: UiMode;
     date: DateUiMode;
     modal: ModalUiMode;
+    text: ControlUiMode;
+    singleSelect: ControlUiMode;
+    multiSelect: ControlUiMode;
+    checkbox: ControlUiMode;
+    radio: ControlUiMode;
+    autocomplete: ControlUiMode;
 }
 
 // ▼▼▼ CHANGE THESE VALUES TO SWITCH CONTROL LIBRARIES ▼▼▼
@@ -36,6 +44,12 @@ export const UI_MODE_BY_CONTROL: UiModeByControl = {
     grid: 'CUSTOM',
     date: 'MATERIAL',
     modal: 'CUSTOM',
+    text: 'CUSTOM',
+    singleSelect: 'CUSTOM',
+    multiSelect: 'CUSTOM',
+    checkbox: 'CUSTOM',
+    radio: 'CUSTOM',
+    autocomplete: 'CUSTOM',
 };
 // ▲▲▲ CHANGE THESE VALUES TO SWITCH CONTROL LIBRARIES ▲▲▲
 

@@ -27,8 +27,8 @@ import { ModalAdapter as BrModalAdapter, CustomModalInput, MaterialModalInput } 
 import { RuntimeUiConfigService } from '../../services/runtime-ui-config.service';
 
 // Implementation components
-import { CustomModalComponent } from '../../implementations/custom-modal/custom-modal.component';
-import { MaterialModalComponent } from '../../implementations/material-modal/material-modal.component';
+import { CustomModalComponent } from '../../implementations/modal/custom/custom-modal.component';
+import { MaterialModalComponent } from '../../implementations/modal/material/material-modal.component';
 
 @Component({
     selector: 'br-modal',

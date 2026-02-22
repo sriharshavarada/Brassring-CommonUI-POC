@@ -5,7 +5,7 @@ This document is intended for the next engineer/AI agent to continue work withou
 ## Repository
 - Path: `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC`
 - Branch: `main`
-- Git state at handoff time: **dirty working tree** (there are uncommitted changes from today's Playground/Runtime work)
+- Git state at handoff time: **dirty working tree** (there are many uncommitted UI/Playground/Modes-page changes)
 
 ## Commit Timeline (Important)
 These are the key commits in order (older -> newer):
@@ -49,6 +49,7 @@ Primary wrappers:
 - Grid: `CUSTOM`, `MATERIAL`, `CANVAS`
 - Date: `CUSTOM`, `MATERIAL`
 - Modal: `CUSTOM`, `MATERIAL`
+- Controls (separate wrappers per control): `CUSTOM`, `MATERIAL`
 
 ### 3) Shared advanced grid behavior
 - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/implementations/grid-shell/grid-shell.component.ts`
@@ -65,7 +66,9 @@ Primary wrappers:
 ### 4) Per-control mode switching
 - Mode config:
   - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/config/ui-mode.config.ts`
-- `UI_MODE_BY_CONTROL` supports separate mode per control (grid/date/modal).
+- `UI_MODE_BY_CONTROL` supports separate mode per control:
+  - grid/date/modal
+  - text/singleSelect/multiSelect/checkbox/radio/autocomplete
 
 ### 5) Runtime mode switching service (today)
 - Added runtime service with localStorage persistence:
@@ -76,13 +79,15 @@ Primary wrappers:
 - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/user-list/user-list.component.ts`
 - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/order-list/order-list.component.ts`
 - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/modal-demo/modal-demo.component.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/add-user/add-user.component.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/add-order/add-order.component.ts`
 
 ## Documentation Pages Added
 - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/docs/docs.component.ts`
 - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/docs/docs.component.html`
 - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/docs/docs.component.scss`
 
-## Major Work Done Today (Uncommitted, but implemented)
+## Major Work Done (Uncommitted, but implemented)
 
 ### A) Developer Playground (new capability)
 Added a full interactive playground route and screen:
@@ -91,12 +96,12 @@ Added a full interactive playground route and screen:
 - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/playground/playground.component.scss`
 
 What it provides now:
-- Per-control runtime mode switch UI (grid/date/modal)
 - Presets for each control type
 - Collapsible config editor sections
 - Collapsible consumer code sections
 - Live preview rendering
 - Event log panel
+- Per-playground local mode switching (grid / modal popup / controls)
 
 ### B) Real JSON editor workbench
 Added reusable JSON workbench with tree editing:
@@ -131,6 +136,7 @@ Capabilities:
 
 Important bug fixes today:
 - Removed accidental visible token strings like `tok-attr`, `tok-keyword`, `tok-selector` by preventing re-tokenization of generated spans.
+- Made code editor scrollbar visible on dark theme (vertical/horizontal thumb styling).
 
 ### D) Real code execution intent in preview
 Playground now treats consumer HTML as **real code snippets** containing actual wrapper tags:
@@ -146,7 +152,7 @@ Apply flow on Code Studio:
 - On success: preview renders control normally with applied wrapper and style
 
 ## Routes / App shell updates done today
-- Routes updated to include playground + docs:
+- Routes updated to include playground + docs + modes:
   - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/app.routes.ts`
 - Nav/app shell updated to expose these pages and show live mode state:
   - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/app.component.ts`
@@ -155,6 +161,80 @@ Apply flow on Code Studio:
 - README updated with docs/playground references:
   - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/README.md`
 
+## Latest Delta (Most Recent UI / Playground Changes)
+
+This section is the most important for the next AI to continue correctly.
+
+### 1) `Mode Studio` moved out of Playground into a dedicated page
+- New route/page:
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/modes/modes.component.ts`
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/modes/modes.component.html`
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/modes/modes.component.scss`
+- `Mode Studio` removed from `/playground` to reduce clutter.
+- New top-nav item added: `Modes`.
+- Top-right compact Modes dropdown `Manage` now routes to `/modes`.
+
+### 2) Playground now has local mode switching per playground section
+- Grid Playground header has inline `Grid Mode` segmented switch.
+- Controls Playground header has inline mode switch:
+  - `All Controls` => bulk `CUSTOM/MATERIAL`
+  - single control playground => mode for that control only
+  - Date control uses date modes
+- Modal Popup Playground header has inline `Modal Pop-up Mode` switch.
+- This makes testing possible without going to global Mode Studio.
+
+### 3) Developer Playground layout/UX improved significantly
+- Standalone `Date Playground` tab removed (date is covered under Controls Playground).
+- Local collapsible accordions for each playground:
+  - Configurator
+  - Code Studio
+- Both are above preview and default collapsed for Grid / Controls / Modal Popup.
+- Redundant top `Show/Hide Config Editor` and `Show/Hide Code Studio` buttons removed.
+- Preview remains immediately visible.
+- Modal section renamed to **Modal Popup Playground** and wording aligned to “popup”.
+- Modal action button moved near preview content (`Open Current Popup`) for better discoverability.
+
+### 4) Top app header/nav redesigned
+- Feature pages grouped into `Pages` dropdown (Users, Orders, Add User, Add Order, Modals).
+- `Playground`, `Modes`, `Docs` remain direct links.
+- Compact top-right `Modes` status dropdown added (instead of long inline mode text).
+- `Pages` and `Modes` dropdowns now close on outside click and close each other when opened.
+
+### 5) Controls implementation split (important architecture evolution)
+- Separate wrappers and implementations exist for each form control:
+  - `br-text`
+  - `br-single-select`
+  - `br-multi-select`
+  - `br-checkbox`
+  - `br-radio`
+  - `br-autocomplete`
+  - `br-date`
+- Adapters added for each control config mapping (similar to date adapter pattern).
+- Implementations grouped under `/src/app/common/implementations/form/controls/...`
+
+### 6) UI quality changes in controls/playground
+- Custom vs Material radio styles are intentionally differentiated now.
+- Multi-select redesigned:
+  - dropdown-style control
+  - checkbox options
+  - selected chips below with `x` remove
+- Material multi-select duplicate checkbox indicator issue fixed (Material pseudo-checkbox hidden in panel).
+
+### 7) Consumer Code generator improvements
+- Controls playground generated TS now matches generated HTML:
+  - includes `asTextConfig`, `asSingleSelectConfig`, etc. only when needed
+  - generated code is control-specific (single-control playgrounds no longer show all-control helper noise)
+- Modal consumer demo text updated to popup wording.
+
+### 8) Grid pagination defaults changed for easier preview
+- Shared grid shell page size options changed to: `5, 10, 15`
+- Default page size changed to `5`
+- Playground grid presets (`simple`, `moderate`, `complex`) now default to `5`
+- This was done to make bottom pagination/footer visible immediately in playground.
+
+### 9) Naming consistency changes
+- User-facing labels now use **Modal Pop-up** in several places (playground + modes page + top modes summary).
+
 ## Current Known State / Caveats
 - TypeScript app typecheck passes.
 - In this environment, production build can fail due blocked internet font fetch (`fonts.googleapis.com`) during font inlining.
@@ -162,19 +242,17 @@ Apply flow on Code Studio:
 - Multiple ng serve processes may exist; if `4200` is taken, Angular auto-prompts next port.
 
 ## Current Working Tree Changes (not yet committed)
-At handoff time, these are modified/new:
-- `README.md`
-- `src/app/app.component.html`
-- `src/app/app.component.scss`
-- `src/app/app.component.ts`
-- `src/app/app.routes.ts`
-- `src/app/common/components/br-date/br-date.component.ts`
-- `src/app/common/components/br-grid/br-grid.component.ts`
-- `src/app/common/components/br-modal/br-modal.component.ts`
-- `src/app/common/index.ts`
-- `src/app/common/services/...` (new)
-- `src/app/screens/docs/...` (new)
-- `src/app/screens/playground/...` (new + many files)
+The working tree is still dirty and includes substantial changes across:
+- app shell/nav (`app.component.*`)
+- routes (`app.routes.ts`)
+- common runtime mode service + config + wrappers + adapters
+- grid shell / grid implementations
+- controls wrappers/adapters/implementations
+- playground (large set of files)
+- docs screen + handoff docs
+- new `Modes` page (`src/app/screens/modes/...`)
+
+If continuing from here, run `git status --short` first and avoid reverting unrelated user changes.
 
 ## How next AI should continue (recommended order)
 1. Read this document first.
@@ -182,9 +260,12 @@ At handoff time, these are modified/new:
    - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/docs/01-high-level-architecture.md`
    - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/docs/02-runtime-flow-browser-to-control.md`
    - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/docs/03-consumer-integration-guide.md`
-3. Verify local run using `npm start` and open `/playground`.
-4. If continuing Playground editor accuracy, next step is replacing custom highlighter with Monaco for true folding/intellisense/diagnostics.
-5. Before new feature work, commit or stash current uncommitted changes intentionally to avoid loss.
+3. Verify local run using `npm start` and open:
+   - `/playground`
+   - `/modes`
+4. Confirm local mode switches (inside each playground card) and global modes (`/modes`) both update runtime behavior.
+5. If continuing Playground editor accuracy, next step is replacing custom highlighter with Monaco for true folding/intellisense/diagnostics.
+6. Before new feature work, commit or stash current uncommitted changes intentionally to avoid loss.
 
 ## One-line context for next AI prompt
-Use `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/docs/00-project-handoff-so-far.md` as the authoritative handoff; project already has per-control runtime modes, advanced grid shell, docs page, and a large uncommitted Playground/Code Studio implementation from today.
+Use `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/docs/00-project-handoff-so-far.md` as the authoritative handoff; project now has a dedicated `/modes` page for global mode control, local per-playground mode switches, advanced grid shell (custom/material/canvas), popup modal playground, controls wrappers/adapters/implementations, and a large uncommitted Playground/Code Studio UX iteration.

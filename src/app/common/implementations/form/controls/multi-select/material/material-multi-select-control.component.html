@@ -1,0 +1,24 @@
+<mat-form-field appearance="outline" class="br-material-field">
+  <mat-label>{{ config.label }}</mat-label>
+  <mat-select multiple [disabled]="config.disabled" [ngModel]="config.value" (ngModelChange)="valueChange.emit($event)"
+    panelClass="br-multi-select-panel">
+    <mat-select-trigger>
+      {{ selectedLabels.length > 0 ? selectedLabels.join(', ') : 'Select options' }}
+    </mat-select-trigger>
+    <mat-option *ngFor="let opt of config.options" [value]="opt.value">
+      <mat-checkbox [checked]="isSelected(opt.value)" [disableRipple]="true">
+        {{ opt.label }}
+      </mat-checkbox>
+    </mat-option>
+  </mat-select>
+</mat-form-field>
+
+<div class="br-selected-chips" *ngIf="selectedValues.length > 0">
+  <ng-container *ngFor="let opt of config.options">
+    <button type="button" class="br-chip" *ngIf="isSelected(opt.value)" (click)="removeValue(opt.value)"
+      [disabled]="config.disabled">
+      <span>{{ opt.label }}</span>
+      <span class="chip-close">x</span>
+    </button>
+  </ng-container>
+</div>

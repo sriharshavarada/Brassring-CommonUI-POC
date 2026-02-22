@@ -34,11 +34,18 @@ export class RuntimeUiConfigService {
       if (!raw) {
         return { ...UI_MODE_BY_CONTROL };
       }
-      const parsed = JSON.parse(raw) as Partial<UiModeByControl>;
+      const parsed = JSON.parse(raw) as Partial<UiModeByControl> & { form?: UiModeByControl['text'] };
+      const legacyFormMode = parsed.form;
       return {
         grid: parsed.grid ?? UI_MODE_BY_CONTROL.grid,
         date: parsed.date ?? UI_MODE_BY_CONTROL.date,
         modal: parsed.modal ?? UI_MODE_BY_CONTROL.modal,
+        text: parsed.text ?? legacyFormMode ?? UI_MODE_BY_CONTROL.text,
+        singleSelect: parsed.singleSelect ?? legacyFormMode ?? UI_MODE_BY_CONTROL.singleSelect,
+        multiSelect: parsed.multiSelect ?? legacyFormMode ?? UI_MODE_BY_CONTROL.multiSelect,
+        checkbox: parsed.checkbox ?? legacyFormMode ?? UI_MODE_BY_CONTROL.checkbox,
+        radio: parsed.radio ?? legacyFormMode ?? UI_MODE_BY_CONTROL.radio,
+        autocomplete: parsed.autocomplete ?? legacyFormMode ?? UI_MODE_BY_CONTROL.autocomplete,
       };
     } catch {
       return { ...UI_MODE_BY_CONTROL };
@@ -53,4 +60,3 @@ export class RuntimeUiConfigService {
     }
   }
 }
-

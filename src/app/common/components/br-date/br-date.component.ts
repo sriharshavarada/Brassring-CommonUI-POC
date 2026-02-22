@@ -29,8 +29,8 @@ import { DateAdapter as BrDateAdapter, CustomDateInput, MaterialDateInput } from
 import { RuntimeUiConfigService } from '../../services/runtime-ui-config.service';
 
 // Implementation components
-import { CustomDateComponent } from '../../implementations/custom-date/custom-date.component';
-import { MaterialDateComponent } from '../../implementations/material-date/material-date.component';
+import { CustomDateComponent } from '../../implementations/form/date/custom/custom-date.component';
+import { MaterialDateComponent } from '../../implementations/form/date/material/material-date.component';
 
 @Component({
     selector: 'br-date',

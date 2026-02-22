@@ -130,7 +130,7 @@ export class GridAdapter {
             columns,
             data: config.data || [],
             pagination: config.pagination ?? false,
-            pageSize: config.pageSize ?? 10,
+            pageSize: config.pageSize ?? 5,
             sorting: config.sorting ?? false,
             striped: config.striped ?? true,
             title: config.title ?? '',

@@ -1,0 +1,8 @@
+<div class="br-control br-single-select-control">
+  <label class="br-label">{{ config.label }}</label>
+  <select class="br-select" [disabled]="config.disabled" [required]="config.required" [ngModel]="config.value"
+    (ngModelChange)="valueChange.emit($event)">
+    <option [ngValue]="''">Select...</option>
+    <option *ngFor="let opt of config.options" [ngValue]="opt.value">{{ opt.label }}</option>
+  </select>
+</div>

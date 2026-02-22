@@ -1,0 +1,8 @@
+<mat-form-field appearance="outline" class="br-material-field">
+  <mat-label>{{ config.label }}</mat-label>
+  <input matInput [matAutocomplete]="auto" [placeholder]="config.placeholder" [disabled]="config.disabled"
+    [ngModel]="config.value" (ngModelChange)="valueChange.emit($event)" />
+  <mat-autocomplete #auto="matAutocomplete">
+    <mat-option *ngFor="let opt of filtered()" [value]="opt.label">{{ opt.label }}</mat-option>
+  </mat-autocomplete>
+</mat-form-field>

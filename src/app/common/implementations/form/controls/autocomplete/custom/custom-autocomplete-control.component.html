@@ -1,0 +1,8 @@
+<div class="br-control br-autocomplete-control">
+  <label class="br-label">{{ config.label }}</label>
+  <input class="br-input" [attr.list]="config.listId" type="text" [placeholder]="config.placeholder"
+    [disabled]="config.disabled" [ngModel]="config.value" (ngModelChange)="valueChange.emit($event)" />
+  <datalist [id]="config.listId">
+    <option *ngFor="let opt of config.options" [value]="opt.label"></option>
+  </datalist>
+</div>
