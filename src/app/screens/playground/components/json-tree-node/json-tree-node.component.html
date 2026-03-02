@@ -5,6 +5,7 @@
   <span class="toggle-spacer" *ngIf="!isComposite"></span>
 
   <span class="node-key" *ngIf="!isRoot">{{ keyLabel }}:</span>
+  <button type="button" class="delete-btn" *ngIf="!isRoot" (click)="onDelete($event)" aria-label="Delete node">×</button>
 
   <ng-container *ngIf="isComposite; else primitiveNode">
     <span class="token">{{ isArray ? '[' : '{' }}</span>
@@ -32,14 +33,14 @@
   <ng-container *ngIf="isArray; else objectChildren">
     <app-json-tree-node *ngFor="let item of value; let i = index; trackBy: trackByIndex" [keyLabel]="'[' + i + ']'"
       [value]="item" [path]="childPath(i)" [depth]="depth + 1" [collapsedPaths]="collapsedPaths"
-      (nodeChange)="nodeChange.emit($event)">
+      (nodeChange)="nodeChange.emit($event)" (nodeDelete)="nodeDelete.emit($event)">
     </app-json-tree-node>
   </ng-container>
 
   <ng-template #objectChildren>
     <app-json-tree-node *ngFor="let key of objectKeys(value); trackBy: trackByKey" [keyLabel]="key" [value]="value[key]"
       [path]="childPath(key)" [depth]="depth + 1" [collapsedPaths]="collapsedPaths"
-      (nodeChange)="nodeChange.emit($event)">
+      (nodeChange)="nodeChange.emit($event)" (nodeDelete)="nodeDelete.emit($event)">
     </app-json-tree-node>
   </ng-template>
 

@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import {
+  BrAdvancedDateConfiguration,
   BrDateComponent,
   BrDateConfig,
   BrFormActionEvent,
@@ -63,6 +64,20 @@ interface DemoCodeState {
   htmlBefore: string;
   htmlAfter: string;
 }
+
+const PLAYGROUND_DATE_CONFIGURATION: BrAdvancedDateConfiguration = {
+  Disabledaysofweek: ['', '', '', 3, '', '', ''],
+  Firstdayofweek: '3',
+  Defaulttodaysdate: true,
+  Datedisplay: '1',
+  Currentdate: 'year',
+  Customdate: 'year',
+  Minslidervalue: '-10',
+  Maxslidervalue: '10',
+  Mindate: '0d',
+  Maxdate: '',
+  includeToday: false,
+};
 
 @Component({
   selector: 'app-playground',
@@ -637,6 +652,12 @@ export class PlaygroundComponent {
     return {
       label: field.label,
       value: this.controlValue(field) || '',
+      minDate: field.minDate ? new Date(field.minDate) : null,
+      maxDate: field.maxDate ? new Date(field.maxDate) : null,
+      language: field.language,
+      locale: field.locale,
+      dateFormat: field.dateFormat,
+      dateConfiguration: field.dateConfiguration ?? field.DateConfiguration ?? null,
       disabled: field.disabled,
       placeholder: field.placeholder || 'Select date',
       required: field.required,
@@ -1623,6 +1644,10 @@ ${helperBlock}
       value: '2026-01-15',
       minDate: new Date('2025-01-01'),
       maxDate: new Date('2026-12-31'),
+      language: 'en-US',
+      locale: 'en-US',
+      dateFormat: 'MM/dd/yyyy',
+      DateConfiguration: this.clone(PLAYGROUND_DATE_CONFIGURATION),
       disabled: false,
       placeholder: 'Pick a date',
       required: false,
@@ -1640,6 +1665,10 @@ ${helperBlock}
       value: '2026-02-01',
       minDate: new Date('2026-01-01'),
       maxDate: new Date('2026-12-31'),
+      language: 'fr-FR',
+      locale: 'fr-FR',
+      dateFormat: 'dd/MM/yyyy',
+      DateConfiguration: this.clone(PLAYGROUND_DATE_CONFIGURATION),
       disabled: false,
       placeholder: 'Compact mode',
       required: true,
@@ -1657,6 +1686,9 @@ ${helperBlock}
       value: '2026-03-10',
       minDate: null,
       maxDate: null,
+      language: 'ar-SA',
+      locale: 'ar-SA',
+      dateFormat: 'yyyy-MM-dd',
       disabled: true,
       placeholder: 'Disabled',
       required: false,
@@ -1705,7 +1737,15 @@ ${helperBlock}
             { label: 'Contract', value: 'ct' },
           ],
         },
-        { id: 'startDate', type: 'date', label: 'Start Date' },
+        {
+          id: 'startDate',
+          type: 'date',
+          label: 'Start Date',
+          language: 'en-US',
+          locale: 'en-US',
+          dateFormat: 'MM/dd/yyyy',
+          DateConfiguration: this.clone(PLAYGROUND_DATE_CONFIGURATION),
+        },
         {
           id: 'location',
           type: 'autocomplete',
@@ -1740,7 +1780,15 @@ ${helperBlock}
       fields: [
         { id: 'name', type: 'text', label: 'Name', required: true },
         { id: 'agree', type: 'checkbox', label: 'I Agree' },
-        { id: 'when', type: 'date', label: 'Date' },
+        {
+          id: 'when',
+          type: 'date',
+          label: 'Date',
+          language: 'fr-FR',
+          locale: 'fr-FR',
+          dateFormat: 'dd/MM/yyyy',
+          DateConfiguration: this.clone(PLAYGROUND_DATE_CONFIGURATION),
+        },
       ],
       value: { name: '', agree: false, when: '' },
       showActions: true,
@@ -1752,7 +1800,17 @@ ${helperBlock}
   private buildSingleControlVariantConfig(control: Exclude<ControlPlayground, 'all'>, variant: string): BrFormConfig {
     if (control === 'date') {
       return this.singleControlConfig(
-        { id: 'dateControl', type: 'date', label: 'Start Date', placeholder: 'Select start date', required: variant === 'bounded' },
+        {
+          id: 'dateControl',
+          type: 'date',
+          label: 'Start Date',
+          placeholder: 'Select start date',
+          required: variant === 'bounded',
+          language: 'en-US',
+          locale: 'en-US',
+          dateFormat: 'MM/dd/yyyy',
+          DateConfiguration: this.clone(PLAYGROUND_DATE_CONFIGURATION),
+        },
         variant === 'disabled' ? '2026-03-10' : '2026-02-10',
         `${this.controlPlaygroundLabels[control]} Playground`,
         `Variant: ${this.controlVariantLabel(variant)}`,

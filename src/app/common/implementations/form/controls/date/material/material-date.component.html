@@ -4,10 +4,9 @@
         <mat-label>{{ config.label }}<span class="required-marker" *ngIf="config.required"> *</span></mat-label>
         <input matInput [matDatepicker]="picker" [ngModel]="config.value" (ngModelChange)="onDateChange($event)"
             [min]="config.minDate" [max]="config.maxDate" [disabled]="config.disabled"
-            [required]="config.required" [placeholder]="config.placeholder">
+            [required]="config.required" [placeholder]="config.placeholder" [matDatepickerFilter]="dateFilter">
         <mat-datepicker-toggle *ngIf="config.uiConfig.showIcon" matIconSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-datepicker #picker></mat-datepicker>
+        <mat-datepicker #picker [startAt]="startAt" [calendarHeaderComponent]="calendarHeader"></mat-datepicker>
         <mat-hint *ngIf="config.errorMessage">{{ config.errorMessage }}</mat-hint>
     </mat-form-field>
-    <span class="badge" *ngIf="config.uiConfig.showBadge">Material</span>
 </div>

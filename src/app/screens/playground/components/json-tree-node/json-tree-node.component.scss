@@ -30,6 +30,19 @@
   min-width: 70px;
 }
 
+.delete-btn {
+  width: 18px;
+  height: 18px;
+  border: 1px solid #e2a3a3;
+  background: #fff5f5;
+  color: #c53030;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+}
+
 .token {
   color: #805ad5;
   font-weight: 700;

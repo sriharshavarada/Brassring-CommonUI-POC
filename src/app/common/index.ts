@@ -43,7 +43,7 @@ export type {
     BrGridSortRule,
     BrGridFilterRule,
 } from './models/grid-config.model';
-export type { BrDateConfig, BrDateUiConfig } from './models/date-config.model';
+export type { BrDateConfig, BrDateUiConfig, BrAdvancedDateConfiguration } from './models/date-config.model';
 export type { BrModalConfig, BrModalUiConfig, BrModalAction, BrModalActionEvent } from './models/modal-config.model';
 export type { BrFormConfig, BrFormField, BrFormFieldType, BrFormOption, BrFormUiConfig, BrFormActionEvent, BrFormActionSource } from './models/form-config.model';
 export type {

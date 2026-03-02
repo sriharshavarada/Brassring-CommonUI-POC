@@ -69,8 +69,9 @@
             </div>
           </div>
           <div class="file-tabs">
-            <button type="button" class="file-tab" *ngFor="let file of codeFiles" [class.active]="gridCode.activeFile === file"
-              (click)="setCodeFile('grid', file)">{{ file.toUpperCase() }}</button>
+            <button type="button" class="file-tab" *ngFor="let file of codeFiles"
+              [class.active]="gridCode.activeFile === file" (click)="setCodeFile('grid', file)">{{ file.toUpperCase()
+              }}</button>
           </div>
           <app-code-editor [language]="codeLanguage(gridCode.activeFile)"
             [value]="gridCode.activeFile === 'ts' ? gridCode.ts : (gridCode.activeFile === 'html' ? gridCode.html : gridCode.scss)"
@@ -101,21 +102,19 @@
           <h2>Controls Playground</h2>
           <div class="inline-mode-control">
             <span class="inline-mode-label">
-              {{ activeControlPlayground === 'all' ? 'Controls Modes' : (controlPlaygroundLabels[activeControlPlayground] + ' Mode') }}
+              {{ activeControlPlayground === 'all' ? 'Controls Modes' :
+              (controlPlaygroundLabels[activeControlPlayground] + ' Mode') }}
             </span>
-            <div class="segmented compact inline-mode-segmented" *ngIf="activeControlPlayground === 'all'; else controlsSingleHeaderMode">
+            <div class="segmented compact inline-mode-segmented"
+              *ngIf="activeControlPlayground === 'all'; else controlsSingleHeaderMode">
               <button type="button" class="seg-btn" (click)="setAllControlModes('CUSTOM')">CUSTOM</button>
               <button type="button" class="seg-btn" (click)="setAllControlModes('MATERIAL')">MATERIAL</button>
             </div>
             <ng-template #controlsSingleHeaderMode>
               <div class="segmented compact inline-mode-segmented">
-                <button
-                  type="button"
-                  class="seg-btn"
+                <button type="button" class="seg-btn"
                   *ngFor="let mode of (activeControlPlayground === 'date' ? dateModes : controlModes)"
-                  [class.active]="activeControlModeValue() === mode"
-                  (click)="setActiveControlPlaygroundMode(mode)"
-                >
+                  [class.active]="activeControlModeValue() === mode" (click)="setActiveControlPlaygroundMode(mode)">
                   {{ mode }}
                 </button>
               </div>
@@ -176,8 +175,9 @@
             </div>
           </div>
           <div class="file-tabs">
-            <button type="button" class="file-tab" *ngFor="let file of codeFiles" [class.active]="formCode.activeFile === file"
-              (click)="setCodeFile('form', file)">{{ file.toUpperCase() }}</button>
+            <button type="button" class="file-tab" *ngFor="let file of codeFiles"
+              [class.active]="formCode.activeFile === file" (click)="setCodeFile('form', file)">{{ file.toUpperCase()
+              }}</button>
           </div>
           <app-code-editor [language]="codeLanguage(formCode.activeFile)"
             [value]="formCode.activeFile === 'ts' ? formCode.ts : (formCode.activeFile === 'html' ? formCode.html : formCode.scss)"
@@ -240,8 +240,8 @@
           <div class="inline-mode-control">
             <span class="inline-mode-label">Modal Pop-up Mode</span>
             <div class="segmented compact inline-mode-segmented">
-              <button type="button" class="seg-btn" *ngFor="let mode of modalModes" [class.active]="modes.modal === mode"
-                (click)="setModalMode(mode)">
+              <button type="button" class="seg-btn" *ngFor="let mode of modalModes"
+                [class.active]="modes.modal === mode" (click)="setModalMode(mode)">
                 {{ mode }}
               </button>
             </div>
@@ -264,7 +264,8 @@
           <span class="inline-collapse-caret" [class.open]="!modalConfigCollapsed">▾</span>
         </button>
         <div class="inline-collapse-body" *ngIf="!modalConfigCollapsed">
-          <app-json-workbench title="Modal Pop-up Configurator" [value]="modalConfig" (valueChange)="onModalConfigChange($event)">
+          <app-json-workbench title="Modal Pop-up Configurator" [value]="modalConfig"
+            (valueChange)="onModalConfigChange($event)">
           </app-json-workbench>
         </div>
       </section>
@@ -285,8 +286,9 @@
             </div>
           </div>
           <div class="file-tabs">
-            <button type="button" class="file-tab" *ngFor="let file of codeFiles" [class.active]="modalCode.activeFile === file"
-              (click)="setCodeFile('modal', file)">{{ file.toUpperCase() }}</button>
+            <button type="button" class="file-tab" *ngFor="let file of codeFiles"
+              [class.active]="modalCode.activeFile === file" (click)="setCodeFile('modal', file)">{{ file.toUpperCase()
+              }}</button>
           </div>
           <app-code-editor [language]="codeLanguage(modalCode.activeFile)"
             [value]="modalCode.activeFile === 'ts' ? modalCode.ts : (modalCode.activeFile === 'html' ? modalCode.html : modalCode.scss)"

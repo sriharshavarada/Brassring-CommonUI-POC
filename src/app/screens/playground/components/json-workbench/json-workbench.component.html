@@ -19,7 +19,7 @@
       <div class="panel-title">Tree Editor</div>
       <div class="tree-panel">
         <app-json-tree-node [isRoot]="true" [keyLabel]="'root'" [value]="model" [path]="[]" [depth]="0"
-          [collapsedPaths]="collapsedPaths" (nodeChange)="onNodeChange($event)">
+          [collapsedPaths]="collapsedPaths" (nodeChange)="onNodeChange($event)" (nodeDelete)="onNodeDelete($event)">
         </app-json-tree-node>
       </div>
     </div>

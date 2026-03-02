@@ -29,8 +29,8 @@ import { DateAdapter as BrDateAdapter, CustomDateInput, MaterialDateInput } from
 import { RuntimeUiConfigService } from '../../services/runtime-ui-config.service';
 
 // Implementation components
-import { CustomDateComponent } from '../../implementations/form/date/custom/custom-date.component';
-import { MaterialDateComponent } from '../../implementations/form/date/material/material-date.component';
+import { CustomDateComponent } from '../../implementations/form/controls/date/custom/custom-date.component';
+import { MaterialDateComponent } from '../../implementations/form/controls/date/material/material-date.component';
 
 @Component({
     selector: 'br-date',
@@ -83,7 +83,7 @@ export class BrDateComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     onMaterialDateChange(value: Date | null): void {
-        this.dateChange.emit(value ? value.toISOString().split('T')[0] : '');
+        this.dateChange.emit(value ? this.toLocalIsoDate(value) : '');
     }
 
     ngOnDestroy(): void {
@@ -98,5 +98,12 @@ export class BrDateComponent implements OnInit, OnChanges, OnDestroy {
         } else {
             this.materialConfig = BrDateAdapter.toMaterial(this.config);
         }
+    }
+
+    private toLocalIsoDate(value: Date): string {
+        const year = value.getFullYear();
+        const month = String(value.getMonth() + 1).padStart(2, '0');
+        const day = String(value.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
     }
 }

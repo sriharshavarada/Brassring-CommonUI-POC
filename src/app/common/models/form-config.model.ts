@@ -1,3 +1,5 @@
+import type { BrAdvancedDateConfiguration } from './date-config.model';
+
 export type BrFormFieldType =
   | 'text'
   | 'single-select'
@@ -21,6 +23,13 @@ export interface BrFormField {
   disabled?: boolean;
   options?: BrFormOption[];
   hint?: string;
+  minDate?: Date | string | null;
+  maxDate?: Date | string | null;
+  language?: string;
+  locale?: string;
+  dateFormat?: string;
+  dateConfiguration?: BrAdvancedDateConfiguration | string | null;
+  DateConfiguration?: BrAdvancedDateConfiguration | string | null;
 }
 
 export interface BrFormUiConfig {

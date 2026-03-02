@@ -24,6 +24,25 @@ export interface BrDateConfig {
     /** Maximum selectable date */
     maxDate?: Date | null;
 
+    /** Locale/language for date presentation, e.g. en-US, ar-SA, fr-FR */
+    language?: string;
+    locale?: string;
+
+    /** Display/parse format passed directly on date control (sibling to DateConfiguration) */
+    dateFormat?: string;
+
+    /**
+     * Optional advanced/legacy configuration node.
+     * Supports relative min/max windows, disabled weekdays,
+     * include-today behavior, and defaulting value to today.
+     */
+    dateConfiguration?: BrAdvancedDateConfiguration | string | null;
+
+    /**
+     * Legacy casing compatibility for payloads coming as DateConfiguration.
+     */
+    DateConfiguration?: BrAdvancedDateConfiguration | string | null;
+
     /** Whether the field is disabled */
     disabled?: boolean;
 
@@ -38,6 +57,22 @@ export interface BrDateConfig {
 
     /** Visual configuration for the date control renderer */
     uiConfig?: BrDateUiConfig;
+}
+
+export interface BrAdvancedDateConfiguration {
+    Disabledaysofweek?: Array<number | string>;
+    Firstdayofweek?: number | string;
+    Defaulttodaysdate?: boolean;
+    Datedisplay?: string | number;
+    IncludeToday?: boolean;
+    Includetoday?: boolean;
+    includeToday?: boolean;
+    Currentdate?: string;
+    Customdate?: string;
+    Minslidervalue?: number | string;
+    Maxslidervalue?: number | string;
+    Mindate?: string | Date | null;
+    Maxdate?: string | Date | null;
 }
 
 export interface BrDateUiConfig {

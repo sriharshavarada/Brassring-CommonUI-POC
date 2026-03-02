@@ -23,6 +23,7 @@ export class JsonTreeNodeComponent {
   @Input() isRoot = false;
 
   @Output() nodeChange = new EventEmitter<JsonNodeChange>();
+  @Output() nodeDelete = new EventEmitter<Array<string | number>>();
 
   get isArray(): boolean {
     return Array.isArray(this.value);
@@ -107,6 +108,12 @@ export class JsonTreeNodeComponent {
 
   trackByKey(_: number, key: string): string {
     return key;
+  }
+
+  onDelete(event: Event): void {
+    event.stopPropagation();
+    if (this.isRoot) return;
+    this.nodeDelete.emit([...this.path]);
   }
 
   private emitChange(value: any): void {

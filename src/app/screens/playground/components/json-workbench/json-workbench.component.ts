@@ -71,6 +71,12 @@ export class JsonWorkbenchComponent implements OnChanges {
     this.valueChange.emit(this.clone(this.model));
   }
 
+  onNodeDelete(path: Array<string | number>): void {
+    this.deleteAtPath(this.model, path);
+    this.editorText = this.stringify(this.model);
+    this.valueChange.emit(this.clone(this.model));
+  }
+
   private collectCompositePaths(value: any, path: Array<string | number>): string[] {
     if (!value || typeof value !== 'object') {
       return [];
@@ -104,6 +110,26 @@ export class JsonWorkbenchComponent implements OnChanges {
     }
 
     cursor[path[path.length - 1]] = value;
+  }
+
+  private deleteAtPath(root: any, path: Array<string | number>): void {
+    if (path.length === 0) return;
+
+    let cursor = root;
+    for (let i = 0; i < path.length - 1; i += 1) {
+      cursor = cursor[path[i]];
+      if (cursor === null || cursor === undefined) return;
+    }
+
+    const leaf = path[path.length - 1];
+    if (Array.isArray(cursor) && typeof leaf === 'number' && leaf >= 0 && leaf < cursor.length) {
+      cursor.splice(leaf, 1);
+      return;
+    }
+
+    if (cursor && typeof cursor === 'object' && (typeof leaf === 'string' || typeof leaf === 'number')) {
+      delete cursor[leaf];
+    }
   }
 
   private stringify(value: any): string {
