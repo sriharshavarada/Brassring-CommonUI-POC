@@ -211,6 +211,9 @@ This section is the most important for the next AI to continue correctly.
   - `br-date`
 - Adapters added for each control config mapping (similar to date adapter pattern).
 - Implementations grouped under `/src/app/common/implementations/form/controls/...`
+- Date implementations are now also in controls hierarchy:
+  - `/src/app/common/implementations/form/controls/date/custom/...`
+  - `/src/app/common/implementations/form/controls/date/material/...`
 
 ### 6) UI quality changes in controls/playground
 - Custom vs Material radio styles are intentionally differentiated now.
@@ -234,6 +237,47 @@ This section is the most important for the next AI to continue correctly.
 
 ### 9) Naming consistency changes
 - User-facing labels now use **Modal Pop-up** in several places (playground + modes page + top modes summary).
+
+### 10) Date control updates (major)
+- Advanced DateConfiguration support added in adapter for both `CUSTOM` and `MATERIAL`:
+  - `Mindate` / `Maxdate` relative token handling (days/weeks/months/years)
+  - week/month/year range anchoring logic
+  - `Defaulttodaysdate` default value behavior
+  - include-today handling (`includeToday` / `Includetoday` / `IncludeToday`)
+  - disabled weekdays (`Disabledaysofweek`)
+- Fixed disabled-day parsing bug:
+  - empty strings in `Disabledaysofweek` are ignored (not treated as Sunday).
+- `Firstdayofweek` now works consistently:
+  - used in min/max week calculations
+  - applied to Material calendar display week start.
+- Locale/language support added on date config:
+  - sibling fields on date control: `language` / `locale`
+  - locale-aware month names + weekday labels in both Custom and Material.
+- `dateFormat` added as sibling property on date control (not inside DateConfiguration):
+  - supported in both Custom and Material format/parse flows.
+  - currently supported patterns include slash and hyphen variants:
+    - `yyyy-MM-dd`
+    - `MM/dd/yyyy`, `M/d/yyyy`, `dd/MM/yyyy`, `d/M/yyyy`
+    - `MM-dd-yyyy`, `M-d-yyyy`, `dd-MM-yyyy`, `d-M-yyyy`
+    - corresponding `yy` variants.
+- Timezone off-by-one fix for Material path:
+  - removed UTC-based date output behavior; now emits local calendar date correctly.
+- Custom date picker no longer uses native browser date popup:
+  - replaced with custom popup calendar to support week-start + disabled-day parity.
+  - month/year direct switching added (dropdowns).
+- Material date picker now also has month/year direct switching:
+  - custom calendar header component with month/year dropdowns + prev/next buttons.
+- Open behavior aligned for both modes:
+  - if value exists -> open to selected date’s month/year
+  - if empty -> open to current month/year.
+- Date Playground JSON presets updated to include:
+  - `DateConfiguration`
+  - locale/language
+  - `dateFormat`.
+
+### 11) JSON Tree Editor quality-of-life update
+- Tree editor now supports deleting any non-root node directly from tree view.
+- Deletion updates object keys/array indexes in model and auto-keeps JSON syntax valid in raw pane.
 
 ## Current Known State / Caveats
 - TypeScript app typecheck passes.
