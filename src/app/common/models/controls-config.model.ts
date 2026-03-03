@@ -4,6 +4,11 @@ export interface BrOption {
 }
 
 export interface BrTextConfig {
+  id?: string;
+  controlId?: string;
+  name?: string;
+  className?: string;
+  meta?: Record<string, any>;
   label: string;
   value: string;
   placeholder?: string;

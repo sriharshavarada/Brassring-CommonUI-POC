@@ -142,6 +142,13 @@ class DynamicFirstDayNativeDateAdapter extends NativeDateAdapter {
 export class MaterialDateComponent implements OnChanges {
     @Input() config!: MaterialDateInput;
     @Output() dateChange = new EventEmitter<Date | null>();
+    @Output() blurEvent = new EventEmitter<FocusEvent>();
+    @Output() focusEvent = new EventEmitter<FocusEvent>();
+    @Output() inputEvent = new EventEmitter<Event>();
+    @Output() changeEvent = new EventEmitter<Event>();
+    @Output() keydownEvent = new EventEmitter<KeyboardEvent>();
+    @Output() keyupEvent = new EventEmitter<KeyboardEvent>();
+    @Output() clickEvent = new EventEmitter<MouseEvent>();
     readonly calendarHeader = MaterialDateCalendarHeaderComponent;
 
     constructor(private readonly dateAdapter: DateAdapter<Date>) { }

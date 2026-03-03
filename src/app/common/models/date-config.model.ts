@@ -12,6 +12,12 @@
  */
 
 export interface BrDateConfig {
+    id?: string;
+    controlId?: string;
+    name?: string;
+    className?: string;
+    meta?: Record<string, any>;
+
     /** Label text for the date field */
     label: string;
 

@@ -2,9 +2,12 @@
 <div class="material-date-wrapper" [ngClass]="wrapperClasses" [ngStyle]="wrapperStyles">
     <mat-form-field [appearance]="appearance" class="date-field">
         <mat-label>{{ config.label }}<span class="required-marker" *ngIf="config.required"> *</span></mat-label>
-        <input matInput [matDatepicker]="picker" [ngModel]="config.value" (ngModelChange)="onDateChange($event)"
-            [min]="config.minDate" [max]="config.maxDate" [disabled]="config.disabled"
-            [required]="config.required" [placeholder]="config.placeholder" [matDatepickerFilter]="dateFilter">
+        <input matInput [ngClass]="config.className" [attr.id]="config.id" [attr.name]="config.name" [matDatepicker]="picker"
+            [ngModel]="config.value" (ngModelChange)="onDateChange($event)" [min]="config.minDate" [max]="config.maxDate"
+            [disabled]="config.disabled" [required]="config.required" [placeholder]="config.placeholder"
+            [matDatepickerFilter]="dateFilter" (blur)="blurEvent.emit($event)" (focus)="focusEvent.emit($event)"
+            (input)="inputEvent.emit($event)" (change)="changeEvent.emit($event)" (keydown)="keydownEvent.emit($event)"
+            (keyup)="keyupEvent.emit($event)" (click)="clickEvent.emit($event)">
         <mat-datepicker-toggle *ngIf="config.uiConfig.showIcon" matIconSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker [startAt]="startAt" [calendarHeaderComponent]="calendarHeader"></mat-datepicker>
         <mat-hint *ngIf="config.errorMessage">{{ config.errorMessage }}</mat-hint>

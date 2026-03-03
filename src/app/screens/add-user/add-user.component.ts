@@ -6,6 +6,8 @@ import {
   BrAutocompleteConfig,
   BrCheckboxComponent,
   BrCheckboxConfig,
+  BrControlEvent,
+  ControlRegistryService,
   BrDateComponent,
   BrDateConfig,
   BrMultiSelectComponent,
@@ -35,7 +37,16 @@ import {
   styleUrls: ['./add-user.component.scss'],
 })
 export class AddUserComponent {
-  nameConfig: BrTextConfig = { label: 'Full Name', value: '', placeholder: 'Enter full name', required: true };
+  nameConfig: BrTextConfig = {
+    id: 'add-user-name',
+    name: 'userName',
+    className: 'profile-field',
+    meta: { settingValue: '1234', source: 'add-user-screen' },
+    label: 'Full Name',
+    value: '',
+    placeholder: 'Enter full name',
+    required: true,
+  };
   emailConfig: BrTextConfig = { label: 'Email', value: '', placeholder: 'name@company.com', required: true };
 
   departmentConfig: BrSingleSelectConfig = {
@@ -73,6 +84,10 @@ export class AddUserComponent {
   };
 
   startDateConfig: BrDateConfig = {
+    controlId: 'add-user-start-date',
+    name: 'userStartDate',
+    className: 'profile-field',
+    meta: { settingValue: 'ABCD', source: 'add-user-screen' },
     label: 'Start Date',
     value: '',
     minDate: new Date('2025-01-01'),
@@ -98,6 +113,9 @@ export class AddUserComponent {
   activeConfig: BrCheckboxConfig = { label: 'Active User', checked: true };
 
   submitMessage = '';
+  controlEvents: string[] = [];
+
+  constructor(private readonly controlRegistry: ControlRegistryService) { }
 
   updateName(value: string): void { this.nameConfig = { ...this.nameConfig, value }; }
   updateEmail(value: string): void { this.emailConfig = { ...this.emailConfig, value }; }
@@ -107,6 +125,26 @@ export class AddUserComponent {
   updateStartDate(value: string): void { this.startDateConfig = { ...this.startDateConfig, value }; }
   updateLocation(value: string): void { this.locationConfig = { ...this.locationConfig, value }; }
   updateActive(checked: boolean): void { this.activeConfig = { ...this.activeConfig, checked }; }
+
+  onTextControlEvent(event: BrControlEvent<string>): void {
+    this.pushControlEvent('TEXT', event);
+  }
+
+  onDateControlEvent(event: BrControlEvent<string>): void {
+    this.pushControlEvent('DATE', event);
+  }
+
+  onNameBlur(_: FocusEvent): void {
+    this.controlEvents = [`Name blur fired`, ...this.controlEvents].slice(0, 8);
+  }
+
+  onNameKeyup(event: KeyboardEvent): void {
+    this.controlEvents = [`Name keyup: ${event.key}`, ...this.controlEvents].slice(0, 8);
+  }
+
+  onDateFocus(_: FocusEvent): void {
+    this.controlEvents = [`Date focus fired`, ...this.controlEvents].slice(0, 8);
+  }
 
   submit(): void {
     const payload = {
@@ -118,7 +156,17 @@ export class AddUserComponent {
       startDate: this.startDateConfig.value,
       location: this.locationConfig.value,
       active: this.activeConfig.checked,
+      registryRead: {
+        nameById: this.controlRegistry.valueById('add-user-name'),
+        startDateById: this.controlRegistry.valueById('add-user-start-date'),
+        profileFields: this.controlRegistry.valuesByClass('profile-field'),
+      },
     };
     this.submitMessage = `Saved user payload: ${JSON.stringify(payload)}`;
+  }
+
+  private pushControlEvent(scope: string, event: BrControlEvent<string>): void {
+    const text = `${scope} ${event.type}: id=${event.id || '-'} value=${event.value || ''} meta=${JSON.stringify(event.meta || {})}`;
+    this.controlEvents = [text, ...this.controlEvents].slice(0, 8);
   }
 }

@@ -64,6 +64,7 @@ export type {
     BrRadioConfig,
     BrAutocompleteConfig,
 } from './models/controls-config.model';
+export type { BrControlEvent, BrControlEventType } from './models/control-event.model';
 
 // ─── UI Mode Config (for display/debug purposes) ────────────
 export { UI_MODE_BY_CONTROL } from './config/ui-mode.config';
@@ -72,6 +73,9 @@ export type { UiMode, DateUiMode, ModalUiMode, ControlUiMode, FormUiMode, UiMode
 
 // ─── Runtime Mode Service ──────────────────────────────────
 export { RuntimeUiConfigService } from './services/runtime-ui-config.service';
+export { ControlRegistryService } from './services/control-registry.service';
+export type { BrControlHandle, BrRegisteredControlType } from './services/control-registry.service';
+export { BaseValueAccessor } from './forms/base-value-accessor';
 
 // ─── Adapters (internal mapping contracts, exported for documentation/testing) ──
 export {

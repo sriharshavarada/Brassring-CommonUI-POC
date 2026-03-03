@@ -7,13 +7,19 @@
   <section class="form-card">
     <h2>Profile</h2>
     <div class="form-grid">
-      <div class="field"><br-text [config]="nameConfig" (valueChange)="updateName($event)"></br-text></div>
+      <div class="field">
+        <br-text [config]="nameConfig" (valueChange)="updateName($event)" (controlEvent)="onTextControlEvent($event)"
+          (blur)="onNameBlur($event)" (keyup)="onNameKeyup($event)"></br-text>
+      </div>
       <div class="field"><br-text [config]="emailConfig" (valueChange)="updateEmail($event)"></br-text></div>
       <div class="field"><br-single-select [config]="departmentConfig" (valueChange)="updateDepartment($event)"></br-single-select></div>
       <div class="field"><br-autocomplete [config]="locationConfig" (valueChange)="updateLocation($event)"></br-autocomplete></div>
       <div class="field full"><br-multi-select [config]="skillsConfig" (valueChange)="updateSkills($event)"></br-multi-select></div>
       <div class="field"><br-radio [config]="userTypeConfig" (valueChange)="updateUserType($event)"></br-radio></div>
-      <div class="field"><br-date [config]="startDateConfig" (dateChange)="updateStartDate($event)"></br-date></div>
+      <div class="field">
+        <br-date [config]="startDateConfig" (dateChange)="updateStartDate($event)" (controlEvent)="onDateControlEvent($event)"
+          (focus)="onDateFocus($event)"></br-date>
+      </div>
       <div class="field checkbox-row"><br-checkbox [config]="activeConfig" (valueChange)="updateActive($event)"></br-checkbox></div>
     </div>
 
@@ -23,4 +29,11 @@
   </section>
 
   <p class="result" *ngIf="submitMessage">{{ submitMessage }}</p>
+
+  <section class="event-log" *ngIf="controlEvents.length">
+    <h3>Control Event Trace</h3>
+    <ul>
+      <li *ngFor="let entry of controlEvents">{{ entry }}</li>
+    </ul>
+  </section>
 </div>

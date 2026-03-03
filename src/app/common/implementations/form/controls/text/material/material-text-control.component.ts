@@ -16,4 +16,11 @@ import { MaterialTextInput } from '../../../../../adapters/text.adapter';
 export class MaterialTextControlComponent {
   @Input() config!: MaterialTextInput;
   @Output() valueChange = new EventEmitter<string>();
+  @Output() blurEvent = new EventEmitter<FocusEvent>();
+  @Output() focusEvent = new EventEmitter<FocusEvent>();
+  @Output() inputEvent = new EventEmitter<Event>();
+  @Output() changeEvent = new EventEmitter<Event>();
+  @Output() keydownEvent = new EventEmitter<KeyboardEvent>();
+  @Output() keyupEvent = new EventEmitter<KeyboardEvent>();
+  @Output() clickEvent = new EventEmitter<MouseEvent>();
 }

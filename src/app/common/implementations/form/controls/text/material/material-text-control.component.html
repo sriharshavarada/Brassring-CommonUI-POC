@@ -1,5 +1,8 @@
 <mat-form-field appearance="outline" class="br-material-field">
   <mat-label>{{ config.label }}</mat-label>
-  <input matInput [placeholder]="config.placeholder" [disabled]="config.disabled"
-    [required]="config.required" [ngModel]="config.value" (ngModelChange)="valueChange.emit($event)" />
+  <input matInput [ngClass]="config.className" [attr.id]="config.id" [attr.name]="config.name"
+    [placeholder]="config.placeholder" [disabled]="config.disabled" [required]="config.required" [ngModel]="config.value"
+    (ngModelChange)="valueChange.emit($event)" (blur)="blurEvent.emit($event)" (focus)="focusEvent.emit($event)"
+    (input)="inputEvent.emit($event)" (change)="changeEvent.emit($event)" (keydown)="keydownEvent.emit($event)"
+    (keyup)="keyupEvent.emit($event)" (click)="clickEvent.emit($event)" />
 </mat-form-field>

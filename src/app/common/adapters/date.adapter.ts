@@ -15,6 +15,9 @@ import { BrAdvancedDateConfiguration, BrDateConfig, BrDateUiConfig } from '../mo
 
 // ─── Custom Date adapted output ──────────────────────────────
 export interface CustomDateInput {
+    id?: string;
+    name?: string;
+    className?: string;
     label: string;
     locale: string;
     dateFormat: string;
@@ -35,6 +38,9 @@ export interface CustomDateInput {
 
 // ─── Material Date adapted output ────────────────────────────
 export interface MaterialDateInput {
+    id?: string;
+    name?: string;
+    className?: string;
     label: string;
     locale: string;
     dateFormat: string;
@@ -79,6 +85,9 @@ export class DateAdapter {
         const resolved = DateAdapter.resolveConfig(config);
 
         return {
+            id: config.id || config.controlId,
+            name: config.name,
+            className: config.className,
             label: config.label || '',
             locale: resolved.locale,
             dateFormat: config.dateFormat || 'yyyy-MM-dd',
@@ -111,6 +120,9 @@ export class DateAdapter {
         const resolved = DateAdapter.resolveConfig(config);
 
         return {
+            id: config.id || config.controlId,
+            name: config.name,
+            className: config.className,
             label: config.label || '',
             locale: resolved.locale,
             dateFormat: config.dateFormat || 'yyyy-MM-dd',
