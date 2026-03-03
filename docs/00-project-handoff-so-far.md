@@ -15,6 +15,8 @@ These are the key commits in order (older -> newer):
 - `76b26f5` `KT Doc`
 - `9c2c63c` `Model PopUP`
 - `3d1c98e` `Cusome modelpopup` (current `HEAD`)
+- `59a221e` `docs: update handoff with date control and tree editor changes`
+- `81c77af` `2-Way-Binding Attempt 1`
 
 ### What those missed 2 commits likely covered
 If someone missed recent check-ins:
@@ -278,6 +280,47 @@ This section is the most important for the next AI to continue correctly.
 ### 11) JSON Tree Editor quality-of-life update
 - Tree editor now supports deleting any non-root node directly from tree view.
 - Deletion updates object keys/array indexes in model and auto-keeps JSON syntax valid in raw pane.
+
+### 12) 2-Way Binding Attempt 1 (post-date-control work)
+Commit reference:
+- `81c77af` `2-Way-Binding Attempt 1`
+
+Goal:
+- Add a framework-neutral wrapper contract while keeping Angular forms compatibility internal.
+- Implement first for `br-text` and `br-date`.
+
+What was implemented:
+- Reusable CVA base abstraction:
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/forms/base-value-accessor.ts`
+- Control registry for native-comfort lookups:
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/services/control-registry.service.ts`
+  - API: `valueById`, `valuesByName`, `valuesByClass`
+- Wrapper neutral inputs added (text/date scope):
+  - `id`, `controlId`, `name`, `className`, `value`, `disabled`, `required`
+- Wrapper event outputs added/forwarded (text/date scope):
+  - `valueChange`, `blur`, `focus`, `input`, `change`, `keydown`, `keyup`, `click`
+- 2-hop event flow wired:
+  - implementation -> wrapper -> consumer
+  - with CVA callbacks invoked at wrapper boundary (`onChange`, `onTouched`)
+- Generic metadata support:
+  - `meta` input support in config/wrapper
+  - normalized event payload model:
+    - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/models/control-event.model.ts`
+  - `controlEvent` output includes identity/value/meta/originalEvent
+- Adapters updated to carry identity/class fields for text/date implementations.
+- Add User consumer updated as reference usage:
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/add-user/add-user.component.ts`
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/add-user/add-user.component.html`
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/add-user/add-user.component.scss`
+  - demonstrates `meta`, `controlEvent`, and registry reads in submit payload.
+
+Companion design/implementation doc:
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/docs/04-form-control-public-contract-and-cva-plan.md`
+
+Current scope limit:
+- Full pattern rollout is done only for `br-text` and `br-date`.
+- Remaining controls still need same pattern:
+  - `br-radio`, `br-checkbox`, `br-single-select`, `br-multi-select`, `br-autocomplete`.
 
 ## Current Known State / Caveats
 - TypeScript app typecheck passes.
