@@ -11,16 +11,26 @@
         <br-text [config]="nameConfig" (valueChange)="updateName($event)" (controlEvent)="onTextControlEvent($event)"
           (blur)="onNameBlur($event)" (keyup)="onNameKeyup($event)"></br-text>
       </div>
-      <div class="field"><br-text [config]="emailConfig" (valueChange)="updateEmail($event)"></br-text></div>
-      <div class="field"><br-single-select [config]="departmentConfig" (valueChange)="updateDepartment($event)"></br-single-select></div>
-      <div class="field"><br-autocomplete [config]="locationConfig" (valueChange)="updateLocation($event)"></br-autocomplete></div>
-      <div class="field full"><br-multi-select [config]="skillsConfig" (valueChange)="updateSkills($event)"></br-multi-select></div>
-      <div class="field"><br-radio [config]="userTypeConfig" (valueChange)="updateUserType($event)"></br-radio></div>
+      <div class="field"><br-text [config]="emailConfig" (valueChange)="updateEmail($event)"
+          (controlEvent)="onControlEvent('TEXT:email', $event)"></br-text></div>
+      <div class="field"><br-single-select [config]="departmentConfig"
+          (valueChange)="updateDepartment($event)"
+          (controlEvent)="onControlEvent('SINGLE_SELECT:department', $event)"></br-single-select></div>
+      <div class="field"><br-autocomplete [config]="locationConfig"
+          (valueChange)="updateLocation($event)"
+          (controlEvent)="onControlEvent('AUTOCOMPLETE:location', $event)"></br-autocomplete></div>
+      <div class="field full"><br-multi-select [config]="skillsConfig"
+          (valueChange)="updateSkills($event)"
+          (controlEvent)="onControlEvent('MULTI_SELECT:skills', $event)"></br-multi-select></div>
+      <div class="field"><br-radio [config]="userTypeConfig" (valueChange)="updateUserType($event)"
+          (controlEvent)="onControlEvent('RADIO:userType', $event)"></br-radio></div>
       <div class="field">
-        <br-date [config]="startDateConfig" (dateChange)="updateStartDate($event)" (controlEvent)="onDateControlEvent($event)"
-          (focus)="onDateFocus($event)"></br-date>
+        <br-date [config]="startDateConfig" (dateChange)="updateStartDate($event)"
+          (controlEvent)="onDateControlEvent($event)" (focus)="onDateFocus($event)"></br-date>
       </div>
-      <div class="field checkbox-row"><br-checkbox [config]="activeConfig" (valueChange)="updateActive($event)"></br-checkbox></div>
+      <div class="field checkbox-row"><br-checkbox [config]="activeConfig"
+          (valueChange)="updateActive($event)"
+          (controlEvent)="onControlEvent('CHECKBOX:active', $event)"></br-checkbox></div>
     </div>
 
     <div class="actions">

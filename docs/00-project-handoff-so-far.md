@@ -317,14 +317,95 @@ What was implemented:
 Companion design/implementation doc:
 - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/docs/04-form-control-public-contract-and-cva-plan.md`
 
-Current scope limit:
-- Full pattern rollout is done only for `br-text` and `br-date`.
-- Remaining controls still need same pattern:
-  - `br-radio`, `br-checkbox`, `br-single-select`, `br-multi-select`, `br-autocomplete`.
+Current scope limit (at commit `81c77af`):
+- Full pattern rollout was done only for `br-text` and `br-date`.
+- Remaining controls were pending at that point.
+
+### 13) Post-commit rollout and playground parity updates (latest)
+After `81c77af`, the same public-contract/CVA/events/registry pattern was rolled out across all form controls and wired in Playground demos.
+
+#### A) Full form control parity completed
+Controls now aligned on the same feature contract:
+- `br-text`
+- `br-date`
+- `br-radio`
+- `br-autocomplete`
+- `br-checkbox`
+- `br-single-select`
+- `br-multi-select`
+
+Implemented across these controls:
+- CVA support (`writeValue`, `registerOnChange`, `registerOnTouched`, `setDisabledState`) via shared base.
+- Wrapper inputs:
+  - `id`, `controlId`, `name`, `className`, `value`, `disabled`, `required`, `meta`
+  - plus control-specific inputs (`label`, `options`, `placeholder`, etc.).
+- Wrapper outputs:
+  - `valueChange`, `blur`, `focus`, `input`, `change`, `keydown`, `keyup`, `click`, `controlEvent`
+  - `br-date` also keeps `dateChange`.
+- 2-hop event forwarding:
+  - implementation -> wrapper -> consumer.
+- Registry coverage:
+  - `valueById`, `valuesByName`, `valuesByClass` for all above controls.
+
+Supporting updates:
+- `BrRegisteredControlType` expanded for:
+  - `checkbox`, `singleSelect`, `multiSelect`.
+- `BrSingleSelectConfig`, `BrMultiSelectConfig`, `BrCheckboxConfig` extended with normalized identity/meta fields.
+- Adapters and custom/material implementations updated accordingly.
+
+#### B) Consumer event trace updates
+Added control-event tracing on real consumer pages:
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/add-user/add-user.component.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/add-user/add-user.component.html`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/add-order/add-order.component.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/add-order/add-order.component.html`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/add-order/add-order.component.scss`
+
+Both pages now show recent control event traces in UI.
+
+#### C) Playground variants enhanced for each control
+Controls Playground now supports richer per-control variants:
+- config variants (existing + refined naming like `*-config`)
+- `events-demo`
+- `ngmodel-simple` (no config)
+- `registry-demo` (byId/byName/byClass demo)
+
+UI/labeling updates:
+- Config Editor title now reflects selected control + variant.
+- Code Studio title now reflects selected control + variant.
+- JSON workbench title now reflects selected control context.
+
+#### D) Playground event + registry demo behavior
+For control previews:
+- `controlEvent` is wired and pushed to Event Log.
+- `events-demo` variants include interaction-oriented setups (often 2 controls).
+- `registry-demo` includes:
+  - controls configured with `id`/`name`/`className`/`meta`,
+  - preview action button:
+    - `Read Registry Values (byId/byName/byClass)`,
+  - logs registry API results in Event Log.
+
+#### E) Code Studio generated code improved (copy-paste ready)
+For `registry-demo`, generated TS/HTML now includes real working integration:
+- imports and injects `ControlRegistryService`,
+- includes `readRegistryValues()` method using:
+  - `valueById(...)`
+  - `valuesByName(...)`
+  - `valuesByClass(...)`,
+- generated control config mapping includes identity/meta fields.
+
+#### F) Model updates for Playground support
+`BrFormField` now supports identity/meta fields used by generated/previewed controls:
+- `controlId?`
+- `name?`
+- `className?`
+- `meta?`
 
 ## Current Known State / Caveats
-- TypeScript app typecheck passes.
-- In this environment, production build can fail due blocked internet font fetch (`fonts.googleapis.com`) during font inlining.
+- Angular compile/typecheck passes:
+  - `npx ngc -p tsconfig.app.json`
+  - `npx tsc -p tsconfig.app.json --noEmit`
+- In this environment, `npm run build` currently fails with a Node runtime malloc crash (`pointer being freed was not allocated`) on Node `v22.21.1`.
 - Dev server runs fine.
 - Multiple ng serve processes may exist; if `4200` is taken, Angular auto-prompts next port.
 

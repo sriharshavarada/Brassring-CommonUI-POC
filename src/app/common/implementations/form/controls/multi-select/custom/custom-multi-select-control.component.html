@@ -1,6 +1,8 @@
-<div class="br-control br-multi-select-control">
+<div class="br-control br-multi-select-control" [ngClass]="config.className" [attr.id]="config.id" [attr.name]="config.name">
   <label class="br-label">{{ config.label }}</label>
-  <button type="button" class="br-multi-trigger" [disabled]="config.disabled" (click)="togglePanel()">
+  <button type="button" class="br-multi-trigger" [disabled]="config.disabled" (click)="togglePanel($event)"
+    (blur)="blurEvent.emit($event)" (focus)="focusEvent.emit($event)" (keydown)="keydownEvent.emit($event)"
+    (keyup)="keyupEvent.emit($event)">
     <span class="trigger-text" *ngIf="selectedLabels.length === 0">Select options</span>
     <span class="trigger-text" *ngIf="selectedLabels.length > 0">{{ selectedLabels.join(', ') }}</span>
     <span class="trigger-caret" [class.open]="panelOpen">▾</span>
@@ -8,7 +10,8 @@
 
   <div class="br-options-panel" *ngIf="panelOpen">
     <label class="br-option-row" *ngFor="let opt of config.options">
-      <input type="checkbox" [checked]="isSelected(opt.value)" [disabled]="config.disabled" (change)="toggleValue(opt.value)" />
+      <input type="checkbox" [checked]="isSelected(opt.value)" [disabled]="config.disabled"
+        (change)="toggleValue(opt.value, $event)" (click)="clickEvent.emit($event)" />
       <span>{{ opt.label }}</span>
     </label>
   </div>

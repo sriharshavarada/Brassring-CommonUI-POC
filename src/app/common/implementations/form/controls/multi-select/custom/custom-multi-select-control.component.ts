@@ -14,6 +14,13 @@ import { CustomMultiSelectInput } from '../../../../../adapters/multi-select.ada
 export class CustomMultiSelectControlComponent {
   @Input() config!: CustomMultiSelectInput;
   @Output() valueChange = new EventEmitter<any[]>();
+  @Output() blurEvent = new EventEmitter<FocusEvent>();
+  @Output() focusEvent = new EventEmitter<FocusEvent>();
+  @Output() inputEvent = new EventEmitter<Event>();
+  @Output() changeEvent = new EventEmitter<Event>();
+  @Output() keydownEvent = new EventEmitter<KeyboardEvent>();
+  @Output() keyupEvent = new EventEmitter<KeyboardEvent>();
+  @Output() clickEvent = new EventEmitter<MouseEvent>();
 
   panelOpen = false;
 
@@ -29,14 +36,17 @@ export class CustomMultiSelectControlComponent {
       .map((option) => option.label);
   }
 
-  togglePanel(): void {
+  togglePanel(event?: MouseEvent): void {
     if (this.config.disabled) {
       return;
+    }
+    if (event) {
+      this.clickEvent.emit(event);
     }
     this.panelOpen = !this.panelOpen;
   }
 
-  toggleValue(value: any): void {
+  toggleValue(value: any, event?: Event): void {
     if (this.config.disabled) {
       return;
     }
@@ -47,6 +57,10 @@ export class CustomMultiSelectControlComponent {
     } else {
       next.push(value);
     }
+    if (event) {
+      this.changeEvent.emit(event);
+      this.inputEvent.emit(event);
+    }
     this.valueChange.emit(next);
   }
 
@@ -54,6 +68,9 @@ export class CustomMultiSelectControlComponent {
     event?.stopPropagation();
     if (this.config.disabled) {
       return;
+    }
+    if (event) {
+      this.clickEvent.emit(event);
     }
     const next = this.selectedValues.filter((item) => item !== value);
     this.valueChange.emit(next);

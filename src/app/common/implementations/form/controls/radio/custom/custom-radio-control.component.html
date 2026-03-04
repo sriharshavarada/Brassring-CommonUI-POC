@@ -1,6 +1,6 @@
 <div class="br-radio-group">
   <label class="br-label">{{ config.label }} <span class="mode-pill">CUSTOM</span></label>
-  <div class="br-radio-options">
+  <div class="br-radio-options" [ngClass]="config.className" [attr.id]="config.id">
     <label
       class="br-radio-option"
       [class.is-selected]="config.value === opt.value"
@@ -13,8 +13,15 @@
         [name]="config.name"
         [value]="opt.value"
         [disabled]="config.disabled"
+        [required]="config.required"
         [checked]="config.value === opt.value"
-        (change)="valueChange.emit(opt.value)"
+        (change)="valueChange.emit(opt.value); changeEvent.emit($event)"
+        (blur)="blurEvent.emit($event)"
+        (focus)="focusEvent.emit($event)"
+        (input)="inputEvent.emit($event)"
+        (keydown)="keydownEvent.emit($event)"
+        (keyup)="keyupEvent.emit($event)"
+        (click)="clickEvent.emit($event)"
       />
       <span class="br-radio-dot" aria-hidden="true"></span>
       <span class="br-radio-text">{{ opt.label }}</span>

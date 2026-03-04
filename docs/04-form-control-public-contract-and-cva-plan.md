@@ -7,7 +7,14 @@ This document explains the newly implemented direction for form controls:
 - 2-hop event forwarding,
 - control registry for id/name/class value lookup.
 
-Current implementation scope in code: `br-text` and `br-date`.
+Current implementation scope in code:
+- `br-text`
+- `br-date`
+- `br-radio`
+- `br-autocomplete`
+- `br-checkbox`
+- `br-single-select`
+- `br-multi-select`
 
 ## Architecture (3 parties)
 1. Consumer (screens)
@@ -59,6 +66,11 @@ Contains common CVA plumbing:
 Usage:
 - `BrTextComponent` extends `BaseValueAccessor<string>`
 - `BrDateComponent` extends `BaseValueAccessor<string>`
+- `BrRadioComponent` extends `BaseValueAccessor<any>`
+- `BrAutocompleteComponent` extends `BaseValueAccessor<string>`
+- `BrCheckboxComponent` extends `BaseValueAccessor<boolean>`
+- `BrSingleSelectComponent` extends `BaseValueAccessor<any>`
+- `BrMultiSelectComponent` extends `BaseValueAccessor<any[]>`
 
 ## Control Registry (native comfort API)
 A central registry service was added to support value lookups by id/name/class.
@@ -91,7 +103,7 @@ Also, wrapper invokes CVA callbacks where needed:
   - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/index.ts`
 
 ### B) Model updates for normalized public contract
-- Text config model:
+- Controls config model:
   - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/models/controls-config.model.ts`
 - Date config model:
   - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/models/date-config.model.ts`
@@ -99,14 +111,27 @@ Also, wrapper invokes CVA callbacks where needed:
 ### C) Adapter propagation of id/name/class
 - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/adapters/text.adapter.ts`
 - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/adapters/date.adapter.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/adapters/radio.adapter.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/adapters/autocomplete.adapter.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/adapters/checkbox.adapter.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/adapters/single-select.adapter.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/adapters/multi-select.adapter.ts`
 
 ### D) Wrapper refactors (CVA + neutral inputs/outputs + registry)
-- Text wrapper:
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/components/br-text/br-text.component.ts`
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/components/br-text/br-text.component.html`
-- Date wrapper:
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/components/br-date/br-date.component.ts`
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/components/br-date/br-date.component.html`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/components/br-text/br-text.component.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/components/br-text/br-text.component.html`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/components/br-date/br-date.component.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/components/br-date/br-date.component.html`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/components/br-radio/br-radio.component.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/components/br-radio/br-radio.component.html`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/components/br-autocomplete/br-autocomplete.component.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/components/br-autocomplete/br-autocomplete.component.html`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/components/br-checkbox/br-checkbox.component.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/components/br-checkbox/br-checkbox.component.html`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/components/br-single-select/br-single-select.component.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/components/br-single-select/br-single-select.component.html`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/components/br-multi-select/br-multi-select.component.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/components/br-multi-select/br-multi-select.component.html`
 
 ### E) Implementation-level event emitters and id/name/class wiring
 - Text custom:
@@ -140,9 +165,7 @@ Files:
 - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/add-user/add-user.component.scss`
 
 ## Notes and Current Limits
-- Scope currently implemented: `br-text` and `br-date`.
-- Remaining controls still need same pattern rollout:
-  - `br-radio`, `br-checkbox`, `br-single-select`, `br-multi-select`, `br-autocomplete`.
+- Scope implemented: all current form wrappers listed above.
 - Wrapper `[config]` usage is still supported for backward compatibility while neutral inputs are added.
 
 ## Validation status

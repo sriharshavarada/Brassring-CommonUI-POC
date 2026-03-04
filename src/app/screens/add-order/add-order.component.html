@@ -7,13 +7,29 @@
   <section class="form-card">
     <h2>Order Details</h2>
     <div class="form-grid">
-      <div class="field"><br-text [config]="orderCodeConfig" (valueChange)="updateOrderCode($event)"></br-text></div>
-      <div class="field"><br-text [config]="customerConfig" (valueChange)="updateCustomer($event)"></br-text></div>
-      <div class="field"><br-text [config]="amountConfig" (valueChange)="updateAmount($event)"></br-text></div>
-      <div class="field"><br-single-select [config]="statusConfig" (valueChange)="updateStatus($event)"></br-single-select></div>
-      <div class="field"><br-date [config]="orderDateConfig" (dateChange)="updateOrderDate($event)"></br-date></div>
-      <div class="field"><br-date [config]="deliveryDateConfig" (dateChange)="updateDeliveryDate($event)"></br-date></div>
-      <div class="field full"><br-checkbox [config]="expeditedConfig" (valueChange)="updateExpedited($event)"></br-checkbox></div>
+      <div class="field"><br-text [config]="orderCodeConfig" (valueChange)="updateOrderCode($event)"
+          (controlEvent)="onControlEvent('TEXT:orderCode', $event)"></br-text></div>
+      <div class="field"><br-text [config]="customerConfig" (valueChange)="updateCustomer($event)"
+          (controlEvent)="onControlEvent('TEXT:customer', $event)"></br-text></div>
+      <div class="field"><br-text [config]="amountConfig" (valueChange)="updateAmount($event)"
+          (controlEvent)="onControlEvent('TEXT:amount', $event)"></br-text></div>
+      <div class="field"><br-single-select [config]="statusConfig"
+          (valueChange)="updateStatus($event)"
+          (controlEvent)="onControlEvent('SINGLE_SELECT:status', $event)"></br-single-select></div>
+      <div class="field"><br-date [config]="orderDateConfig" (dateChange)="updateOrderDate($event)"
+          (controlEvent)="onControlEvent('DATE:orderDate', $event)"></br-date></div>
+      <div class="field"><br-date [config]="deliveryDateConfig" (dateChange)="updateDeliveryDate($event)"
+          (controlEvent)="onControlEvent('DATE:deliveryDate', $event)"></br-date>
+      </div>
+      <div class="field full"><br-checkbox [config]="expeditedConfig"
+          (valueChange)="updateExpedited($event)"
+          (controlEvent)="onControlEvent('CHECKBOX:expedited', $event)"></br-checkbox></div>
+      <div class="field full"><br-radio label="Order Type" [options]="orderTypeOptions"
+          [(ngModel)]="orderType" id="add-order-type"
+          (controlEvent)="onControlEvent('RADIO:orderType', $event)"></br-radio></div>
+      <div class="field full"><br-autocomplete id="AutoCompleteTest" [(ngModel)]="AutoCompleteTest"
+          (controlEvent)="onControlEvent('AUTOCOMPLETE:autoCompleteTest', $event)"></br-autocomplete>
+      </div>
     </div>
 
     <div class="actions">
@@ -22,4 +38,11 @@
   </section>
 
   <p class="result" *ngIf="submitMessage">{{ submitMessage }}</p>
+
+  <section class="event-log" *ngIf="controlEvents.length">
+    <h3>Control Event Trace</h3>
+    <ul>
+      <li *ngFor="let entry of controlEvents">{{ entry }}</li>
+    </ul>
+  </section>
 </div>

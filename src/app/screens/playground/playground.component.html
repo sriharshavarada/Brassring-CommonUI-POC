@@ -149,19 +149,20 @@
 
       <section class="inline-collapse">
         <button type="button" class="inline-collapse-toggle" (click)="toggleConfigPanel('form')">
-          <span class="inline-collapse-title">Controls Config Editor</span>
+          <span class="inline-collapse-title">{{ controlsConfigEditorTitle() }}</span>
           <span class="inline-collapse-meta">{{ formConfigCollapsed ? 'Collapsed' : 'Expanded' }}</span>
           <span class="inline-collapse-caret" [class.open]="!formConfigCollapsed">▾</span>
         </button>
         <div class="inline-collapse-body" *ngIf="!formConfigCollapsed">
-          <app-json-workbench title="Controls Config" [value]="formConfig" (valueChange)="onFormConfigChange($event)">
+          <app-json-workbench [title]="controlsConfigWorkbenchTitle()" [value]="formConfig"
+            (valueChange)="onFormConfigChange($event)">
           </app-json-workbench>
         </div>
       </section>
 
       <section class="inline-collapse">
         <button type="button" class="inline-collapse-toggle" (click)="toggleCodePanel('form')">
-          <span class="inline-collapse-title">Controls Code Studio</span>
+          <span class="inline-collapse-title">{{ controlsCodeStudioTitle() }}</span>
           <span class="inline-collapse-meta">{{ formCode.collapsed ? 'Collapsed' : 'Expanded' }}</span>
           <span class="inline-collapse-caret" [class.open]="!formCode.collapsed">▾</span>
         </button>
@@ -193,26 +194,69 @@
           <div [innerHTML]="formCode.htmlBefore"></div>
           <div class="form-controls-grid">
             <div class="form-field-item" *ngFor="let field of formConfig.fields; trackBy: trackByFieldId">
-              <br-text *ngIf="field.type === 'text'" [config]="getTextConfig(field)"
-                (valueChange)="updateControlValue(field.id, $event)"></br-text>
+              <br-text *ngIf="field.type === 'text' && !isNgModelOnlyField(field)" [config]="getTextConfig(field)"
+                (valueChange)="updateControlValue(field.id, $event)"
+                (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-text>
+              <br-text *ngIf="field.type === 'text' && isNgModelOnlyField(field)" [id]="field.id" [label]="field.label"
+                [placeholder]="field.placeholder" [required]="!!field.required" [disabled]="!!field.disabled"
+                [ngModel]="controlValue(field)" (ngModelChange)="updateControlValue(field.id, $event)"
+                (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-text>
 
-              <br-single-select *ngIf="field.type === 'single-select'" [config]="getSingleSelectConfig(field)"
-                (valueChange)="updateControlValue(field.id, $event)"></br-single-select>
+              <br-single-select *ngIf="field.type === 'single-select' && !isNgModelOnlyField(field)"
+                [config]="getSingleSelectConfig(field)"
+                (valueChange)="updateControlValue(field.id, $event)"
+                (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-single-select>
+              <br-single-select *ngIf="field.type === 'single-select' && isNgModelOnlyField(field)" [id]="field.id"
+                [label]="field.label" [options]="field.options || []" [required]="!!field.required"
+                [disabled]="!!field.disabled" [ngModel]="controlValue(field)"
+                (ngModelChange)="updateControlValue(field.id, $event)"
+                (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-single-select>
 
-              <br-multi-select *ngIf="field.type === 'multi-select'" [config]="getMultiSelectConfig(field)"
-                (valueChange)="updateControlValue(field.id, $event)"></br-multi-select>
+              <br-multi-select *ngIf="field.type === 'multi-select' && !isNgModelOnlyField(field)"
+                [config]="getMultiSelectConfig(field)"
+                (valueChange)="updateControlValue(field.id, $event)"
+                (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-multi-select>
+              <br-multi-select *ngIf="field.type === 'multi-select' && isNgModelOnlyField(field)" [id]="field.id"
+                [label]="field.label" [options]="field.options || []" [required]="!!field.required"
+                [disabled]="!!field.disabled" [ngModel]="controlValue(field)"
+                (ngModelChange)="updateControlValue(field.id, $event)"
+                (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-multi-select>
 
-              <br-checkbox *ngIf="field.type === 'checkbox'" [config]="getCheckboxConfig(field)"
-                (valueChange)="updateControlValue(field.id, $event)"></br-checkbox>
+              <br-checkbox *ngIf="field.type === 'checkbox' && !isNgModelOnlyField(field)"
+                [config]="getCheckboxConfig(field)"
+                (valueChange)="updateControlValue(field.id, $event)"
+                (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-checkbox>
+              <br-checkbox *ngIf="field.type === 'checkbox' && isNgModelOnlyField(field)" [id]="field.id"
+                [label]="field.label" [required]="!!field.required" [disabled]="!!field.disabled"
+                [ngModel]="controlValue(field)" (ngModelChange)="updateControlValue(field.id, $event)"
+                (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-checkbox>
 
-              <br-radio *ngIf="field.type === 'radio'" [config]="getRadioConfig(field)"
-                (valueChange)="updateControlValue(field.id, $event)"></br-radio>
+              <br-radio *ngIf="field.type === 'radio' && !isNgModelOnlyField(field)" [config]="getRadioConfig(field)"
+                (valueChange)="updateControlValue(field.id, $event)"
+                (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-radio>
+              <br-radio *ngIf="field.type === 'radio' && isNgModelOnlyField(field)" [id]="field.id"
+                [label]="field.label" [options]="field.options || []" [required]="!!field.required"
+                [disabled]="!!field.disabled" [ngModel]="controlValue(field)"
+                (ngModelChange)="updateControlValue(field.id, $event)"
+                (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-radio>
 
-              <br-date *ngIf="field.type === 'date'" [config]="getDateConfig(field)"
-                (dateChange)="updateControlValue(field.id, $event)"></br-date>
+              <br-date *ngIf="field.type === 'date' && !isNgModelOnlyField(field)" [config]="getDateConfig(field)"
+                (dateChange)="updateControlValue(field.id, $event)"
+                (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-date>
+              <br-date *ngIf="field.type === 'date' && isNgModelOnlyField(field)" [id]="field.id" [label]="field.label"
+                [placeholder]="field.placeholder || 'Select date'" [required]="!!field.required" [disabled]="!!field.disabled"
+                [ngModel]="controlValue(field)" (ngModelChange)="updateControlValue(field.id, $event)"
+                (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-date>
 
-              <br-autocomplete *ngIf="field.type === 'autocomplete'" [config]="getAutocompleteConfig(field)"
-                (valueChange)="updateControlValue(field.id, $event)"></br-autocomplete>
+              <br-autocomplete *ngIf="field.type === 'autocomplete' && !isNgModelOnlyField(field)"
+                [config]="getAutocompleteConfig(field)"
+                (valueChange)="updateControlValue(field.id, $event)"
+                (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-autocomplete>
+              <br-autocomplete *ngIf="field.type === 'autocomplete' && isNgModelOnlyField(field)" [id]="field.id"
+                [label]="field.label" [placeholder]="field.placeholder" [options]="field.options || []"
+                [required]="!!field.required" [disabled]="!!field.disabled" [ngModel]="controlValue(field)"
+                (ngModelChange)="updateControlValue(field.id, $event)"
+                (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-autocomplete>
             </div>
           </div>
           <div class="form-actions-row" *ngIf="formConfig.showActions !== false">
@@ -221,6 +265,11 @@
             </button>
             <button type="button" class="btn secondary" (click)="onControlsAction('submit')">
               {{ formConfig.submitLabel || 'Submit' }}
+            </button>
+          </div>
+          <div class="form-actions-row" *ngIf="isRegistryDemoVariant()">
+            <button type="button" class="btn ghost" (click)="runRegistryLookupDemo()">
+              Read Registry Values (byId/byName/byClass)
             </button>
           </div>
           <div [innerHTML]="formCode.htmlAfter"></div>

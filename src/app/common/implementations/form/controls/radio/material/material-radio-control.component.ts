@@ -15,4 +15,11 @@ import { MaterialRadioInput } from '../../../../../adapters/radio.adapter';
 export class MaterialRadioControlComponent {
   @Input() config!: MaterialRadioInput;
   @Output() valueChange = new EventEmitter<any>();
+  @Output() blurEvent = new EventEmitter<FocusEvent>();
+  @Output() focusEvent = new EventEmitter<FocusEvent>();
+  @Output() inputEvent = new EventEmitter<Event>();
+  @Output() changeEvent = new EventEmitter<any>();
+  @Output() keydownEvent = new EventEmitter<KeyboardEvent>();
+  @Output() keyupEvent = new EventEmitter<KeyboardEvent>();
+  @Output() clickEvent = new EventEmitter<MouseEvent>();
 }

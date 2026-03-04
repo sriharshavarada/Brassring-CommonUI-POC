@@ -17,6 +17,13 @@ import { MaterialMultiSelectInput } from '../../../../../adapters/multi-select.a
 export class MaterialMultiSelectControlComponent {
   @Input() config!: MaterialMultiSelectInput;
   @Output() valueChange = new EventEmitter<any[]>();
+  @Output() blurEvent = new EventEmitter<FocusEvent>();
+  @Output() focusEvent = new EventEmitter<FocusEvent>();
+  @Output() inputEvent = new EventEmitter<Event>();
+  @Output() changeEvent = new EventEmitter<any>();
+  @Output() keydownEvent = new EventEmitter<KeyboardEvent>();
+  @Output() keyupEvent = new EventEmitter<KeyboardEvent>();
+  @Output() clickEvent = new EventEmitter<MouseEvent>();
 
   get selectedValues(): any[] {
     return Array.isArray(this.config?.value) ? this.config.value : [];
@@ -32,9 +39,12 @@ export class MaterialMultiSelectControlComponent {
     return this.selectedValues.includes(value);
   }
 
-  removeValue(value: any): void {
+  removeValue(value: any, event?: MouseEvent): void {
     if (this.config.disabled) {
       return;
+    }
+    if (event) {
+      this.clickEvent.emit(event);
     }
     this.valueChange.emit(this.selectedValues.filter((item) => item !== value));
   }

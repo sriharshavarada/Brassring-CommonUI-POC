@@ -17,6 +17,13 @@ import { MaterialAutocompleteInput } from '../../../../../adapters/autocomplete.
 export class MaterialAutocompleteControlComponent {
   @Input() config!: MaterialAutocompleteInput;
   @Output() valueChange = new EventEmitter<string>();
+  @Output() blurEvent = new EventEmitter<FocusEvent>();
+  @Output() focusEvent = new EventEmitter<FocusEvent>();
+  @Output() inputEvent = new EventEmitter<Event>();
+  @Output() changeEvent = new EventEmitter<Event>();
+  @Output() keydownEvent = new EventEmitter<KeyboardEvent>();
+  @Output() keyupEvent = new EventEmitter<KeyboardEvent>();
+  @Output() clickEvent = new EventEmitter<MouseEvent>();
 
   filtered(): Array<{ label: string; value: any }> {
     const term = (this.config?.value || '').toLowerCase();

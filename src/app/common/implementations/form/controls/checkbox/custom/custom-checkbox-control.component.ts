@@ -14,4 +14,11 @@ import { CustomCheckboxInput } from '../../../../../adapters/checkbox.adapter';
 export class CustomCheckboxControlComponent {
   @Input() config!: CustomCheckboxInput;
   @Output() valueChange = new EventEmitter<boolean>();
+  @Output() blurEvent = new EventEmitter<FocusEvent>();
+  @Output() focusEvent = new EventEmitter<FocusEvent>();
+  @Output() inputEvent = new EventEmitter<Event>();
+  @Output() changeEvent = new EventEmitter<Event>();
+  @Output() keydownEvent = new EventEmitter<KeyboardEvent>();
+  @Output() keyupEvent = new EventEmitter<KeyboardEvent>();
+  @Output() clickEvent = new EventEmitter<MouseEvent>();
 }

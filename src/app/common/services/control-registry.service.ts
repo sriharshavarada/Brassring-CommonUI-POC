@@ -1,6 +1,13 @@
 import { Injectable } from '@angular/core';
 
-export type BrRegisteredControlType = 'text' | 'date';
+export type BrRegisteredControlType =
+  | 'text'
+  | 'date'
+  | 'autocomplete'
+  | 'radio'
+  | 'checkbox'
+  | 'singleSelect'
+  | 'multiSelect';
 
 export interface BrControlHandle {
   id?: string;
@@ -88,4 +95,3 @@ export class ControlRegistryService {
     }
   }
 }
-

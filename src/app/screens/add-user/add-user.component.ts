@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-
+import { FormsModule } from '@angular/forms';
 import {
   BrAutocompleteComponent,
   BrAutocompleteConfig,
@@ -32,6 +32,7 @@ import {
     BrRadioComponent,
     BrDateComponent,
     BrAutocompleteComponent,
+    FormsModule
   ],
   templateUrl: './add-user.component.html',
   styleUrls: ['./add-user.component.scss'],
@@ -48,7 +49,7 @@ export class AddUserComponent {
     required: true,
   };
   emailConfig: BrTextConfig = { label: 'Email', value: '', placeholder: 'name@company.com', required: true };
-
+  username: string = "MyRadio";
   departmentConfig: BrSingleSelectConfig = {
     label: 'Department',
     value: '',
@@ -126,12 +127,16 @@ export class AddUserComponent {
   updateLocation(value: string): void { this.locationConfig = { ...this.locationConfig, value }; }
   updateActive(checked: boolean): void { this.activeConfig = { ...this.activeConfig, checked }; }
 
-  onTextControlEvent(event: BrControlEvent<string>): void {
-    this.pushControlEvent('TEXT', event);
+  onTextControlEvent(event: BrControlEvent<unknown>): void {
+    this.pushControlEvent('TEXT:name', event);
   }
 
-  onDateControlEvent(event: BrControlEvent<string>): void {
-    this.pushControlEvent('DATE', event);
+  onDateControlEvent(event: BrControlEvent<unknown>): void {
+    this.pushControlEvent('DATE:startDate', event);
+  }
+
+  onControlEvent(scope: string, event: BrControlEvent<unknown>): void {
+    this.pushControlEvent(scope, event);
   }
 
   onNameBlur(_: FocusEvent): void {
@@ -165,8 +170,8 @@ export class AddUserComponent {
     this.submitMessage = `Saved user payload: ${JSON.stringify(payload)}`;
   }
 
-  private pushControlEvent(scope: string, event: BrControlEvent<string>): void {
-    const text = `${scope} ${event.type}: id=${event.id || '-'} value=${event.value || ''} meta=${JSON.stringify(event.meta || {})}`;
+  private pushControlEvent(scope: string, event: BrControlEvent<unknown>): void {
+    const text = `${scope} ${event.type}: id=${event.id || '-'} value=${JSON.stringify(event.value ?? '')} meta=${JSON.stringify(event.meta || {})}`;
     this.controlEvents = [text, ...this.controlEvents].slice(0, 8);
   }
 }

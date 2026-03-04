@@ -1,9 +1,23 @@
 <br-custom-autocomplete-control *ngIf="mode === 'CUSTOM' && customConfig as cfg"
   [config]="cfg"
-  (valueChange)="valueChange.emit($event)">
+  (valueChange)="onImplementationValueChange($event)"
+  (blurEvent)="onImplementationBlur($event)"
+  (focusEvent)="onImplementationFocus($event)"
+  (inputEvent)="onImplementationInput($event)"
+  (changeEvent)="onImplementationChange($event)"
+  (keydownEvent)="onImplementationKeydown($event)"
+  (keyupEvent)="onImplementationKeyup($event)"
+  (clickEvent)="onImplementationClick($event)">
 </br-custom-autocomplete-control>
 
 <br-material-autocomplete-control *ngIf="mode === 'MATERIAL' && materialConfig as cfg"
   [config]="cfg"
-  (valueChange)="valueChange.emit($event)">
+  (valueChange)="onImplementationValueChange($event)"
+  (blurEvent)="onImplementationBlur($event)"
+  (focusEvent)="onImplementationFocus($event)"
+  (inputEvent)="onImplementationInput($event)"
+  (changeEvent)="onImplementationChange($event)"
+  (keydownEvent)="onImplementationKeydown($event)"
+  (keyupEvent)="onImplementationKeyup($event)"
+  (clickEvent)="onImplementationClick($event)">
 </br-material-autocomplete-control>

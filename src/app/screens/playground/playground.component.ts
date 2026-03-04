@@ -31,6 +31,7 @@ import {
   ControlUiMode,
   DateUiMode,
   ModalUiMode,
+  ControlRegistryService,
   RuntimeUiConfigService,
   UiMode,
 } from '../../common';
@@ -185,7 +186,10 @@ export class PlaygroundComponent {
     formAction?: (event: BrFormActionEvent, runtimeConsole: Console) => void;
   } = {};
 
-  constructor(public readonly runtimeUiConfig: RuntimeUiConfigService) {
+  constructor(
+    public readonly runtimeUiConfig: RuntimeUiConfigService,
+    private readonly controlRegistry: ControlRegistryService,
+  ) {
     this.modalPresetConfigs = this.createModalPresetConfigs();
     this.modalConfig = this.clone(this.modalPresetConfigs[this.activeModalPreset]);
     this.resetGridCodeFromConfig();
@@ -222,19 +226,19 @@ export class PlaygroundComponent {
   get controlVariants(): string[] {
     switch (this.activeControlPlayground) {
       case 'date':
-        return ['default', 'bounded', 'disabled'];
+        return ['default-config', 'bounded-config', 'disabled-config', 'events-demo', 'registry-demo', 'ngmodel-simple'];
       case 'text':
-        return ['default', 'required', 'disabled'];
+        return ['default-config', 'required-config', 'disabled-config', 'events-demo', 'registry-demo', 'ngmodel-simple'];
       case 'single-select':
-        return ['default', 'required', 'disabled'];
+        return ['default-config', 'required-config', 'disabled-config', 'events-demo', 'registry-demo', 'ngmodel-simple'];
       case 'multi-select':
-        return ['default', 'preselected', 'disabled'];
+        return ['default-config', 'preselected-config', 'disabled-config', 'events-demo', 'registry-demo', 'ngmodel-simple'];
       case 'checkbox':
-        return ['unchecked', 'checked', 'disabled'];
+        return ['unchecked-config', 'checked-config', 'disabled-config', 'events-demo', 'registry-demo', 'ngmodel-simple'];
       case 'radio':
-        return ['default', 'preselected', 'disabled'];
+        return ['default-config', 'preselected-config', 'disabled-config', 'events-demo', 'registry-demo', 'ngmodel-simple'];
       case 'autocomplete':
-        return ['default', 'prefilled', 'disabled'];
+        return ['default-config', 'prefilled-config', 'disabled-config', 'events-demo', 'registry-demo', 'ngmodel-simple'];
       default:
         return ['default'];
     }
@@ -350,6 +354,27 @@ export class PlaygroundComponent {
 
   controlVariantLabel(variant: string): string {
     return variant.replace(/-/g, ' ').replace(/\b\w/g, (x) => x.toUpperCase());
+  }
+
+  controlsConfigEditorTitle(): string {
+    if (this.activeControlPlayground === 'all') {
+      return 'Controls Config Editor';
+    }
+    return `${this.controlPlaygroundLabels[this.activeControlPlayground]} - ${this.controlVariantLabel(this.activeControlVariant)} - Config Editor`;
+  }
+
+  controlsConfigWorkbenchTitle(): string {
+    if (this.activeControlPlayground === 'all') {
+      return 'Controls Config';
+    }
+    return `${this.controlPlaygroundLabels[this.activeControlPlayground]} Config`;
+  }
+
+  controlsCodeStudioTitle(): string {
+    if (this.activeControlPlayground === 'all') {
+      return 'Controls Code Studio';
+    }
+    return `${this.controlPlaygroundLabels[this.activeControlPlayground]} - ${this.controlVariantLabel(this.activeControlVariant)} - Code Studio`;
   }
 
   activeControlModeValue(): string | null {
@@ -592,8 +617,35 @@ export class PlaygroundComponent {
     });
   }
 
+  onWrapperControlEvent(fieldId: string, event: { type?: string; value?: unknown }): void {
+    const valueText = JSON.stringify(event?.value ?? '');
+    this.pushLog(`Control event [${fieldId}]: ${event?.type || 'unknown'} -> ${valueText}`);
+  }
+
+  runRegistryLookupDemo(): void {
+    const firstField = this.formConfig.fields[0];
+    if (!firstField) return;
+
+    const sampleId = firstField.id;
+    const sampleName = firstField.name || 'registry-group';
+    const sampleClass = (firstField.className || 'registry-shared').split(/\s+/)[0];
+
+    const byId = this.controlRegistry.valueById(sampleId);
+    const byName = this.controlRegistry.valuesByName(sampleName);
+    const byClass = this.controlRegistry.valuesByClass(sampleClass);
+
+    this.pushLog(`Registry valueById('${sampleId}') => ${JSON.stringify(byId)}`);
+    this.pushLog(`Registry valuesByName('${sampleName}') => ${JSON.stringify(byName)}`);
+    this.pushLog(`Registry valuesByClass('${sampleClass}') => ${JSON.stringify(byClass)}`);
+  }
+
   asTextConfig(field: BrFormField): BrTextConfig {
     return {
+      id: field.id,
+      controlId: field.controlId,
+      name: field.name,
+      className: field.className,
+      meta: field.meta,
       label: field.label,
       value: String(this.controlValue(field) ?? ''),
       placeholder: field.placeholder,
@@ -604,6 +656,11 @@ export class PlaygroundComponent {
 
   asSingleSelectConfig(field: BrFormField): BrSingleSelectConfig {
     return {
+      id: field.id,
+      controlId: field.controlId,
+      name: field.name,
+      className: field.className,
+      meta: field.meta,
       label: field.label,
       value: this.controlValue(field),
       options: field.options || [],
@@ -614,42 +671,72 @@ export class PlaygroundComponent {
 
   asMultiSelectConfig(field: BrFormField): BrMultiSelectConfig {
     return {
+      id: field.id,
+      controlId: field.controlId,
+      name: field.name,
+      className: field.className,
+      meta: field.meta,
       label: field.label,
       value: Array.isArray(this.controlValue(field)) ? this.controlValue(field) : [],
       options: field.options || [],
       disabled: field.disabled,
+      required: field.required,
     };
   }
 
   asCheckboxConfig(field: BrFormField): BrCheckboxConfig {
     return {
+      id: field.id,
+      controlId: field.controlId,
+      name: field.name,
+      className: field.className,
+      meta: field.meta,
       label: field.label,
+      value: !!this.controlValue(field),
       checked: !!this.controlValue(field),
       disabled: field.disabled,
+      required: field.required,
     };
   }
 
   asRadioConfig(field: BrFormField): BrRadioConfig {
     return {
+      id: field.id,
+      controlId: field.controlId,
+      name: field.name,
+      className: field.className,
+      meta: field.meta,
       label: field.label,
       value: this.controlValue(field),
       options: field.options || [],
       disabled: field.disabled,
+      required: field.required,
     };
   }
 
   asAutocompleteConfig(field: BrFormField): BrAutocompleteConfig {
     return {
+      id: field.id,
+      controlId: field.controlId,
+      name: field.name,
+      className: field.className,
+      meta: field.meta,
       label: field.label,
       value: String(this.controlValue(field) ?? ''),
       options: field.options || [],
       placeholder: field.placeholder,
       disabled: field.disabled,
+      required: field.required,
     };
   }
 
   asDateConfig(field: BrFormField): BrDateConfig {
     return {
+      id: field.id,
+      controlId: field.controlId,
+      name: field.name,
+      className: field.className,
+      meta: field.meta,
       label: field.label,
       value: this.controlValue(field) || '',
       minDate: field.minDate ? new Date(field.minDate) : null,
@@ -698,6 +785,18 @@ export class PlaygroundComponent {
 
   getDateConfig(field: BrFormField): BrDateConfig {
     return this.formControlConfigMap[field.id] as BrDateConfig;
+  }
+
+  isNgModelOnlyVariant(): boolean {
+    return this.activeControlPlayground !== 'all' && this.activeControlVariant === 'ngmodel-simple';
+  }
+
+  isNgModelOnlyField(field: BrFormField): boolean {
+    return this.isNgModelOnlyVariant() && this.formConfig.fields.length === 1 && this.formConfig.fields[0].id === field.id;
+  }
+
+  isRegistryDemoVariant(): boolean {
+    return this.activeControlPlayground !== 'all' && this.activeControlVariant === 'registry-demo';
   }
 
   clearEventLog(): void {
@@ -1048,11 +1147,12 @@ export class YourFeatureComponent {
 
   private buildFormTsCode(config: BrFormConfig): string {
     const fieldTypes = new Set((config.fields || []).map((f) => f.type));
-
+    const isRegistryDemo = this.isRegistryDemoConfig(config);
     const typeImports: string[] = ['BrControlsConfig', 'BrControlActionEvent'];
     if (fieldTypes.size > 0) {
       typeImports.push('BrControlField');
     }
+    if (isRegistryDemo) typeImports.push('ControlRegistryService');
     if (fieldTypes.has('text')) typeImports.push('BrTextConfig');
     if (fieldTypes.has('single-select')) typeImports.push('BrSingleSelectConfig');
     if (fieldTypes.has('multi-select')) typeImports.push('BrMultiSelectConfig');
@@ -1071,6 +1171,11 @@ export class YourFeatureComponent {
     if (fieldTypes.has('text')) {
       helperMethods.push(`  asTextConfig(field: BrControlField): BrTextConfig {
     return {
+      id: field.id,
+      controlId: field.controlId,
+      name: field.name,
+      className: field.className,
+      meta: field.meta,
       label: field.label,
       value: String(this.controlValue(field) ?? ''),
       placeholder: field.placeholder,
@@ -1083,6 +1188,11 @@ export class YourFeatureComponent {
     if (fieldTypes.has('single-select')) {
       helperMethods.push(`  asSingleSelectConfig(field: BrControlField): BrSingleSelectConfig {
     return {
+      id: field.id,
+      controlId: field.controlId,
+      name: field.name,
+      className: field.className,
+      meta: field.meta,
       label: field.label,
       value: this.controlValue(field),
       options: field.options || [],
@@ -1095,10 +1205,16 @@ export class YourFeatureComponent {
     if (fieldTypes.has('multi-select')) {
       helperMethods.push(`  asMultiSelectConfig(field: BrControlField): BrMultiSelectConfig {
     return {
+      id: field.id,
+      controlId: field.controlId,
+      name: field.name,
+      className: field.className,
+      meta: field.meta,
       label: field.label,
       value: Array.isArray(this.controlValue(field)) ? this.controlValue(field) : [],
       options: field.options || [],
       disabled: field.disabled,
+      required: field.required,
     };
   }`);
     }
@@ -1106,9 +1222,16 @@ export class YourFeatureComponent {
     if (fieldTypes.has('checkbox')) {
       helperMethods.push(`  asCheckboxConfig(field: BrControlField): BrCheckboxConfig {
     return {
+      id: field.id,
+      controlId: field.controlId,
+      name: field.name,
+      className: field.className,
+      meta: field.meta,
       label: field.label,
+      value: !!this.controlValue(field),
       checked: !!this.controlValue(field),
       disabled: field.disabled,
+      required: field.required,
     };
   }`);
     }
@@ -1116,10 +1239,16 @@ export class YourFeatureComponent {
     if (fieldTypes.has('radio')) {
       helperMethods.push(`  asRadioConfig(field: BrControlField): BrRadioConfig {
     return {
+      id: field.id,
+      controlId: field.controlId,
+      name: field.name,
+      className: field.className,
+      meta: field.meta,
       label: field.label,
       value: this.controlValue(field),
       options: field.options || [],
       disabled: field.disabled,
+      required: field.required,
     };
   }`);
     }
@@ -1127,11 +1256,17 @@ export class YourFeatureComponent {
     if (fieldTypes.has('autocomplete')) {
       helperMethods.push(`  asAutocompleteConfig(field: BrControlField): BrAutocompleteConfig {
     return {
+      id: field.id,
+      controlId: field.controlId,
+      name: field.name,
+      className: field.className,
+      meta: field.meta,
       label: field.label,
       value: String(this.controlValue(field) ?? ''),
       options: field.options || [],
       placeholder: field.placeholder,
       disabled: field.disabled,
+      required: field.required,
     };
   }`);
     }
@@ -1139,6 +1274,11 @@ export class YourFeatureComponent {
     if (fieldTypes.has('date')) {
       helperMethods.push(`  asDateConfig(field: BrControlField): BrDateConfig {
     return {
+      id: field.id,
+      controlId: field.controlId,
+      name: field.name,
+      className: field.className,
+      meta: field.meta,
       label: field.label,
       value: this.controlValue(field) || '',
       disabled: field.disabled,
@@ -1149,11 +1289,27 @@ export class YourFeatureComponent {
     }
 
     const helperBlock = helperMethods.length > 0 ? `\n${helperMethods.join('\n\n')}\n` : '';
+    const registryMembers = isRegistryDemo
+      ? `
+  constructor(private readonly controlRegistry: ControlRegistryService) {}
+
+  readRegistryValues(): void {
+    const sampleId = this.controlsConfig.fields[0]?.id || '';
+    const sampleName = this.controlsConfig.fields[0]?.name || 'registry-group';
+    const sampleClass = (this.controlsConfig.fields[0]?.className || 'registry-shared').split(/\\s+/)[0];
+
+    console.log('valueById', sampleId, this.controlRegistry.valueById(sampleId));
+    console.log('valuesByName', sampleName, this.controlRegistry.valuesByName(sampleName));
+    console.log('valuesByClass', sampleClass, this.controlRegistry.valuesByClass(sampleClass));
+  }
+`
+      : '';
 
     return `import { ${typeImports.join(', ')} } from '../../common';
 
 export class YourFeatureComponent {
   controlsConfig: BrControlsConfig = ${JSON.stringify(config, null, 2)};
+${registryMembers}
 
   updateControlValue(fieldId: string, value: any): void {
     this.controlsConfig = {
@@ -1201,6 +1357,12 @@ ${helperBlock}
 
   private buildFormHtmlCode(config: BrFormConfig): string {
     const controls = (config.fields || []).map((field) => this.controlHtmlSnippet(field)).join('\n    ');
+    const registryButton = this.isRegistryDemoConfig(config)
+      ? `
+  <div class="controls-actions">
+    <button type="button" class="btn ghost" (click)="readRegistryValues()">Read Registry Values</button>
+  </div>`
+      : '';
     const actions = config.showActions === false
       ? ''
       : `
@@ -1215,11 +1377,38 @@ ${helperBlock}
   <div class="controls-host">
     ${controls}
   </div>
+  ${registryButton}
   ${actions}
 </section>`;
   }
 
+  private isRegistryDemoConfig(config: BrFormConfig): boolean {
+    return (config.description || '').toLowerCase().includes('registry demo');
+  }
+
   private controlHtmlSnippet(field: BrFormField): string {
+    if (this.isNgModelOnlyField(field)) {
+      if (field.type === 'text') {
+        return `<br-text [id]="'${field.id}'" [label]="'${field.label}'" [placeholder]="'${field.placeholder || ''}'" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ngModel]="controlValue(${this.fieldRef(field.id)})" (ngModelChange)="updateControlValue('${field.id}', $event)"></br-text>`;
+      }
+      if (field.type === 'single-select') {
+        return `<br-single-select [id]="'${field.id}'" [label]="'${field.label}'" [options]="${JSON.stringify(field.options || [])}" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ngModel]="controlValue(${this.fieldRef(field.id)})" (ngModelChange)="updateControlValue('${field.id}', $event)"></br-single-select>`;
+      }
+      if (field.type === 'multi-select') {
+        return `<br-multi-select [id]="'${field.id}'" [label]="'${field.label}'" [options]="${JSON.stringify(field.options || [])}" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ngModel]="controlValue(${this.fieldRef(field.id)})" (ngModelChange)="updateControlValue('${field.id}', $event)"></br-multi-select>`;
+      }
+      if (field.type === 'checkbox') {
+        return `<br-checkbox [id]="'${field.id}'" [label]="'${field.label}'" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ngModel]="controlValue(${this.fieldRef(field.id)})" (ngModelChange)="updateControlValue('${field.id}', $event)"></br-checkbox>`;
+      }
+      if (field.type === 'radio') {
+        return `<br-radio [id]="'${field.id}'" [label]="'${field.label}'" [options]="${JSON.stringify(field.options || [])}" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ngModel]="controlValue(${this.fieldRef(field.id)})" (ngModelChange)="updateControlValue('${field.id}', $event)"></br-radio>`;
+      }
+      if (field.type === 'date') {
+        return `<br-date [id]="'${field.id}'" [label]="'${field.label}'" [placeholder]="'${field.placeholder || 'Select date'}'" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ngModel]="controlValue(${this.fieldRef(field.id)})" (ngModelChange)="updateControlValue('${field.id}', $event)"></br-date>`;
+      }
+      return `<br-autocomplete [id]="'${field.id}'" [label]="'${field.label}'" [placeholder]="'${field.placeholder || ''}'" [options]="${JSON.stringify(field.options || [])}" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ngModel]="controlValue(${this.fieldRef(field.id)})" (ngModelChange)="updateControlValue('${field.id}', $event)"></br-autocomplete>`;
+    }
+
     if (field.type === 'text') {
       return `<br-text [config]="asTextConfig(${this.fieldRef(field.id)})" (valueChange)="updateControlValue('${field.id}', $event)"></br-text>`;
     }
@@ -1798,6 +1987,15 @@ ${helperBlock}
   }
 
   private buildSingleControlVariantConfig(control: Exclude<ControlPlayground, 'all'>, variant: string): BrFormConfig {
+    const variantKey = variant.replace(/-config$/, '');
+    const ngModelOnly = variantKey === 'ngmodel-simple';
+    if (variantKey === 'events-demo') {
+      return this.buildControlEventsDemoVariantConfig(control);
+    }
+    if (variantKey === 'registry-demo') {
+      return this.buildControlRegistryDemoVariantConfig(control);
+    }
+
     if (control === 'date') {
       return this.singleControlConfig(
         {
@@ -1805,25 +2003,25 @@ ${helperBlock}
           type: 'date',
           label: 'Start Date',
           placeholder: 'Select start date',
-          required: variant === 'bounded',
+          required: variantKey === 'bounded',
           language: 'en-US',
           locale: 'en-US',
           dateFormat: 'MM/dd/yyyy',
           DateConfiguration: this.clone(PLAYGROUND_DATE_CONFIGURATION),
         },
-        variant === 'disabled' ? '2026-03-10' : '2026-02-10',
+        variantKey === 'disabled' ? '2026-03-10' : '2026-02-10',
         `${this.controlPlaygroundLabels[control]} Playground`,
-        `Variant: ${this.controlVariantLabel(variant)}`,
-        variant === 'disabled',
+        `Variant: ${this.controlVariantLabel(variant)}${ngModelOnly ? ' (No Config)' : ''}`,
+        variantKey === 'disabled',
       );
     }
 
     if (control === 'text') {
       return this.singleControlConfig(
-        { id: 'textControl', type: 'text', label: 'Employee Name', placeholder: 'Type full name', required: variant === 'required', disabled: variant === 'disabled' },
-        variant === 'disabled' ? 'Read-only value' : '',
+        { id: 'textControl', type: 'text', label: 'Employee Name', placeholder: 'Type full name', required: variantKey === 'required', disabled: variantKey === 'disabled' },
+        variantKey === 'disabled' ? 'Read-only value' : '',
         `${this.controlPlaygroundLabels[control]} Playground`,
-        `Variant: ${this.controlVariantLabel(variant)}`,
+        `Variant: ${this.controlVariantLabel(variant)}${ngModelOnly ? ' (No Config)' : ''}`,
       );
     }
 
@@ -1833,8 +2031,8 @@ ${helperBlock}
           id: 'singleSelectControl',
           type: 'single-select',
           label: 'Department',
-          required: variant === 'required',
-          disabled: variant === 'disabled',
+          required: variantKey === 'required',
+          disabled: variantKey === 'disabled',
           options: [
             { label: 'Engineering', value: 'eng' },
             { label: 'Finance', value: 'fin' },
@@ -1842,9 +2040,9 @@ ${helperBlock}
             { label: 'Operations', value: 'ops' },
           ],
         },
-        variant === 'disabled' ? 'fin' : '',
+        variantKey === 'disabled' ? 'fin' : '',
         `${this.controlPlaygroundLabels[control]} Playground`,
-        `Variant: ${this.controlVariantLabel(variant)}`,
+        `Variant: ${this.controlVariantLabel(variant)}${ngModelOnly ? ' (No Config)' : ''}`,
       );
     }
 
@@ -1854,7 +2052,7 @@ ${helperBlock}
           id: 'multiSelectControl',
           type: 'multi-select',
           label: 'Skills',
-          disabled: variant === 'disabled',
+          disabled: variantKey === 'disabled',
           options: [
             { label: 'Angular', value: 'angular' },
             { label: 'Java', value: 'java' },
@@ -1862,18 +2060,18 @@ ${helperBlock}
             { label: 'AWS', value: 'aws' },
           ],
         },
-        variant === 'preselected' ? ['angular', 'aws'] : [],
+        variantKey === 'preselected' ? ['angular', 'aws'] : [],
         `${this.controlPlaygroundLabels[control]} Playground`,
-        `Variant: ${this.controlVariantLabel(variant)}`,
+        `Variant: ${this.controlVariantLabel(variant)}${ngModelOnly ? ' (No Config)' : ''}`,
       );
     }
 
     if (control === 'checkbox') {
       return this.singleControlConfig(
-        { id: 'checkboxControl', type: 'checkbox', label: 'Enable notifications', disabled: variant === 'disabled' },
-        variant === 'checked' || variant === 'disabled',
+        { id: 'checkboxControl', type: 'checkbox', label: 'Enable notifications', disabled: variantKey === 'disabled' },
+        variantKey === 'checked' || variantKey === 'disabled',
         `${this.controlPlaygroundLabels[control]} Playground`,
-        `Variant: ${this.controlVariantLabel(variant)}`,
+        `Variant: ${this.controlVariantLabel(variant)}${ngModelOnly ? ' (No Config)' : ''}`,
       );
     }
 
@@ -1883,16 +2081,16 @@ ${helperBlock}
           id: 'radioControl',
           type: 'radio',
           label: 'Employment Type',
-          disabled: variant === 'disabled',
+          disabled: variantKey === 'disabled',
           options: [
             { label: 'Full Time', value: 'ft' },
             { label: 'Contract', value: 'ct' },
             { label: 'Intern', value: 'in' },
           ],
         },
-        variant === 'preselected' ? 'ct' : '',
+        variantKey === 'preselected' ? 'ct' : '',
         `${this.controlPlaygroundLabels[control]} Playground`,
-        `Variant: ${this.controlVariantLabel(variant)}`,
+        `Variant: ${this.controlVariantLabel(variant)}${ngModelOnly ? ' (No Config)' : ''}`,
       );
     }
 
@@ -1902,7 +2100,7 @@ ${helperBlock}
         type: 'autocomplete',
         label: 'Location',
         placeholder: 'Search location',
-        disabled: variant === 'disabled',
+        disabled: variantKey === 'disabled',
         options: [
           { label: 'Austin', value: 'Austin' },
           { label: 'Seattle', value: 'Seattle' },
@@ -1911,10 +2109,288 @@ ${helperBlock}
           { label: 'Denver', value: 'Denver' },
         ],
       },
-      variant === 'prefilled' ? 'Seattle' : '',
+      variantKey === 'prefilled' ? 'Seattle' : '',
       `${this.controlPlaygroundLabels[control]} Playground`,
-      `Variant: ${this.controlVariantLabel(variant)}`,
+      `Variant: ${this.controlVariantLabel(variant)}${ngModelOnly ? ' (No Config)' : ''}`,
     );
+  }
+
+  private buildControlEventsDemoVariantConfig(control: Exclude<ControlPlayground, 'all'>): BrFormConfig {
+    if (control === 'text') {
+      return {
+        title: 'Text Box Playground',
+        description: 'Events Demo: type in first box and tab/click to second to trigger keyup/focus/blur/click events.',
+        fields: [
+          { id: 'textControlA', type: 'text', label: 'Text A', placeholder: 'Type here' },
+          { id: 'textControlB', type: 'text', label: 'Text B', placeholder: 'Click here after A' },
+        ],
+        value: { textControlA: '', textControlB: '' },
+        showActions: false,
+      };
+    }
+
+    if (control === 'date') {
+      return {
+        title: 'Date Playground',
+        description: 'Events Demo: open date picker, pick a date, then move focus to second date control.',
+        fields: [
+          { id: 'dateControlA', type: 'date', label: 'Date A', placeholder: 'Pick date', language: 'en-US', locale: 'en-US', dateFormat: 'MM/dd/yyyy' },
+          { id: 'dateControlB', type: 'date', label: 'Date B', placeholder: 'Pick date', language: 'en-US', locale: 'en-US', dateFormat: 'MM/dd/yyyy' },
+        ],
+        value: { dateControlA: '', dateControlB: '' },
+        showActions: false,
+      };
+    }
+
+    if (control === 'single-select') {
+      return {
+        title: 'Single Select Playground',
+        description: 'Events Demo: click/select in first dropdown, then move to second to see change/focus/blur.',
+        fields: [
+          {
+            id: 'singleSelectControlA',
+            type: 'single-select',
+            label: 'Department A',
+            options: [
+              { label: 'Engineering', value: 'eng' },
+              { label: 'Finance', value: 'fin' },
+              { label: 'HR', value: 'hr' },
+            ],
+          },
+          {
+            id: 'singleSelectControlB',
+            type: 'single-select',
+            label: 'Department B',
+            options: [
+              { label: 'Engineering', value: 'eng' },
+              { label: 'Finance', value: 'fin' },
+              { label: 'HR', value: 'hr' },
+            ],
+          },
+        ],
+        value: { singleSelectControlA: '', singleSelectControlB: '' },
+        showActions: false,
+      };
+    }
+
+    if (control === 'multi-select') {
+      return {
+        title: 'Multi Select Playground',
+        description: 'Events Demo: click options/chips and then click outside to trigger interactions.',
+        fields: [
+          {
+            id: 'multiSelectControlA',
+            type: 'multi-select',
+            label: 'Skills A',
+            options: [
+              { label: 'Angular', value: 'angular' },
+              { label: 'Java', value: 'java' },
+              { label: 'SQL', value: 'sql' },
+            ],
+          },
+          {
+            id: 'multiSelectControlB',
+            type: 'multi-select',
+            label: 'Skills B',
+            options: [
+              { label: 'Angular', value: 'angular' },
+              { label: 'Java', value: 'java' },
+              { label: 'SQL', value: 'sql' },
+            ],
+          },
+        ],
+        value: { multiSelectControlA: [], multiSelectControlB: [] },
+        showActions: false,
+      };
+    }
+
+    if (control === 'checkbox') {
+      return {
+        title: 'Checkbox Playground',
+        description: 'Events Demo: click/toggle both checkboxes to see click/change/value events.',
+        fields: [
+          { id: 'checkboxControlA', type: 'checkbox', label: 'Enable alerts' },
+          { id: 'checkboxControlB', type: 'checkbox', label: 'Enable notifications' },
+        ],
+        value: { checkboxControlA: false, checkboxControlB: true },
+        showActions: false,
+      };
+    }
+
+    if (control === 'radio') {
+      return {
+        title: 'Radio Playground',
+        description: 'Events Demo: switch radio options and move focus between the two groups.',
+        fields: [
+          {
+            id: 'radioControlA',
+            type: 'radio',
+            label: 'Type A',
+            options: [
+              { label: 'Full Time', value: 'ft' },
+              { label: 'Contract', value: 'ct' },
+            ],
+          },
+          {
+            id: 'radioControlB',
+            type: 'radio',
+            label: 'Type B',
+            options: [
+              { label: 'Full Time', value: 'ft' },
+              { label: 'Contract', value: 'ct' },
+            ],
+          },
+        ],
+        value: { radioControlA: 'ft', radioControlB: 'ct' },
+        showActions: false,
+      };
+    }
+
+    return {
+      title: 'Autocomplete Playground',
+      description: 'Events Demo: type in first input, arrow/enter to select, then move to second input.',
+      fields: [
+        {
+          id: 'autocompleteControlA',
+          type: 'autocomplete',
+          label: 'Location A',
+          placeholder: 'Type location',
+          options: [
+            { label: 'Austin', value: 'Austin' },
+            { label: 'Seattle', value: 'Seattle' },
+            { label: 'New York', value: 'New York' },
+          ],
+        },
+        {
+          id: 'autocompleteControlB',
+          type: 'autocomplete',
+          label: 'Location B',
+          placeholder: 'Type location',
+          options: [
+            { label: 'Austin', value: 'Austin' },
+            { label: 'Seattle', value: 'Seattle' },
+            { label: 'New York', value: 'New York' },
+          ],
+        },
+      ],
+      value: { autocompleteControlA: '', autocompleteControlB: '' },
+      showActions: false,
+    };
+  }
+
+  private buildControlRegistryDemoVariantConfig(control: Exclude<ControlPlayground, 'all'>): BrFormConfig {
+    const sharedName = 'registry-group';
+    const sharedClass = 'registry-shared';
+    const metaA = { sample: 'A', scenario: 'registry-demo' };
+    const metaB = { sample: 'B', scenario: 'registry-demo' };
+
+    if (control === 'text') {
+      return {
+        title: 'Text Box Playground',
+        description: 'Registry Demo: Read values using valueById, valuesByName, valuesByClass.',
+        fields: [
+          { id: 'textRegistryA', type: 'text', label: 'Text A', name: sharedName, className: sharedClass, meta: metaA, placeholder: 'Type A' },
+          { id: 'textRegistryB', type: 'text', label: 'Text B', name: sharedName, className: sharedClass, meta: metaB, placeholder: 'Type B' },
+        ],
+        value: { textRegistryA: 'Alpha', textRegistryB: 'Beta' },
+        showActions: false,
+      };
+    }
+
+    if (control === 'date') {
+      return {
+        title: 'Date Playground',
+        description: 'Registry Demo: Read values using valueById, valuesByName, valuesByClass.',
+        fields: [
+          { id: 'dateRegistryA', type: 'date', label: 'Date A', name: sharedName, className: sharedClass, meta: metaA, language: 'en-US', locale: 'en-US', dateFormat: 'MM/dd/yyyy' },
+          { id: 'dateRegistryB', type: 'date', label: 'Date B', name: sharedName, className: sharedClass, meta: metaB, language: 'en-US', locale: 'en-US', dateFormat: 'MM/dd/yyyy' },
+        ],
+        value: { dateRegistryA: '2026-03-10', dateRegistryB: '2026-03-20' },
+        showActions: false,
+      };
+    }
+
+    if (control === 'single-select') {
+      const options = [
+        { label: 'Engineering', value: 'eng' },
+        { label: 'Finance', value: 'fin' },
+        { label: 'HR', value: 'hr' },
+      ];
+      return {
+        title: 'Single Select Playground',
+        description: 'Registry Demo: Read values using valueById, valuesByName, valuesByClass.',
+        fields: [
+          { id: 'singleRegistryA', type: 'single-select', label: 'Department A', name: sharedName, className: sharedClass, meta: metaA, options },
+          { id: 'singleRegistryB', type: 'single-select', label: 'Department B', name: sharedName, className: sharedClass, meta: metaB, options },
+        ],
+        value: { singleRegistryA: 'eng', singleRegistryB: 'fin' },
+        showActions: false,
+      };
+    }
+
+    if (control === 'multi-select') {
+      const options = [
+        { label: 'Angular', value: 'angular' },
+        { label: 'Java', value: 'java' },
+        { label: 'SQL', value: 'sql' },
+      ];
+      return {
+        title: 'Multi Select Playground',
+        description: 'Registry Demo: Read values using valueById, valuesByName, valuesByClass.',
+        fields: [
+          { id: 'multiRegistryA', type: 'multi-select', label: 'Skills A', name: sharedName, className: sharedClass, meta: metaA, options },
+          { id: 'multiRegistryB', type: 'multi-select', label: 'Skills B', name: sharedName, className: sharedClass, meta: metaB, options },
+        ],
+        value: { multiRegistryA: ['angular'], multiRegistryB: ['java', 'sql'] },
+        showActions: false,
+      };
+    }
+
+    if (control === 'checkbox') {
+      return {
+        title: 'Checkbox Playground',
+        description: 'Registry Demo: Read values using valueById, valuesByName, valuesByClass.',
+        fields: [
+          { id: 'checkboxRegistryA', type: 'checkbox', label: 'Notify A', name: sharedName, className: sharedClass, meta: metaA },
+          { id: 'checkboxRegistryB', type: 'checkbox', label: 'Notify B', name: sharedName, className: sharedClass, meta: metaB },
+        ],
+        value: { checkboxRegistryA: true, checkboxRegistryB: false },
+        showActions: false,
+      };
+    }
+
+    if (control === 'radio') {
+      const options = [
+        { label: 'Full Time', value: 'ft' },
+        { label: 'Contract', value: 'ct' },
+      ];
+      return {
+        title: 'Radio Playground',
+        description: 'Registry Demo: Read values using valueById, valuesByName, valuesByClass.',
+        fields: [
+          { id: 'radioRegistryA', type: 'radio', label: 'Type A', name: sharedName, className: sharedClass, meta: metaA, options },
+          { id: 'radioRegistryB', type: 'radio', label: 'Type B', name: sharedName, className: sharedClass, meta: metaB, options },
+        ],
+        value: { radioRegistryA: 'ft', radioRegistryB: 'ct' },
+        showActions: false,
+      };
+    }
+
+    const options = [
+      { label: 'Austin', value: 'Austin' },
+      { label: 'Seattle', value: 'Seattle' },
+      { label: 'New York', value: 'New York' },
+    ];
+    return {
+      title: 'Autocomplete Playground',
+      description: 'Registry Demo: Read values using valueById, valuesByName, valuesByClass.',
+      fields: [
+        { id: 'autoRegistryA', type: 'autocomplete', label: 'Location A', name: sharedName, className: sharedClass, meta: metaA, placeholder: 'Type location', options },
+        { id: 'autoRegistryB', type: 'autocomplete', label: 'Location B', name: sharedName, className: sharedClass, meta: metaB, placeholder: 'Type location', options },
+      ],
+      value: { autoRegistryA: 'Austin', autoRegistryB: 'Seattle' },
+      showActions: false,
+    };
   }
 
   private singleControlConfig(field: BrFormField, value: any, title: string, description: string, disabled = false): BrFormConfig {

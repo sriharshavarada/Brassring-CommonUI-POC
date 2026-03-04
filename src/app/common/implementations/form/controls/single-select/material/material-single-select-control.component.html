@@ -1,7 +1,9 @@
-<mat-form-field appearance="outline" class="br-material-field">
+<mat-form-field appearance="outline" class="br-material-field" [ngClass]="config.className" [attr.id]="config.id">
   <mat-label>{{ config.label }}</mat-label>
-  <mat-select [disabled]="config.disabled" [required]="config.required" [ngModel]="config.value"
-    (ngModelChange)="valueChange.emit($event)">
+  <mat-select [attr.name]="config.name" [disabled]="config.disabled" [required]="config.required" [ngModel]="config.value"
+    (ngModelChange)="valueChange.emit($event)" (blur)="blurEvent.emit($event)" (focus)="focusEvent.emit($event)"
+    (input)="inputEvent.emit($event)" (change)="changeEvent.emit($event)" (keydown)="keydownEvent.emit($event)"
+    (keyup)="keyupEvent.emit($event)" (click)="clickEvent.emit($event)">
     <mat-option *ngFor="let opt of config.options" [value]="opt.value">{{ opt.label }}</mat-option>
   </mat-select>
 </mat-form-field>

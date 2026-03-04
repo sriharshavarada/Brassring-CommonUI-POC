@@ -16,6 +16,10 @@ export interface BrFormOption {
 
 export interface BrFormField {
   id: string;
+  controlId?: string;
+  name?: string;
+  className?: string;
+  meta?: Record<string, any>;
   type: BrFormFieldType;
   label: string;
   placeholder?: string;
