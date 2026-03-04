@@ -32,15 +32,30 @@ jobs:
         run: npm ci
 
       - name: Build
+        run: npm run build -- --configuration production --base-href "/Brassring-CommonUI-POC/" --verbose
+
+      - name: Prepare Pages artifact path
+        id: prepare_artifact
         run: |
-          npm run build -- --configuration production --base-href "/Brassring-CommonUI-POC/"
-          cp dist/br-ui-framework/browser/index.html dist/br-ui-framework/browser/404.html
-          touch dist/br-ui-framework/browser/.nojekyll
+          if [ -f dist/br-ui-framework/browser/index.html ]; then
+            ARTIFACT_PATH="dist/br-ui-framework/browser"
+          elif [ -f dist/br-ui-framework/index.html ]; then
+            ARTIFACT_PATH="dist/br-ui-framework"
+          else
+            echo "Could not find index.html in expected dist paths."
+            echo "Dist tree:"
+            find dist -maxdepth 4 -type f || true
+            exit 1
+          fi
+
+          cp "${ARTIFACT_PATH}/index.html" "${ARTIFACT_PATH}/404.html"
+          touch "${ARTIFACT_PATH}/.nojekyll"
+          echo "artifact_path=${ARTIFACT_PATH}" >> "$GITHUB_OUTPUT"
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist/br-ui-framework/browser
+          path: ${{ steps.prepare_artifact.outputs.artifact_path }}
 
   deploy:
     runs-on: ubuntu-latest
