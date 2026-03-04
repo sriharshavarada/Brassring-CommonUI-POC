@@ -401,6 +401,58 @@ For `registry-demo`, generated TS/HTML now includes real working integration:
 - `className?`
 - `meta?`
 
+### 14) Consumer Docs overhaul (latest)
+The `/docs` page was upgraded from a static page into a production-style docs experience.
+
+Primary files:
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/docs/docs.component.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/docs/docs.component.html`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/docs/docs.component.scss`
+
+What was implemented:
+- 3-pane docs UX:
+  - left navigation index,
+  - center running document,
+  - right “On This Page” anchors.
+- Searchable left nav with live filtering and no-result state.
+- Hierarchical left nav support:
+  - `br-date` is parent,
+  - `br-date configuration reference` is child/sub-entry.
+- Better consumer readability:
+  - new `Preface and Key Terms` page,
+  - simple-language “why/use” context,
+  - key-term sections added in major pages and control pages.
+- Expanded production-grade content:
+  - getting started, forms/events/registry,
+  - per-control usage (config style + ngModel style + reactive forms),
+  - control input/output tables,
+  - grid/modal guidance.
+- Dedicated deep reference:
+  - `br-date configuration reference` now documents:
+    - top-level date props,
+    - `DateConfiguration` property meanings,
+    - relative min/max token behavior,
+    - locale/language and dateFormat notes,
+    - consumer examples.
+
+### 15) CI/build pipeline updates (latest)
+GitHub Actions and build budget handling were adjusted to stabilize deployments.
+
+Workflow file:
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/.github/workflows/angular-pages.yml`
+
+Changes:
+- Build step now runs with verbose output for clearer diagnostics.
+- Artifact path detection hardened to support both layouts:
+  - `dist/br-ui-framework/browser`
+  - `dist/br-ui-framework`
+- Workflow now fails with explicit dist tree dump if artifact path is missing.
+- `.nojekyll` and `404.html` creation moved to detected artifact path.
+
+Budget/config updates:
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/angular.json`
+- Initial bundle budget `maximumError` was raised to `1.5MB` to unblock CI budget failures.
+
 ## Current Known State / Caveats
 - Angular compile/typecheck passes:
   - `npx ngc -p tsconfig.app.json`

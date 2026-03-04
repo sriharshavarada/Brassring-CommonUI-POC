@@ -1,51 +1,103 @@
-<div class="docs-page">
-  <header class="docs-header">
-    <h1>Consumer Docs</h1>
-    <p>This section explains how any team can consume `br-grid`, `br-date`, and `br-modal` in their own app.</p>
-  </header>
+<div class="docs-shell">
+  <aside class="docs-nav">
+    <div class="brand-row">
+      <h1>Docs</h1>
+      <span class="badge">Consumer</span>
+    </div>
+    <p class="nav-subtitle">Wrapper usage, events, and integration patterns.</p>
+    <div class="nav-search">
+      <input type="text" [ngModel]="navSearch" (ngModelChange)="navSearch = $event" placeholder="Search docs..." />
+      <button type="button" class="clear-btn" *ngIf="navSearch" (click)="clearNavSearch()">Clear</button>
+    </div>
 
-  <section class="doc-card">
-    <h2>Quick Start</h2>
-    <ol>
-      <li>Import the façade components from the common layer only.</li>
-      <li>Pass library-agnostic JSON (`BrGridConfig`, `BrDateConfig`, `BrModalConfig`).</li>
-      <li>Handle emitted events in your feature component or service.</li>
-      <li>Switch rendering mode from Playground or mode config without touching consumer screens.</li>
-    </ol>
-  </section>
+    <nav class="nav-groups">
+      <section class="nav-group" *ngFor="let grouped of groupedPages">
+        <h2>{{ grouped.group.label }}</h2>
+        <div class="nav-node" *ngFor="let node of grouped.pages; trackBy: trackByNavNode">
+          <button
+            type="button"
+            class="nav-item"
+            [class.active]="activeSlug === node.page.slug"
+            (click)="selectPage(node.page.slug)">
+            {{ node.page.title }}
+          </button>
+          <button
+            type="button"
+            class="nav-item child"
+            *ngFor="let child of node.children; trackBy: trackByPage"
+            [class.active]="activeSlug === child.slug"
+            (click)="selectPage(child.slug)">
+            {{ child.title }}
+          </button>
+        </div>
+      </section>
+      <p class="nav-empty" *ngIf="!hasNavResults">No docs match your search.</p>
+    </nav>
 
-  <section class="doc-card">
-    <h2>Usage Example</h2>
-    <pre><code>&lt;br-grid [config]="gridConfig" (action)="onGridAction($event)"&gt;&lt;/br-grid&gt;
-&lt;br-date [config]="dateConfig" (dateChange)="onDateChange($event)"&gt;&lt;/br-date&gt;
-&lt;br-modal [config]="modalConfig" (action)="onModalAction($event)"&gt;&lt;/br-modal&gt;</code></pre>
-  </section>
+    <a routerLink="/playground" class="open-playground">Open Playground</a>
+  </aside>
 
-  <section class="doc-card">
-    <h2>Event Wiring Pattern</h2>
-    <pre><code>onGridAction(event: BrGridActionEvent) &#123;
-  if (event.actionId === 'save') &#123;
-    this.api.saveSelection(event.selectedRows).subscribe();
-  &#125;
-&#125;
+  <main class="doc-main">
+    <header class="doc-header">
+      <h2>{{ activePage.title }}</h2>
+      <p>{{ activePage.summary }}</p>
+    </header>
 
-onModalAction(event: BrModalActionEvent) &#123;
-  if (event.actionId === 'confirm') &#123;
-    this.api.confirm(event.fieldValues).subscribe();
-  &#125;
-&#125;</code></pre>
-  </section>
+    <div class="doc-layout">
+      <article class="doc-content">
+        <section
+          class="doc-section"
+          *ngFor="let section of activePage.sections; trackBy: trackBySection"
+          [attr.id]="sectionAnchor(section.id)">
+          <h3>{{ section.title }}</h3>
 
-  <section class="doc-card">
-    <h2>Full Project Documents</h2>
-    <p>Reference docs in repo: <code>{{ repoPath }}</code></p>
-    <ul>
-      <li><code>00-project-handoff-so-far.md</code></li>
-      <li><code>01-high-level-architecture.md</code></li>
-      <li><code>02-runtime-flow-browser-to-control.md</code></li>
-      <li><code>03-consumer-integration-guide.md</code></li>
-    </ul>
-  </section>
+          <ng-container *ngFor="let block of section.blocks">
+            <p *ngIf="block.kind === 'text'">{{ block.text }}</p>
 
-  <a routerLink="/playground" class="link-btn">Open Developer Playground</a>
+            <div class="callout" *ngIf="block.kind === 'callout'">
+              <h4>{{ block.title }}</h4>
+              <p>{{ block.text }}</p>
+            </div>
+
+            <ul *ngIf="block.kind === 'list'">
+              <li *ngFor="let item of block.items">{{ item }}</li>
+            </ul>
+
+            <pre *ngIf="block.kind === 'code'" [attr.data-lang]="block.language"><code>{{ block.code }}</code></pre>
+
+            <div class="table-wrap" *ngIf="block.kind === 'table'">
+              <table>
+                <thead>
+                  <tr>
+                    <th *ngFor="let col of block.columns">{{ col }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let row of block.rows">
+                    <td *ngFor="let cell of row">{{ cell }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </ng-container>
+        </section>
+
+        <section class="repo-links">
+          <h3>Project Docs Folder</h3>
+          <p><code>{{ repoPath }}</code></p>
+        </section>
+      </article>
+
+      <aside class="doc-toc">
+        <h3>On This Page</h3>
+        <button
+          type="button"
+          class="toc-item"
+          *ngFor="let section of activePage.sections; trackBy: trackBySection"
+          (click)="scrollToSection(section.id)">
+          {{ section.title }}
+        </button>
+      </aside>
+    </div>
+  </main>
 </div>
