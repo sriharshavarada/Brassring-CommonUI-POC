@@ -10,6 +10,7 @@
   },
   "private": true,
   "dependencies": {
+    "@sriharshavarada/br-ui-wrapper": "^0.0.1",
     "@angular/animations": "^19.1.0",
     "@angular/cdk": "^19.2.19",
     "@angular/common": "^19.1.0",

@@ -18,7 +18,7 @@ import {
   BrSingleSelectConfig,
   BrTextComponent,
   BrTextConfig,
-} from '../../common';
+} from '@sriharshavarada/br-ui-wrapper';
 
 @Component({
   selector: 'app-add-user',

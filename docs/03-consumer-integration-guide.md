@@ -7,9 +7,21 @@ Teams using `br-grid` and `br-date` either:
 
 ## What consumers should do
 
-## 1. Import only from common API
-Use:
-- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/index.ts`
+## 1. Import only from the public wrapper API
+Preferred:
+- `@sriharshavarada/br-ui-wrapper`
+
+Install in a consumer repo:
+
+```ini
+# .npmrc
+@sriharshavarada:registry=https://npm.pkg.github.com
+```
+
+```bash
+npm login --registry=https://npm.pkg.github.com
+npm install @sriharshavarada/br-ui-wrapper
+```
 
 Do not import:
 - adapters
@@ -21,6 +33,22 @@ Do not import:
 <br-grid [config]="gridConfig" (action)="onGridAction($event)"></br-grid>
 <br-date [config]="dateConfig" (dateChange)="onDateChange($event)"></br-date>
 ```
+
+## Public package contents
+- Wrapper components:
+  - `BrGridComponent`
+  - `BrModalComponent`
+  - `BrTextComponent`
+  - `BrDateComponent`
+  - `BrSingleSelectComponent`
+  - `BrMultiSelectComponent`
+  - `BrCheckboxComponent`
+  - `BrRadioComponent`
+  - `BrAutocompleteComponent`
+- Config and event types for the above wrappers
+- `RuntimeUiConfigService`
+- `ControlRegistryService`
+- mode exports such as `UI_MODE_BY_CONTROL`
 
 ## 3. Provide generic JSON config
 - Build `BrGridConfig` and `BrDateConfig`.
@@ -51,13 +79,13 @@ onGridAction(event: BrGridActionEvent): void {
 
 ## 6. Mode control
 - Central control-level mode config is in:
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/config/ui-mode.config.ts`
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/config/ui-mode.config.ts`
 - Change `UI_MODE_BY_CONTROL.grid` and `UI_MODE_BY_CONTROL.date` as needed.
 
 ## For external project adoption
 
 ## 1. Expose common module/library package
-- Publish or workspace-link common components/models.
+- Publish or workspace-link `@sriharshavarada/br-ui-wrapper`.
 
 ## 2. Keep consumer contract stable
 - Consumer should depend only on:
@@ -73,4 +101,3 @@ onGridAction(event: BrGridActionEvent): void {
 - Version the common contract.
 - Mark additive config keys as optional.
 - Keep backward-compatible adapter defaults.
-

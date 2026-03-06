@@ -28,7 +28,7 @@ Build a common Angular UI abstraction layer where consuming screens use only wra
 
 ## Public API Contract (Consumer-facing)
 Consumers should import only from:
-- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/index.ts`
+- `@sriharshavarada/br-ui-wrapper`
 
 Primary wrappers:
 - `br-grid`
@@ -38,14 +38,10 @@ Primary wrappers:
 ## Architecture Already Implemented
 
 ### 1) Wrapper + Adapter pattern
-- Wrappers (facades):
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/components/br-grid/br-grid.component.ts`
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/components/br-date/br-date.component.ts`
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/components/br-modal/br-modal.component.ts`
-- Adapters:
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/adapters/grid.adapter.ts`
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/adapters/date.adapter.ts`
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/adapters/modal.adapter.ts`
+- The actual wrappers/adapters/implementations now live in the library:
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/public-api.ts`
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/`
+- App-local duplicates for form controls, grid, and modal were removed after library migration.
 
 ### 2) Implementations supported
 - Grid: `CUSTOM`, `MATERIAL`, `CANVAS`
@@ -54,7 +50,7 @@ Primary wrappers:
 - Controls (separate wrappers per control): `CUSTOM`, `MATERIAL`
 
 ### 3) Shared advanced grid behavior
-- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/implementations/grid-shell/grid-shell.component.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/implementations/grid/shell/grid-shell.component.ts`
 - Supports:
   - top toolbar actions
   - search/refresh
@@ -67,15 +63,95 @@ Primary wrappers:
 
 ### 4) Per-control mode switching
 - Mode config:
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/config/ui-mode.config.ts`
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/config/ui-mode.config.ts`
 - `UI_MODE_BY_CONTROL` supports separate mode per control:
   - grid/date/modal
   - text/singleSelect/multiSelect/checkbox/radio/autocomplete
 
 ### 5) Runtime mode switching service (today)
 - Added runtime service with localStorage persistence:
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/services/runtime-ui-config.service.ts`
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/services/runtime-ui-config.service.ts`
 - Wrappers subscribe to runtime mode updates so mode can change live without code edits.
+
+### 5A) Library migration status
+- Library project exists at:
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper`
+- Migrated into library:
+  - all form controls
+  - date control and date configuration support
+  - grid wrapper + adapter + implementations + shell
+  - modal wrapper + adapter + implementations
+  - shared config/event models used by those wrappers
+- App screens, playground, and docs now import public types/components from `@sriharshavarada/br-ui-wrapper`.
+- The old `src/app/common` transition layer was removed after the migration was stabilized.
+
+### 5B) Package split and publish status (new)
+The architecture is now split into:
+- private library repo
+- public demo/docs/consumer repo
+
+Private library repo created and populated:
+- GitHub repo:
+  - `https://github.com/sriharshavarada/br-ui-wrapper`
+- Initial library workspace commit pushed there:
+  - `7e1b934` `Initial library workspace`
+- Follow-up publish config commit pushed there:
+  - `4267f23` `Prepare GitHub Packages publish config`
+
+Published package:
+- package name:
+  - `@sriharshavarada/br-ui-wrapper`
+- version published:
+  - `0.0.1`
+- registry:
+  - `https://npm.pkg.github.com`
+
+Manual publish flow already verified:
+1. `npm login --registry=https://npm.pkg.github.com`
+2. `npm install`
+3. `npm run build`
+4. `cd dist/br-ui-wrapper && npm publish`
+
+Important implication:
+- library source is no longer needed in this demo repo for runtime/build
+- this repo now behaves like a real external consumer of the published package
+
+### 5C) Demo repo switched to package-consumer mode (new)
+This current repo (`/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC`) is now the consumer/demo/docs app, not the library source repo.
+
+What changed:
+- dependency added in root `package.json`:
+  - `@sriharshavarada/br-ui-wrapper`
+- root `.npmrc` added:
+  - `@sriharshavarada:registry=https://npm.pkg.github.com`
+- root `tsconfig.json` local path alias for `br-ui-wrapper` removed
+- local library source deleted from this repo:
+  - `projects/br-ui-wrapper/`
+- Angular workspace library project removed from:
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/angular.json`
+- all app imports / docs / playground code generation updated to use:
+  - `@sriharshavarada/br-ui-wrapper`
+
+Validation completed:
+- local `npm install` resolves the package
+- local app build passes against installed package
+- `npm start` works against installed package
+
+### 5D) GitHub Actions / Pages dependency note (new)
+Because the package is private, GitHub Actions for this demo repo must authenticate before `npm ci`.
+
+Workflow updated:
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/.github/workflows/angular-pages.yml`
+
+Current requirement in GitHub repo settings:
+- add repository secret:
+  - `GH_PACKAGES_TOKEN`
+
+Token needs:
+- `read:packages`
+- and private repo access as needed for your GitHub account/package visibility model
+
+Without `GH_PACKAGES_TOKEN`, GitHub Pages build will fail during dependency install.
 
 ## Consumer Screens Existing
 - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/user-list/user-list.component.ts`
@@ -291,9 +367,11 @@ Goal:
 
 What was implemented:
 - Reusable CVA base abstraction:
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/forms/base-value-accessor.ts`
+  - now lives in library repo/package source:
+    - `projects/br-ui-wrapper/src/lib/common/forms/base-value-accessor.ts`
 - Control registry for native-comfort lookups:
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/services/control-registry.service.ts`
+  - now lives in library repo/package source:
+    - `projects/br-ui-wrapper/src/lib/common/services/control-registry.service.ts`
   - API: `valueById`, `valuesByName`, `valuesByClass`
 - Wrapper neutral inputs added (text/date scope):
   - `id`, `controlId`, `name`, `className`, `value`, `disabled`, `required`
@@ -305,7 +383,7 @@ What was implemented:
 - Generic metadata support:
   - `meta` input support in config/wrapper
   - normalized event payload model:
-    - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/models/control-event.model.ts`
+    - `projects/br-ui-wrapper/src/lib/common/models/control-event.model.ts`
   - `controlEvent` output includes identity/value/meta/originalEvent
 - Adapters updated to carry identity/class fields for text/date implementations.
 - Add User consumer updated as reference usage:
@@ -370,6 +448,28 @@ Controls Playground now supports richer per-control variants:
 - `ngmodel-simple` (no config)
 - `registry-demo` (byId/byName/byClass demo)
 
+### 14) Documentation + help-text alignment for package consumption (latest)
+Consumer-facing docs were updated to treat the package as the primary entry point.
+
+Updated areas:
+- in-app docs page now explains:
+  - install/auth flow
+  - what consumers can import
+  - component index
+  - package boundary wording
+- Playground Code Studio now generates imports from:
+  - `@sriharshavarada/br-ui-wrapper`
+- README and markdown docs now describe this repo as the demo/docs app consuming the published package
+
+Important file updates:
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/docs/docs.component.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/playground/playground.component.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/README.md`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/docs/01-high-level-architecture.md`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/docs/02-runtime-flow-browser-to-control.md`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/docs/03-consumer-integration-guide.md`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/docs/05-br-ui-wrapper-library-repo-migration.md`
+
 UI/labeling updates:
 - Config Editor title now reflects selected control + variant.
 - Code Studio title now reflects selected control + variant.
@@ -401,7 +501,7 @@ For `registry-demo`, generated TS/HTML now includes real working integration:
 - `className?`
 - `meta?`
 
-### 14) Consumer Docs overhaul (latest)
+### 15) Consumer Docs overhaul (latest)
 The `/docs` page was upgraded from a static page into a production-style docs experience.
 
 Primary files:
@@ -480,12 +580,14 @@ If continuing from here, run `git status --short` first and avoid reverting unre
    - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/docs/01-high-level-architecture.md`
    - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/docs/02-runtime-flow-browser-to-control.md`
    - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/docs/03-consumer-integration-guide.md`
-3. Verify local run using `npm start` and open:
+3. Verify GitHub repo secret is present for Pages build:
+   - `GH_PACKAGES_TOKEN`
+4. Verify local run using `npm start` and open:
    - `/playground`
    - `/modes`
-4. Confirm local mode switches (inside each playground card) and global modes (`/modes`) both update runtime behavior.
-5. If continuing Playground editor accuracy, next step is replacing custom highlighter with Monaco for true folding/intellisense/diagnostics.
-6. Before new feature work, commit or stash current uncommitted changes intentionally to avoid loss.
+5. Confirm local mode switches (inside each playground card) and global modes (`/modes`) both update runtime behavior.
+6. If continuing Playground editor accuracy, next step is replacing custom highlighter with Monaco for true folding/intellisense/diagnostics.
+7. Before new feature work, commit or stash current uncommitted changes intentionally to avoid loss.
 
 ## One-line context for next AI prompt
 Use `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/docs/00-project-handoff-so-far.md` as the authoritative handoff; project now has a dedicated `/modes` page for global mode control, local per-playground mode switches, advanced grid shell (custom/material/canvas), popup modal playground, controls wrappers/adapters/implementations, and a large uncommitted Playground/Code Studio UX iteration.

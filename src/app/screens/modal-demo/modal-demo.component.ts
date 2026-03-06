@@ -4,7 +4,7 @@ import {
     BrModalComponent,
     BrModalConfig,
     BrModalActionEvent
-} from '../../common';
+} from '@sriharshavarada/br-ui-wrapper';
 
 @Component({
     selector: 'app-modal-demo',

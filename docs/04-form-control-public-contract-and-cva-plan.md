@@ -54,7 +54,7 @@ This contract is designed to remain stable even if implementation internals chan
 A shared base abstraction was added to avoid duplicated CVA boilerplate.
 
 File:
-- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/forms/base-value-accessor.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/forms/base-value-accessor.ts`
 
 Contains common CVA plumbing:
 - `writeValue`
@@ -76,7 +76,7 @@ Usage:
 A central registry service was added to support value lookups by id/name/class.
 
 File:
-- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/services/control-registry.service.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/services/control-registry.service.ts`
 
 API:
 - `valueById(id)`
@@ -97,60 +97,60 @@ Also, wrapper invokes CVA callbacks where needed:
 ## Files by Plan Part
 
 ### A) Shared CVA + Registry
-- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/forms/base-value-accessor.ts`
-- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/services/control-registry.service.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/forms/base-value-accessor.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/services/control-registry.service.ts`
 - Barrel exports:
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/index.ts`
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/public-api.ts`
 
 ### B) Model updates for normalized public contract
 - Controls config model:
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/models/controls-config.model.ts`
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/models/controls-config.model.ts`
 - Date config model:
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/models/date-config.model.ts`
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/models/date-config.model.ts`
 
 ### C) Adapter propagation of id/name/class
-- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/adapters/text.adapter.ts`
-- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/adapters/date.adapter.ts`
-- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/adapters/radio.adapter.ts`
-- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/adapters/autocomplete.adapter.ts`
-- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/adapters/checkbox.adapter.ts`
-- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/adapters/single-select.adapter.ts`
-- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/adapters/multi-select.adapter.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/adapters/text.adapter.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/adapters/date.adapter.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/adapters/radio.adapter.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/adapters/autocomplete.adapter.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/adapters/checkbox.adapter.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/adapters/single-select.adapter.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/adapters/multi-select.adapter.ts`
 
 ### D) Wrapper refactors (CVA + neutral inputs/outputs + registry)
-- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/components/br-text/br-text.component.ts`
-- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/components/br-text/br-text.component.html`
-- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/components/br-date/br-date.component.ts`
-- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/components/br-date/br-date.component.html`
-- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/components/br-radio/br-radio.component.ts`
-- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/components/br-radio/br-radio.component.html`
-- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/components/br-autocomplete/br-autocomplete.component.ts`
-- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/components/br-autocomplete/br-autocomplete.component.html`
-- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/components/br-checkbox/br-checkbox.component.ts`
-- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/components/br-checkbox/br-checkbox.component.html`
-- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/components/br-single-select/br-single-select.component.ts`
-- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/components/br-single-select/br-single-select.component.html`
-- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/components/br-multi-select/br-multi-select.component.ts`
-- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/components/br-multi-select/br-multi-select.component.html`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/components/br-text/br-text.component.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/components/br-text/br-text.component.html`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/components/br-date/br-date.component.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/components/br-date/br-date.component.html`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/components/br-radio/br-radio.component.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/components/br-radio/br-radio.component.html`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/components/br-autocomplete/br-autocomplete.component.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/components/br-autocomplete/br-autocomplete.component.html`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/components/br-checkbox/br-checkbox.component.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/components/br-checkbox/br-checkbox.component.html`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/components/br-single-select/br-single-select.component.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/components/br-single-select/br-single-select.component.html`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/components/br-multi-select/br-multi-select.component.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/components/br-multi-select/br-multi-select.component.html`
 
 ### E) Implementation-level event emitters and id/name/class wiring
 - Text custom:
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/implementations/form/controls/text/custom/custom-text-control.component.ts`
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/implementations/form/controls/text/custom/custom-text-control.component.html`
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/implementations/form/controls/text/custom/custom-text-control.component.ts`
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/implementations/form/controls/text/custom/custom-text-control.component.html`
 - Text material:
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/implementations/form/controls/text/material/material-text-control.component.ts`
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/implementations/form/controls/text/material/material-text-control.component.html`
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/implementations/form/controls/text/material/material-text-control.component.ts`
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/implementations/form/controls/text/material/material-text-control.component.html`
 - Date custom:
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/implementations/form/controls/date/custom/custom-date.component.ts`
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/implementations/form/controls/date/custom/custom-date.component.html`
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/implementations/form/controls/date/custom/custom-date.component.ts`
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/implementations/form/controls/date/custom/custom-date.component.html`
 - Date material:
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/implementations/form/controls/date/material/material-date.component.ts`
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/implementations/form/controls/date/material/material-date.component.html`
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/implementations/form/controls/date/material/material-date.component.ts`
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/implementations/form/controls/date/material/material-date.component.html`
 
 ### F) Normalized event payload model
-- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/models/control-event.model.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/models/control-event.model.ts`
 - Exported via:
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/index.ts`
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/public-api.ts`
 
 ## Consumer Example Added
 A concrete consumer demonstration was added in Add User screen to show:

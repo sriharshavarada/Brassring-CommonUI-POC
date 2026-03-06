@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ControlRegistryService } from '../../common';
 import {
   BrAutocompleteComponent,
   BrCheckboxComponent,
@@ -14,7 +13,8 @@ import {
   BrSingleSelectConfig,
   BrTextComponent,
   BrTextConfig,
-} from '../../common';
+  ControlRegistryService,
+} from '@sriharshavarada/br-ui-wrapper';
 
 @Component({
   selector: 'app-add-order',

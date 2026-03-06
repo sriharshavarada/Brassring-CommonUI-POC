@@ -136,7 +136,86 @@ export class DocsComponent {
             {
               kind: 'callout',
               title: 'Consumer Boundary',
-              text: 'Import only from `../../common`. Do not import adapters or implementation components directly.',
+              text: 'Import wrappers and public types from `@sriharshavarada/br-ui-wrapper`. Do not import adapters or implementation components directly.',
+            },
+          ],
+        },
+        {
+          id: 'install-and-auth',
+          title: 'Install and Auth',
+          blocks: [
+            {
+              kind: 'text',
+              text: 'This package is a separate published library. Consumer apps install it from GitHub Packages and then import wrappers/types from the package name.',
+            },
+            {
+              kind: 'code',
+              language: 'json',
+              code: `// package.json
+{
+  "dependencies": {
+    "@sriharshavarada/br-ui-wrapper": "^0.0.1"
+  }
+}`,
+            },
+            {
+              kind: 'code',
+              language: 'json',
+              code: `# .npmrc
+@sriharshavarada:registry=https://npm.pkg.github.com`,
+            },
+            {
+              kind: 'code',
+              language: 'typescript',
+              code: `npm login --registry=https://npm.pkg.github.com
+npm install`,
+            },
+            {
+              kind: 'callout',
+              title: 'Private package note',
+              text: 'Because the package is private, each developer machine and each CI pipeline must authenticate to GitHub Packages before install.',
+            },
+          ],
+        },
+        {
+          id: 'public-api-surface',
+          title: 'What Consumers Can Import',
+          blocks: [
+            {
+              kind: 'table',
+              columns: ['Category', 'Available from `@sriharshavarada/br-ui-wrapper`'],
+              rows: [
+                ['Wrapper components', 'BrGridComponent, BrModalComponent, BrTextComponent, BrDateComponent, BrSingleSelectComponent, BrMultiSelectComponent, BrCheckboxComponent, BrRadioComponent, BrAutocompleteComponent'],
+                ['Config and event types', 'BrGridConfig, BrGridActionEvent, BrModalConfig, BrModalActionEvent, BrDateConfig, BrAdvancedDateConfiguration, BrTextConfig, BrSingleSelectConfig, BrMultiSelectConfig, BrCheckboxConfig, BrRadioConfig, BrAutocompleteConfig, BrControlsConfig, BrControlField, BrControlActionEvent, BrControlEvent'],
+                ['Services', 'RuntimeUiConfigService, ControlRegistryService'],
+                ['Mode exports', 'UI_MODE_BY_CONTROL, UI_MODE, UiMode and related mode types'],
+              ],
+            },
+            {
+              kind: 'callout',
+              title: 'Use the public package only',
+              text: 'Treat `@sriharshavarada/br-ui-wrapper` as the only consumer entry point. Do not reference internal file paths, adapters, or implementation folders from application code.',
+            },
+          ],
+        },
+        {
+          id: 'component-index',
+          title: 'Component Index',
+          blocks: [
+            {
+              kind: 'table',
+              columns: ['Component', 'Purpose'],
+              rows: [
+                ['BrGridComponent', 'Tabular data wrapper with toolbar, actions, sorting, filtering, selection, and pagination.'],
+                ['BrModalComponent', 'Modal/popup wrapper with action-driven close and confirm flows.'],
+                ['BrTextComponent', 'Text input wrapper with CVA/event support.'],
+                ['BrDateComponent', 'Date input wrapper with locale, format, and advanced DateConfiguration support.'],
+                ['BrSingleSelectComponent', 'Single-choice select/dropdown wrapper.'],
+                ['BrMultiSelectComponent', 'Multi-value select wrapper.'],
+                ['BrCheckboxComponent', 'Boolean checkbox wrapper.'],
+                ['BrRadioComponent', 'Radio group wrapper.'],
+                ['BrAutocompleteComponent', 'Autocomplete/searchable text wrapper.'],
+              ],
             },
           ],
         },
@@ -150,7 +229,7 @@ export class DocsComponent {
               code: `import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BrTextComponent, BrTextConfig } from '../../common';
+import { BrTextComponent, BrTextConfig } from '@sriharshavarada/br-ui-wrapper';
 
 @Component({
   standalone: true,
@@ -501,7 +580,9 @@ readValues(): void {
             {
               kind: 'code',
               language: 'typescript',
-              code: `gridConfig: BrGridConfig = {
+              code: `import { BrGridActionEvent, BrGridConfig } from '@sriharshavarada/br-ui-wrapper';
+
+gridConfig: BrGridConfig = {
   title: 'Users',
   columns: [
     { field: 'id', header: 'ID' },
@@ -583,7 +664,9 @@ onGridAction(event: BrGridActionEvent): void {
             {
               kind: 'code',
               language: 'typescript',
-              code: `modalConfig: BrModalConfig = {
+              code: `import { BrModalActionEvent, BrModalConfig } from '@sriharshavarada/br-ui-wrapper';
+
+modalConfig: BrModalConfig = {
   isOpen: true,
   title: 'Delete user',
   content: '<p>This action cannot be undone.</p>',
@@ -753,6 +836,37 @@ onModalClose(): void {
           ],
         },
         {
+          id: 'import-and-setup',
+          title: 'Import and Setup',
+          blocks: [
+            {
+              kind: 'text',
+              text: `Import ${this.controlComponentName(slug)} and ${this.controlConfigType(slug)} from \`@sriharshavarada/br-ui-wrapper\`. In a standalone Angular screen, add ${this.controlComponentName(slug)} to the component \`imports\` array.`,
+            },
+            {
+              kind: 'code',
+              language: 'typescript',
+              code: `import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { ${this.controlComponentName(slug)}, ${this.controlConfigType(slug)} } from '@sriharshavarada/br-ui-wrapper';
+
+@Component({
+  standalone: true,
+  imports: [CommonModule, FormsModule, ${this.controlComponentName(slug)}],
+  templateUrl: './your-screen.component.html',
+})
+export class YourScreenComponent {
+  ${this.controlConfigVar(slug)}: ${this.controlConfigType(slug)} = {
+    id: 'sample-${slug}',
+    label: '${label}',
+    value: ${this.defaultValueForType(valueType)}${optionInitSnippet}
+  };
+}`,
+            },
+          ],
+        },
+        {
           id: 'quick-start-config-style',
           title: 'Quick Start: Config Style',
           blocks: [
@@ -887,6 +1001,45 @@ onModalClose(): void {
     if (type.includes('Date')) return "''";
     if (type.includes('string')) return "''";
     return 'null';
+  }
+
+  private controlComponentName(slug: string): string {
+    const map: Record<string, string> = {
+      'br-text': 'BrTextComponent',
+      'br-date': 'BrDateComponent',
+      'br-single-select': 'BrSingleSelectComponent',
+      'br-multi-select': 'BrMultiSelectComponent',
+      'br-checkbox': 'BrCheckboxComponent',
+      'br-radio': 'BrRadioComponent',
+      'br-autocomplete': 'BrAutocompleteComponent',
+    };
+    return map[slug] || 'UnknownComponent';
+  }
+
+  private controlConfigType(slug: string): string {
+    const map: Record<string, string> = {
+      'br-text': 'BrTextConfig',
+      'br-date': 'BrDateConfig',
+      'br-single-select': 'BrSingleSelectConfig',
+      'br-multi-select': 'BrMultiSelectConfig',
+      'br-checkbox': 'BrCheckboxConfig',
+      'br-radio': 'BrRadioConfig',
+      'br-autocomplete': 'BrAutocompleteConfig',
+    };
+    return map[slug] || 'unknown';
+  }
+
+  private controlConfigVar(slug: string): string {
+    const map: Record<string, string> = {
+      'br-text': 'textConfig',
+      'br-date': 'dateConfig',
+      'br-single-select': 'singleSelectConfig',
+      'br-multi-select': 'multiSelectConfig',
+      'br-checkbox': 'checkboxConfig',
+      'br-radio': 'radioConfig',
+      'br-autocomplete': 'autocompleteConfig',
+    };
+    return map[slug] || 'config';
   }
 
   private matchesSearch(page: DocPage, term: string): boolean {

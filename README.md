@@ -59,6 +59,10 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
 # Brassring-CommonUI-POC
 
+This repo is now the demo/docs/consumer app for the published package:
+
+- `@sriharshavarada/br-ui-wrapper`
+
 ## Documentation
 
 - Project handoff (start here):
@@ -69,6 +73,35 @@ For more information on using the Angular CLI, including detailed command refere
   - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/docs/02-runtime-flow-browser-to-control.md`
 - Consumer integration guide:
   - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/docs/03-consumer-integration-guide.md`
+
+## Package install
+
+Consumer apps should install the library package, not copy source files:
+
+```ini
+# .npmrc
+@sriharshavarada:registry=https://npm.pkg.github.com
+```
+
+```bash
+npm login --registry=https://npm.pkg.github.com
+npm install @sriharshavarada/br-ui-wrapper
+```
+
+## What the package provides
+
+- `BrGridComponent`
+- `BrModalComponent`
+- `BrTextComponent`
+- `BrDateComponent`
+- `BrSingleSelectComponent`
+- `BrMultiSelectComponent`
+- `BrCheckboxComponent`
+- `BrRadioComponent`
+- `BrAutocompleteComponent`
+- related config and event types
+- `RuntimeUiConfigService`
+- `ControlRegistryService`
 
 ## In-App Guides
 

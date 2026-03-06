@@ -1,7 +1,12 @@
 # High-Level Architecture
 
 ## Purpose
-This POC provides a UI abstraction layer so screens use only common wrappers (`br-grid`, `br-date`) while the underlying UI library can be switched centrally.
+This POC provides a UI abstraction layer so screens use only wrapper components (`br-grid`, `br-date`, `br-modal`, form controls) while the underlying UI library can be switched centrally.
+
+The reusable package is now consumed as:
+- `@sriharshavarada/br-ui-wrapper`
+
+The current repo is the demo/docs app that consumes that package.
 
 ## Core Design
 - `Facade pattern`: Screen code uses only wrapper controls.
@@ -12,26 +17,26 @@ This POC provides a UI abstraction layer so screens use only common wrappers (`b
 - **Consumer layer**: Feature screens such as:
   - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/user-list/user-list.component.ts`
   - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/order-list/order-list.component.ts`
-- **Common public API**:
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/index.ts`
-- **Wrapper facades**:
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/components/br-grid/br-grid.component.ts`
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/components/br-date/br-date.component.ts`
-- **Adapters**:
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/adapters/grid.adapter.ts`
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/adapters/date.adapter.ts`
+- **Library public API**:
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/public-api.ts`
+- **Wrapper facades / adapters / implementations**:
+  - moved into `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/`
 - **Implementations**:
   - Grid:
-    - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/implementations/custom-grid/custom-grid.component.ts`
-    - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/implementations/material-grid/material-grid.component.ts`
-    - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/implementations/canvas-grid/canvas-grid.component.ts`
+    - `components/br-grid`
+    - `adapters/grid.adapter.ts`
+    - `implementations/grid/custom`
+    - `implementations/grid/material`
+    - `implementations/grid/canvas`
     - Shared advanced shell:
-      - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/implementations/grid-shell/grid-shell.component.ts`
+      - `implementations/grid/shell/grid-shell.component.ts`
   - Date:
-    - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/implementations/custom-date/custom-date.component.ts`
-    - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/implementations/material-date/material-date.component.ts`
+    - `components/br-date`
+    - `adapters/date.adapter.ts`
+    - `implementations/form/controls/date/custom`
+    - `implementations/form/controls/date/material`
 - **Mode configuration**:
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/common/config/ui-mode.config.ts`
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/config/ui-mode.config.ts`
 
 ## Configuration Model Strategy
 - **Behavior/Data config**: sort/filter/pagination/actions/personalization.
@@ -41,4 +46,3 @@ This POC provides a UI abstraction layer so screens use only common wrappers (`b
 ## Event Strategy
 - Grid emits one structured event stream via `(action)` with `source`, `actionId`, and contextual payload.
 - Business logic stays in consumer screens/services, not inside grid/date implementations.
-

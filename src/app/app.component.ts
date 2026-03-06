@@ -1,7 +1,7 @@
 import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { RuntimeUiConfigService } from './common';
+import { RuntimeUiConfigService } from '@sriharshavarada/br-ui-wrapper';
 
 @Component({
   selector: 'br-root',

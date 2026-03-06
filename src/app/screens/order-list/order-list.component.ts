@@ -15,15 +15,14 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-// ▼ Import ONLY from the common barrel — never from implementations ▼
 import {
-    BrGridComponent,
     BrDateComponent,
-    BrGridConfig,
-    BrGridActionEvent,
     BrDateConfig,
+    BrGridActionEvent,
+    BrGridComponent,
+    BrGridConfig,
     UI_MODE
-} from '../../common';
+} from '@sriharshavarada/br-ui-wrapper';
 
 @Component({
     selector: 'br-order-list',

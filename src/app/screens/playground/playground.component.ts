@@ -4,37 +4,37 @@ import { FormsModule } from '@angular/forms';
 
 import {
   BrAdvancedDateConfiguration,
-  BrDateComponent,
-  BrDateConfig,
-  BrFormActionEvent,
-  BrFormActionSource,
-  BrFormConfig,
-  BrFormField,
-  BrTextComponent,
-  BrSingleSelectComponent,
-  BrMultiSelectComponent,
-  BrCheckboxComponent,
-  BrRadioComponent,
-  BrAutocompleteComponent,
-  BrTextConfig,
-  BrSingleSelectConfig,
-  BrMultiSelectConfig,
-  BrCheckboxConfig,
-  BrRadioConfig,
-  BrAutocompleteConfig,
   BrGridActionEvent,
   BrGridComponent,
   BrGridConfig,
   BrModalActionEvent,
   BrModalComponent,
   BrModalConfig,
+  BrAutocompleteComponent,
+  BrAutocompleteConfig,
+  BrCheckboxComponent,
+  BrCheckboxConfig,
+  BrControlActionEvent as BrFormActionEvent,
+  BrControlActionSource as BrFormActionSource,
+  BrControlField as BrFormField,
+  BrControlsConfig as BrFormConfig,
+  BrDateConfig,
+  BrDateComponent,
+  BrMultiSelectConfig,
+  BrMultiSelectComponent,
+  BrRadioConfig,
+  BrRadioComponent,
+  BrSingleSelectConfig,
+  BrSingleSelectComponent,
+  BrTextConfig,
+  BrTextComponent,
+  ControlRegistryService,
   ControlUiMode,
   DateUiMode,
   ModalUiMode,
-  ControlRegistryService,
   RuntimeUiConfigService,
   UiMode,
-} from '../../common';
+} from '@sriharshavarada/br-ui-wrapper';
 import { JsonWorkbenchComponent } from './components/json-workbench/json-workbench.component';
 import { CodeEditorComponent, CodeLanguage } from './components/code-editor/code-editor.component';
 
@@ -1109,7 +1109,7 @@ export class PlaygroundComponent {
   }
 
   private buildGridTsCode(config: BrGridConfig): string {
-    return `import { BrGridConfig, BrGridActionEvent } from '../../common';
+    return `import { BrGridConfig, BrGridActionEvent } from '@sriharshavarada/br-ui-wrapper';
 
 export class YourFeatureComponent {
   gridConfig: BrGridConfig = ${JSON.stringify(config, null, 2)};
@@ -1122,7 +1122,7 @@ export class YourFeatureComponent {
   }
 
   private buildDateTsCode(config: BrDateConfig): string {
-    return `import { BrDateConfig } from '../../common';
+    return `import { BrDateConfig } from '@sriharshavarada/br-ui-wrapper';
 
 export class YourFeatureComponent {
   dateConfig: BrDateConfig = ${JSON.stringify(config, null, 2)};
@@ -1134,7 +1134,7 @@ export class YourFeatureComponent {
   }
 
   private buildModalTsCode(config: BrModalConfig): string {
-    return `import { BrModalConfig, BrModalActionEvent } from '../../common';
+    return `import { BrModalConfig, BrModalActionEvent } from '@sriharshavarada/br-ui-wrapper';
 
 export class YourFeatureComponent {
   modalConfig: BrModalConfig = ${JSON.stringify(config, null, 2)};
@@ -1146,20 +1146,21 @@ export class YourFeatureComponent {
   }
 
   private buildFormTsCode(config: BrFormConfig): string {
-    const fieldTypes = new Set((config.fields || []).map((f) => f.type));
+    const fieldTypes = new Set((config.fields || []).map((f: BrFormField) => f.type));
     const isRegistryDemo = this.isRegistryDemoConfig(config);
-    const typeImports: string[] = ['BrControlsConfig', 'BrControlActionEvent'];
+    const commonTypeImports: string[] = ['BrControlsConfig', 'BrControlActionEvent'];
+    const libraryTypeImports: string[] = [];
     if (fieldTypes.size > 0) {
-      typeImports.push('BrControlField');
+      commonTypeImports.push('BrControlField');
     }
-    if (isRegistryDemo) typeImports.push('ControlRegistryService');
-    if (fieldTypes.has('text')) typeImports.push('BrTextConfig');
-    if (fieldTypes.has('single-select')) typeImports.push('BrSingleSelectConfig');
-    if (fieldTypes.has('multi-select')) typeImports.push('BrMultiSelectConfig');
-    if (fieldTypes.has('checkbox')) typeImports.push('BrCheckboxConfig');
-    if (fieldTypes.has('radio')) typeImports.push('BrRadioConfig');
-    if (fieldTypes.has('autocomplete')) typeImports.push('BrAutocompleteConfig');
-    if (fieldTypes.has('date')) typeImports.push('BrDateConfig');
+    if (isRegistryDemo) commonTypeImports.push('ControlRegistryService');
+    if (fieldTypes.has('text')) libraryTypeImports.push('BrTextConfig');
+    if (fieldTypes.has('single-select')) libraryTypeImports.push('BrSingleSelectConfig');
+    if (fieldTypes.has('multi-select')) libraryTypeImports.push('BrMultiSelectConfig');
+    if (fieldTypes.has('checkbox')) libraryTypeImports.push('BrCheckboxConfig');
+    if (fieldTypes.has('radio')) libraryTypeImports.push('BrRadioConfig');
+    if (fieldTypes.has('autocomplete')) libraryTypeImports.push('BrAutocompleteConfig');
+    if (fieldTypes.has('date')) libraryTypeImports.push('BrDateConfig');
 
     const helperMethods: string[] = [];
     if (fieldTypes.size > 0) {
@@ -1305,7 +1306,10 @@ export class YourFeatureComponent {
 `
       : '';
 
-    return `import { ${typeImports.join(', ')} } from '../../common';
+    const allTypeImports = [...commonTypeImports, ...libraryTypeImports];
+    const libraryImportLine = `import { ${allTypeImports.join(', ')} } from '@sriharshavarada/br-ui-wrapper';`;
+
+    return `${libraryImportLine}
 
 export class YourFeatureComponent {
   controlsConfig: BrControlsConfig = ${JSON.stringify(config, null, 2)};
@@ -1356,7 +1360,7 @@ ${helperBlock}
   }
 
   private buildFormHtmlCode(config: BrFormConfig): string {
-    const controls = (config.fields || []).map((field) => this.controlHtmlSnippet(field)).join('\n    ');
+    const controls = (config.fields || []).map((field: BrFormField) => this.controlHtmlSnippet(field)).join('\n    ');
     const registryButton = this.isRegistryDemoConfig(config)
       ? `
   <div class="controls-actions">
@@ -1579,14 +1583,14 @@ ${helperBlock}
     }
 
     const importRegexByTab: Record<PlaygroundTab, RegExp> = {
-      grid: /import\s*\{[^}]*BrGridConfig[^}]*\}\s*from\s*['"]\.\.\/\.\.\/common['"]/,
-      date: /import\s*\{[^}]*BrDateConfig[^}]*\}\s*from\s*['"]\.\.\/\.\.\/common['"]/,
-      modal: /import\s*\{[^}]*BrModalConfig[^}]*\}\s*from\s*['"]\.\.\/\.\.\/common['"]/,
-      form: /import\s*\{[^}]*Br(ControlsConfig|FormConfig)[^}]*\}\s*from\s*['"]\.\.\/\.\.\/common['"]/,
+      grid: /import\s*\{[^}]*BrGridConfig[^}]*\}\s*from\s*['"]@sriharshavarada\/br-ui-wrapper['"]/,
+      date: /import\s*\{[^}]*BrDateConfig[^}]*\}\s*from\s*['"]@sriharshavarada\/br-ui-wrapper['"]/,
+      modal: /import\s*\{[^}]*BrModalConfig[^}]*\}\s*from\s*['"]@sriharshavarada\/br-ui-wrapper['"]/,
+      form: /import\s*\{[^}]*Br(ControlsConfig|FormConfig)[^}]*\}\s*from\s*['"]@sriharshavarada\/br-ui-wrapper['"]/,
     };
 
     if (!importRegexByTab[tab].test(tsCode)) {
-      throw new Error('TS validation failed: required import from ../../common is missing.');
+      throw new Error('TS validation failed: required import from @sriharshavarada/br-ui-wrapper is missing.');
     }
   }
 

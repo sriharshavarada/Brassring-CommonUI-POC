@@ -8,7 +8,7 @@ import {
   ModalUiMode,
   RuntimeUiConfigService,
   UiMode,
-} from '../../common';
+} from '@sriharshavarada/br-ui-wrapper';
 
 type ModePanelKey =
   | 'grid'

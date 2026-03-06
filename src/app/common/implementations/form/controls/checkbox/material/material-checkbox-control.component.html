@@ -1,7 +1,0 @@
-<mat-checkbox class="br-material-checkbox" [ngClass]="config.className" [attr.id]="config.id" [attr.name]="config.name"
-  [disabled]="config.disabled" [required]="config.required" [ngModel]="config.checked" (ngModelChange)="valueChange.emit($event)"
-  (blur)="blurEvent.emit($event)" (focus)="focusEvent.emit($event)" (input)="inputEvent.emit($event)"
-  (change)="changeEvent.emit($event)" (keydown)="keydownEvent.emit($event)" (keyup)="keyupEvent.emit($event)"
-  (click)="clickEvent.emit($event)">
-  {{ config.label }}
-</mat-checkbox>
