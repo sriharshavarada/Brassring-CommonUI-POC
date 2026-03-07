@@ -116,6 +116,7 @@
               *ngIf="activeControlPlayground === 'all'; else controlsSingleHeaderMode">
               <button type="button" class="seg-btn" (click)="setAllControlModes('CUSTOM')">CUSTOM</button>
               <button type="button" class="seg-btn" (click)="setAllControlModes('MATERIAL')">MATERIAL</button>
+              <button type="button" class="seg-btn" (click)="setAllControlModes('PRIMENG')">PRIMENG</button>
             </div>
             <ng-template #controlsSingleHeaderMode>
               <div class="segmented compact inline-mode-segmented">
@@ -209,18 +210,17 @@
                 [ngModel]="controlValue(field)" (ngModelChange)="updateControlValue(field.id, $event)"
                 (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-text>
 
-              <br-text-area *ngIf="field.type === 'text-area' && !isNgModelOnlyField(field)" [config]="getTextAreaConfig(field)"
-                (valueChange)="updateControlValue(field.id, $event)"
+              <br-text-area *ngIf="field.type === 'text-area' && !isNgModelOnlyField(field)"
+                [config]="getTextAreaConfig(field)" (valueChange)="updateControlValue(field.id, $event)"
                 (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-text-area>
-              <br-text-area *ngIf="field.type === 'text-area' && isNgModelOnlyField(field)" [id]="field.id" [label]="field.label"
-                [placeholder]="field.placeholder" [rows]="field.rows || 4" [maxLength]="field.maxLength || undefined"
-                [required]="!!field.required" [disabled]="!!field.disabled" [ngModel]="controlValue(field)"
-                (ngModelChange)="updateControlValue(field.id, $event)"
+              <br-text-area *ngIf="field.type === 'text-area' && isNgModelOnlyField(field)" [id]="field.id"
+                [label]="field.label" [placeholder]="field.placeholder" [rows]="field.rows || 4"
+                [maxLength]="field.maxLength || undefined" [required]="!!field.required" [disabled]="!!field.disabled"
+                [ngModel]="controlValue(field)" (ngModelChange)="updateControlValue(field.id, $event)"
                 (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-text-area>
 
               <br-single-select *ngIf="field.type === 'single-select' && !isNgModelOnlyField(field)"
-                [config]="getSingleSelectConfig(field)"
-                (valueChange)="updateControlValue(field.id, $event)"
+                [config]="getSingleSelectConfig(field)" (valueChange)="updateControlValue(field.id, $event)"
                 (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-single-select>
               <br-single-select *ngIf="field.type === 'single-select' && isNgModelOnlyField(field)" [id]="field.id"
                 [label]="field.label" [options]="field.options || []" [required]="!!field.required"
@@ -229,8 +229,7 @@
                 (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-single-select>
 
               <br-multi-select *ngIf="field.type === 'multi-select' && !isNgModelOnlyField(field)"
-                [config]="getMultiSelectConfig(field)"
-                (valueChange)="updateControlValue(field.id, $event)"
+                [config]="getMultiSelectConfig(field)" (valueChange)="updateControlValue(field.id, $event)"
                 (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-multi-select>
               <br-multi-select *ngIf="field.type === 'multi-select' && isNgModelOnlyField(field)" [id]="field.id"
                 [label]="field.label" [options]="field.options || []" [required]="!!field.required"
@@ -239,8 +238,7 @@
                 (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-multi-select>
 
               <br-checkbox *ngIf="field.type === 'checkbox' && !isNgModelOnlyField(field)"
-                [config]="getCheckboxConfig(field)"
-                (valueChange)="updateControlValue(field.id, $event)"
+                [config]="getCheckboxConfig(field)" (valueChange)="updateControlValue(field.id, $event)"
                 (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-checkbox>
               <br-checkbox *ngIf="field.type === 'checkbox' && isNgModelOnlyField(field)" [id]="field.id"
                 [label]="field.label" [required]="!!field.required" [disabled]="!!field.disabled"
@@ -260,13 +258,13 @@
                 (dateChange)="updateControlValue(field.id, $event)"
                 (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-date>
               <br-date *ngIf="field.type === 'date' && isNgModelOnlyField(field)" [id]="field.id" [label]="field.label"
-                [placeholder]="field.placeholder || 'Select date'" [required]="!!field.required" [disabled]="!!field.disabled"
-                [ngModel]="controlValue(field)" (ngModelChange)="updateControlValue(field.id, $event)"
+                [placeholder]="field.placeholder || 'Select date'" [required]="!!field.required"
+                [disabled]="!!field.disabled" [ngModel]="controlValue(field)"
+                (ngModelChange)="updateControlValue(field.id, $event)"
                 (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-date>
 
               <br-autocomplete *ngIf="field.type === 'autocomplete' && !isNgModelOnlyField(field)"
-                [config]="getAutocompleteConfig(field)"
-                (valueChange)="updateControlValue(field.id, $event)"
+                [config]="getAutocompleteConfig(field)" (valueChange)="updateControlValue(field.id, $event)"
                 (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-autocomplete>
               <br-autocomplete *ngIf="field.type === 'autocomplete' && isNgModelOnlyField(field)" [id]="field.id"
                 [label]="field.label" [placeholder]="field.placeholder" [options]="field.options || []"
@@ -404,18 +402,15 @@
 
       <div class="preset-row">
         <span class="preset-label">Branding Source:</span>
-        <button type="button" class="preset-btn"
-          [class.active]="brandingStudioDraft?.kind === 'enterprise'"
+        <button type="button" class="preset-btn" [class.active]="brandingStudioDraft?.kind === 'enterprise'"
           (click)="selectBrandingSource('enterprise')">
           Enterprise
         </button>
-        <button type="button" class="preset-btn"
-          [class.active]="brandingStudioDraft?.kind === 'talent-gateway'"
+        <button type="button" class="preset-btn" [class.active]="brandingStudioDraft?.kind === 'talent-gateway'"
           (click)="selectBrandingSource('talent-gateway')">
           Talent Gateway
         </button>
-        <button type="button" class="preset-btn"
-          [class.active]="brandingStudioDraft?.kind === 'library'"
+        <button type="button" class="preset-btn" [class.active]="brandingStudioDraft?.kind === 'library'"
           (click)="selectBrandingSource('library')">
           Library
         </button>

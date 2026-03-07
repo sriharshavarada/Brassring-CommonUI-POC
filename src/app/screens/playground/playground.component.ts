@@ -235,10 +235,10 @@ const LIBRARY_BRANDING_SAMPLE: BrBrandingConfig = {
 export class PlaygroundComponent {
   activeTab: PlaygroundTab = 'grid';
 
-  readonly gridModes: UiMode[] = ['CUSTOM', 'MATERIAL', 'CANVAS'];
-  readonly dateModes: DateUiMode[] = ['CUSTOM', 'MATERIAL'];
-  readonly modalModes: ModalUiMode[] = ['CUSTOM', 'MATERIAL'];
-  readonly controlModes: ControlUiMode[] = ['CUSTOM', 'MATERIAL'];
+  readonly gridModes: UiMode[] = ['CUSTOM', 'MATERIAL', 'CANVAS', 'PRIMENG'];
+  readonly dateModes: DateUiMode[] = ['CUSTOM', 'MATERIAL', 'PRIMENG'];
+  readonly modalModes: ModalUiMode[] = ['CUSTOM', 'MATERIAL', 'PRIMENG'];
+  readonly controlModes: ControlUiMode[] = ['CUSTOM', 'MATERIAL', 'PRIMENG'];
 
   readonly gridPresetLabels: Record<GridPreset, string> = {
     complex: 'Complex Grid',

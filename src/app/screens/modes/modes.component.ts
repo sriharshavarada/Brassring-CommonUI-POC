@@ -35,10 +35,10 @@ interface ModePanelItem {
   styleUrls: ['./modes.component.scss'],
 })
 export class ModesComponent {
-  readonly gridModes: UiMode[] = ['CUSTOM', 'MATERIAL', 'CANVAS'];
-  readonly dateModes: DateUiMode[] = ['CUSTOM', 'MATERIAL'];
-  readonly modalModes: ModalUiMode[] = ['CUSTOM', 'MATERIAL'];
-  readonly controlModes: ControlUiMode[] = ['CUSTOM', 'MATERIAL'];
+  readonly gridModes: UiMode[] = ['CUSTOM', 'MATERIAL', 'CANVAS', 'PRIMENG'];
+  readonly dateModes: DateUiMode[] = ['CUSTOM', 'MATERIAL', 'PRIMENG'];
+  readonly modalModes: ModalUiMode[] = ['CUSTOM', 'MATERIAL', 'PRIMENG'];
+  readonly controlModes: ControlUiMode[] = ['CUSTOM', 'MATERIAL', 'PRIMENG'];
 
   readonly coreModeItems: ModePanelItem[] = [
     { key: 'grid', label: 'Grid', hint: 'br-grid wrapper' },
@@ -55,7 +55,7 @@ export class ModesComponent {
     { key: 'autocomplete', label: 'Autocomplete', hint: 'br-autocomplete wrapper' },
   ];
 
-  constructor(public readonly runtimeUiConfig: RuntimeUiConfigService) {}
+  constructor(public readonly runtimeUiConfig: RuntimeUiConfigService) { }
 
   get modes() {
     return this.runtimeUiConfig.getModesSnapshot();

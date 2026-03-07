@@ -1,0 +1,10 @@
+{
+  "version": "v1",
+  "packages": {
+    "@sriharshavarada/br-ui-wrapper": {
+      "signature": "540c7fcb33ff392c8ef85cccb19fcd23",
+      "file": true,
+      "replaced": "^0.0.2"
+    }
+  }
+}

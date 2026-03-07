@@ -31,13 +31,8 @@
               <span>{{ item.hint }}</span>
             </div>
             <div class="segmented">
-              <button
-                type="button"
-                class="seg-btn"
-                *ngFor="let option of modeOptionsFor(item.key)"
-                [class.active]="modeValueFor(item.key) === option"
-                (click)="setModeFromPanel(item.key, option)"
-              >
+              <button type="button" class="seg-btn" *ngFor="let option of modeOptionsFor(item.key)"
+                [class.active]="modeValueFor(item.key) === option" (click)="setModeFromPanel(item.key, option)">
                 {{ option }}
               </button>
             </div>
@@ -54,6 +49,7 @@
           <div class="bulk-actions">
             <button type="button" class="mini-btn" (click)="setAllControlModes('CUSTOM')">All Custom</button>
             <button type="button" class="mini-btn" (click)="setAllControlModes('MATERIAL')">All Material</button>
+            <button type="button" class="mini-btn" (click)="setAllControlModes('PRIMENG')">All PrimeNG</button>
           </div>
         </div>
 
@@ -64,13 +60,8 @@
               <span>{{ item.hint }}</span>
             </div>
             <div class="segmented compact">
-              <button
-                type="button"
-                class="seg-btn"
-                *ngFor="let option of modeOptionsFor(item.key)"
-                [class.active]="modeValueFor(item.key) === option"
-                (click)="setModeFromPanel(item.key, option)"
-              >
+              <button type="button" class="seg-btn" *ngFor="let option of modeOptionsFor(item.key)"
+                [class.active]="modeValueFor(item.key) === option" (click)="setModeFromPanel(item.key, option)">
                 {{ option }}
               </button>
             </div>
@@ -80,4 +71,3 @@
     </div>
   </section>
 </div>
-

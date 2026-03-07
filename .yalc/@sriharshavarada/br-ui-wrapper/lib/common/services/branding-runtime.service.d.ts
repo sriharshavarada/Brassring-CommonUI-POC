@@ -1,0 +1,32 @@
+import { InjectionToken } from '@angular/core';
+import { BrBrandingConfig, BrBrandingMode } from '../models/branding-config.model';
+import * as i0 from "@angular/core";
+export declare const BR_DEFAULT_BRANDING: InjectionToken<BrBrandingConfig>;
+export declare class BrandingRuntimeService {
+    private readonly defaults;
+    private readonly hasWindow;
+    private readonly brandingSubject;
+    private readonly modeSubject;
+    readonly branding$: import("rxjs").Observable<BrBrandingConfig>;
+    readonly mode$: import("rxjs").Observable<BrBrandingMode>;
+    constructor(defaults: BrBrandingConfig);
+    getBrandingSnapshot(): BrBrandingConfig;
+    getModeSnapshot(): BrBrandingMode;
+    setBranding(config: BrBrandingConfig): void;
+    setMode(mode: BrBrandingMode): void;
+    reset(): void;
+    private mergeBranding;
+    private currentPalette;
+    private resolvePalette;
+    private applyCssVars;
+    private loadInitialBranding;
+    private loadInitialMode;
+    private persistBranding;
+    private persistMode;
+    private broadcastBranding;
+    private broadcastMode;
+    private readonly onBrandingChanged;
+    private readonly onModeChanged;
+    static ɵfac: i0.ɵɵFactoryDeclaration<BrandingRuntimeService, never>;
+    static ɵprov: i0.ɵɵInjectableDeclaration<BrandingRuntimeService>;
+}
