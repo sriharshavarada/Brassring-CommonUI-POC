@@ -1,7 +1,14 @@
 <div class="playground-page">
   <header class="page-header">
-    <h1>Developer Playground</h1>
-    <p>Consistent playgrounds with live config + live consumer file code (TS/HTML/SCSS).</p>
+    <div class="page-header-row">
+      <div class="page-header-copy">
+        <h1>Developer Playground</h1>
+        <p>Consistent playgrounds with live config + live consumer file code (TS/HTML/SCSS).</p>
+      </div>
+      <button type="button" class="btn ghost page-branding-btn" (click)="openBrandingStudio()">
+        Branding Studio
+      </button>
+    </div>
   </header>
 
   <section class="tab-panel">
@@ -202,6 +209,15 @@
                 [ngModel]="controlValue(field)" (ngModelChange)="updateControlValue(field.id, $event)"
                 (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-text>
 
+              <br-text-area *ngIf="field.type === 'text-area' && !isNgModelOnlyField(field)" [config]="getTextAreaConfig(field)"
+                (valueChange)="updateControlValue(field.id, $event)"
+                (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-text-area>
+              <br-text-area *ngIf="field.type === 'text-area' && isNgModelOnlyField(field)" [id]="field.id" [label]="field.label"
+                [placeholder]="field.placeholder" [rows]="field.rows || 4" [maxLength]="field.maxLength || undefined"
+                [required]="!!field.required" [disabled]="!!field.disabled" [ngModel]="controlValue(field)"
+                (ngModelChange)="updateControlValue(field.id, $event)"
+                (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-text-area>
+
               <br-single-select *ngIf="field.type === 'single-select' && !isNgModelOnlyField(field)"
                 [config]="getSingleSelectConfig(field)"
                 (valueChange)="updateControlValue(field.id, $event)"
@@ -279,6 +295,7 @@
         </ng-template>
       </div>
     </article>
+
   </section>
 
   <section class="workspace" *ngIf="activeTab === 'modal'">
@@ -374,4 +391,72 @@
       <p *ngFor="let entry of eventLog">{{ entry }}</p>
     </div>
   </section>
+
+  <div class="branding-studio-overlay" *ngIf="brandingStudioOpen" (click)="closeBrandingStudio()">
+    <section class="branding-studio" (click)="$event.stopPropagation()">
+      <div class="branding-studio-head">
+        <div>
+          <h3>Branding Studio</h3>
+          <p>Apply one runtime branding source across all branded controls in this page.</p>
+        </div>
+        <button type="button" class="btn ghost" (click)="closeBrandingStudio()">Close</button>
+      </div>
+
+      <div class="preset-row">
+        <span class="preset-label">Branding Source:</span>
+        <button type="button" class="preset-btn"
+          [class.active]="brandingStudioDraft?.kind === 'enterprise'"
+          (click)="selectBrandingSource('enterprise')">
+          Enterprise
+        </button>
+        <button type="button" class="preset-btn"
+          [class.active]="brandingStudioDraft?.kind === 'talent-gateway'"
+          (click)="selectBrandingSource('talent-gateway')">
+          Talent Gateway
+        </button>
+        <button type="button" class="preset-btn"
+          [class.active]="brandingStudioDraft?.kind === 'library'"
+          (click)="selectBrandingSource('library')">
+          Library
+        </button>
+      </div>
+
+      <div class="preset-row">
+        <span class="preset-label">Color Mode:</span>
+        <button type="button" class="preset-btn" *ngFor="let mode of brandingModes"
+          [class.active]="brandingStudioDraft?.mode === mode" (click)="setBrandingMode(mode)">
+          {{ mode | titlecase }}
+        </button>
+      </div>
+
+      <div class="file-tabs">
+        <button type="button" class="file-tab" [class.active]="brandingStudioTab === 'config'"
+          (click)="setBrandingStudioTab('config')">
+          Branding Config
+        </button>
+        <button type="button" class="file-tab" [class.active]="brandingStudioTab === 'code'"
+          (click)="setBrandingStudioTab('code')">
+          Code Studio
+        </button>
+      </div>
+
+      <app-json-workbench *ngIf="brandingStudioTab === 'config' && brandingStudioDraft"
+        [title]="brandingConfigWorkbenchTitle()" [value]="brandingStudioDraft.payload"
+        (valueChange)="onBrandingConfigChange($event)">
+      </app-json-workbench>
+
+      <section class="code-studio branding-code-studio" *ngIf="brandingStudioTab === 'code'">
+        <div class="code-head">
+          <h3>Runtime Branding Code</h3>
+        </div>
+        <app-code-editor [language]="'typescript'" [value]="brandingStudioCode()"></app-code-editor>
+      </section>
+
+      <div class="branding-studio-actions">
+        <button type="button" class="btn ghost" (click)="resetBrandingStudioToDefaults()">Reset Draft</button>
+        <button type="button" class="btn ghost" (click)="clearAppliedBranding()">Reset Applied Branding</button>
+        <button type="button" class="btn secondary" (click)="applyBrandingStudio()">Apply Branding</button>
+      </div>
+    </section>
+  </div>
 </div>

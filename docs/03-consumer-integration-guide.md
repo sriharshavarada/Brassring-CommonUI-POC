@@ -50,6 +50,28 @@ Do not import:
 - `ControlRegistryService`
 - mode exports such as `UI_MODE_BY_CONTROL`
 
+## Runtime branding and light/dark mode
+- Branding is an app-level runtime concern, not a per-control input.
+- Consumers should not push branding into each control config object.
+- Preferred flow:
+  - load raw team branding
+  - normalize through adapter if needed
+  - call `BrandingRuntimeService.setBranding(...)`
+  - call `BrandingRuntimeService.setMode('light' | 'dark')`
+- Branded controls such as `br-text` and `br-text-area` read the current runtime branding automatically.
+
+Example:
+```ts
+constructor(private readonly brandingRuntimeService: BrandingRuntimeService) {}
+
+initializeBranding(): void {
+  this.brandingRuntimeService.setBranding(
+    EnterpriseBrandingAdapter.toBrBrandingConfig(rawEnterpriseBranding)
+  );
+  this.brandingRuntimeService.setMode('light');
+}
+```
+
 ## 3. Provide generic JSON config
 - Build `BrGridConfig` and `BrDateConfig`.
 - Put behavior options in config (`features`, actions, sorting/filter defaults).

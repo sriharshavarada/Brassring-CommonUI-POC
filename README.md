@@ -1,62 +1,3 @@
-# BrUiFramework
-
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.1.5.
-
-## Development server
-
-To start a local development server, run:
-
-```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
 # Brassring-CommonUI-POC
 
 This repo is now the demo/docs/consumer app for the published package:
@@ -86,6 +27,39 @@ Consumer apps should install the library package, not copy source files:
 ```bash
 npm login --registry=https://npm.pkg.github.com
 npm install @sriharshavarada/br-ui-wrapper
+```
+
+## Local development workflow
+
+Use these scripts when developing the library and demo app together on the same machine:
+
+```bash
+# first-time attach local yalc package
+npm run dev:use-local-lib
+
+# refresh local package after library changes
+npm run dev:refresh-local-lib
+
+# remove local yalc override and go back to published package
+npm run dev:use-published-lib
+```
+
+Equivalent shell wrappers:
+
+```bash
+./scripts/use-local-lib.sh
+./scripts/refresh-local-lib.sh
+./scripts/use-published-lib.sh
+./scripts/run-app.sh
+./scripts/restart-app-clean.sh
+```
+
+Regular app commands:
+
+```bash
+npm start
+npm run build
+npm test
 ```
 
 ## What the package provides

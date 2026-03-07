@@ -22,8 +22,12 @@
       <input *ngSwitchCase="'number'" class="inline-input" type="number" [ngModel]="value"
         (ngModelChange)="onNumberChange($event)" />
 
-      <input *ngSwitchDefault class="inline-input" type="text" [ngModel]="displayValue"
-        (ngModelChange)="onTextChange($event)" />
+      <div *ngSwitchDefault class="inline-value-group">
+        <input class="inline-input" type="text" [ngModel]="displayValue" (ngModelChange)="onTextChange($event)" />
+        <label class="color-picker-shell" *ngIf="canUseColorPicker" aria-label="Pick color">
+          <input class="color-picker" type="color" [value]="colorPickerValue" (input)="onColorChange($any($event.target).value)" />
+        </label>
+      </div>
     </ng-container>
     <span class="type-pill">{{ typeLabel }}</span>
   </ng-template>

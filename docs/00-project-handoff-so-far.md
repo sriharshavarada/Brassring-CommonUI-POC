@@ -2,10 +2,17 @@
 
 This document is intended for the next engineer/AI agent to continue work without re-discovery.
 
-## Repository
+## Repositories
+
+### Demo / docs / consumer app
 - Path: `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC`
 - Branch: `main`
-- Git state at handoff time: **dirty working tree** (there are many uncommitted UI/Playground/Modes-page changes)
+- Role: consumer app, docs site, playground, GitHub Pages host
+
+### Library repo
+- Path: `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper`
+- Branch: `main`
+- Role: source of `@sriharshavarada/br-ui-wrapper`, published to GitHub Packages
 
 ## Commit Timeline (Important)
 These are the key commits in order (older -> newer):
@@ -30,17 +37,33 @@ Build a common Angular UI abstraction layer where consuming screens use only wra
 Consumers should import only from:
 - `@sriharshavarada/br-ui-wrapper`
 
-Primary wrappers:
-- `br-grid`
-- `br-date`
-- `br-modal`
+Primary wrappers currently exposed:
+- `BrGridComponent`
+- `BrModalComponent`
+- `BrTextComponent`
+- `BrTextAreaComponent`
+- `BrDateComponent`
+- `BrSingleSelectComponent`
+- `BrMultiSelectComponent`
+- `BrCheckboxComponent`
+- `BrRadioComponent`
+- `BrAutocompleteComponent`
+
+Also exposed:
+- config and event models
+- `RuntimeUiConfigService`
+- `ControlRegistryService`
+- `BrandingRuntimeService`
+- `EnterpriseBrandingAdapter`
+- `TalentGatewayBrandingAdapter`
+- normalized branding models
 
 ## Architecture Already Implemented
 
 ### 1) Wrapper + Adapter pattern
-- The actual wrappers/adapters/implementations now live in the library:
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/public-api.ts`
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/`
+- The actual wrappers/adapters/implementations now live in the library repo:
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/public-api.ts`
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/`
 - App-local duplicates for form controls, grid, and modal were removed after library migration.
 
 ### 2) Implementations supported
@@ -50,7 +73,7 @@ Primary wrappers:
 - Controls (separate wrappers per control): `CUSTOM`, `MATERIAL`
 
 ### 3) Shared advanced grid behavior
-- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/implementations/grid/shell/grid-shell.component.ts`
+- `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/grid/shell/grid-shell.component.ts`
 - Supports:
   - top toolbar actions
   - search/refresh
@@ -63,19 +86,19 @@ Primary wrappers:
 
 ### 4) Per-control mode switching
 - Mode config:
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/config/ui-mode.config.ts`
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/config/ui-mode.config.ts`
 - `UI_MODE_BY_CONTROL` supports separate mode per control:
   - grid/date/modal
   - text/singleSelect/multiSelect/checkbox/radio/autocomplete
 
-### 5) Runtime mode switching service (today)
+### 5) Runtime mode switching service
 - Added runtime service with localStorage persistence:
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper/src/lib/common/services/runtime-ui-config.service.ts`
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/services/runtime-ui-config.service.ts`
 - Wrappers subscribe to runtime mode updates so mode can change live without code edits.
 
 ### 5A) Library migration status
-- Library project exists at:
-  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/projects/br-ui-wrapper`
+- Library project exists in the separate repo:
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper`
 - Migrated into library:
   - all form controls
   - date control and date configuration support
@@ -101,7 +124,7 @@ Private library repo created and populated:
 Published package:
 - package name:
   - `@sriharshavarada/br-ui-wrapper`
-- version published:
+- latest successfully published version at time of this handoff:
   - `0.0.1`
 - registry:
   - `https://npm.pkg.github.com`
@@ -115,6 +138,7 @@ Manual publish flow already verified:
 Important implication:
 - library source is no longer needed in this demo repo for runtime/build
 - this repo now behaves like a real external consumer of the published package
+- local development still uses `yalc` when iterating quickly across both repos
 
 ### 5C) Demo repo switched to package-consumer mode (new)
 This current repo (`/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC`) is now the consumer/demo/docs app, not the library source repo.
@@ -136,6 +160,48 @@ Validation completed:
 - local `npm install` resolves the package
 - local app build passes against installed package
 - `npm start` works against installed package
+
+### 5E) Local dev workflow after repo separation
+This is now the standard split:
+
+#### Library repo (`/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper`)
+- local fast iteration:
+  - `npm run dev:yalc`
+  - `npm run dev:yalc:push`
+- real package release:
+  - `npm run release:publish`
+
+Supporting shell wrappers:
+- `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/scripts/yalc-publish.sh`
+- `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/scripts/yalc-publish-push.sh`
+- `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/scripts/release-publish.sh`
+
+#### Demo app repo (`/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC`)
+- use local library package:
+  - `npm run dev:use-local-lib`
+- refresh local package after library change:
+  - `npm run dev:refresh-local-lib`
+- remove local override and go back to published package:
+  - `npm run dev:use-published-lib`
+
+Supporting shell wrappers:
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/scripts/use-local-lib.sh`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/scripts/refresh-local-lib.sh`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/scripts/use-published-lib.sh`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/scripts/run-app.sh`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/scripts/restart-app-clean.sh`
+
+Important release rule:
+- `yalc` state is local-only
+- before pushing the demo app for GitHub Pages / CI, run:
+  - `npm run dev:use-published-lib`
+- GitHub Pages cannot reproduce local `yalc` state
+
+Important publish rule:
+- library package version must be bumped in:
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/package.json`
+- do **not** bump only the root workspace `package.json`
+- `npm publish` will fail with `409 Conflict` if you try to republish an existing version
 
 ### 5D) GitHub Actions / Pages dependency note (new)
 Because the package is private, GitHub Actions for this demo repo must authenticate before `npm ci`.
@@ -180,6 +246,7 @@ What it provides now:
 - Live preview rendering
 - Event log panel
 - Per-playground local mode switching (grid / modal popup / controls)
+- Page-level `Branding Studio` popup for runtime branding
 
 ### B) Real JSON editor workbench
 Added reusable JSON workbench with tree editing:
@@ -198,6 +265,7 @@ Behavior added/fixed today:
 - Live sync tree <-> raw JSON
 - Preserve collapse state on in-place edits (so expanding one node and editing does not reset all)
 - Raw and tree panes same height
+- Color picker support for hex color values on keys containing `color`
 
 ### C) Consumer Code Studio (TS/HTML/SCSS)
 Added VSCode-like editor component and integrated in Playground:
@@ -258,6 +326,142 @@ This section is the most important for the next AI to continue correctly.
   - `All Controls` => bulk `CUSTOM/MATERIAL`
   - single control playground => mode for that control only
   - Date control uses date modes
+
+### 3) `br-text-area` added to the library and app
+- New wrapper exported from the package:
+  - `BrTextAreaComponent`
+- Supports:
+  - `rows`
+  - `maxLength`
+  - `id`, `name`, `className`, `meta`
+  - CVA support
+  - wrapper event forwarding
+  - registry integration
+  - `CUSTOM` and `MATERIAL` implementations
+- Playground and docs were updated to include `br-text-area`
+
+### 4) Branding system added to the library
+Library repo now contains:
+- normalized branding model:
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/models/branding-config.model.ts`
+- branding adapters:
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/adapters/enterprise-branding.adapter.ts`
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/adapters/talent-gateway-branding.adapter.ts`
+- runtime branding service:
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/services/branding-runtime.service.ts`
+
+Branding flow:
+1. raw team branding payload
+2. optional adapter normalization
+3. `BrandingRuntimeService.setBranding(...)`
+4. `BrandingRuntimeService.setMode('light' | 'dark')`
+5. library writes CSS variables and implementations pick them up
+
+Important architecture note:
+- branding is app-level runtime state
+- it is **not** passed inside each control config
+- controls consume branding automatically from the shared runtime service
+
+### 5) Branding token contract was expanded and corrected
+New normalized tokens include:
+- `accentColor`
+- `focusColor`
+- `focusRingColor`
+- `sectionBorderColor`
+- `inputBackgroundColor`
+- `inputBorderColor`
+- `inputTextColor`
+- `inputPlaceholderColor`
+- `inputDisabledBackgroundColor`
+- `inputDisabledTextColor`
+
+Important semantic fix:
+- `baseFontColor` should affect typed text if a more specific `inputTextColor` is not supplied
+- this fallback is handled in the branding runtime merge layer
+- Enterprise/TG payloads still only map the keys they truly expose
+
+### 6) Branding consumption was implemented across library controls
+Initially branding was applied only to:
+- `br-text`
+- `br-text-area`
+
+It has now been extended across the remaining implementation surfaces:
+- `br-single-select`
+- `br-multi-select`
+- `br-autocomplete`
+- `br-checkbox`
+- `br-radio`
+- `br-date`
+- `br-grid` (through shared `grid-shell`; canvas/custom/material all flow through the shell)
+- `br-modal`
+
+Important clarification:
+- branding was implemented at the library implementation/style layer
+- consumer control code did **not** need to change structurally
+- meaning: consumers still configure controls the same way; they set runtime branding once and controls update visually
+
+### 7) Branding documentation added in the library repo
+New mapping document:
+- `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/docs/branding-surface-mapping.md`
+
+It records, per component:
+- purpose/surface
+- Enterprise raw key
+- Talent Gateway raw key
+- normalized library branding key
+
+This is the main reference for future expansion or debugging of branding behavior.
+
+### 8) Playground branding UX was reworked
+Earlier attempt:
+- branding variants were added per control
+- user rejected this because branding is app-level, not control-level
+
+Current solution:
+- `Branding Studio` is now a page-level popup in Playground
+- not nested under `Controls Playground`
+- it lets users:
+  - choose branding source:
+    - `Enterprise`
+    - `Talent Gateway`
+    - `Library`
+  - choose color mode:
+    - `Light`
+    - `Dark`
+  - edit branding JSON with color picker support
+  - inspect the runtime branding code in a dedicated `Code Studio` tab
+
+Implementation files:
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/playground/playground.component.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/playground/playground.component.html`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/playground/playground.component.scss`
+
+### 9) Docs page updated for branding runtime model
+Docs page now explicitly explains:
+- branding and light/dark mode are runtime app-level settings
+- not per-control config
+- `br-text` and `br-text-area` branding reference pages include complete code snippets with:
+  - control config
+  - team branding payload
+  - adapter usage
+  - `BrandingRuntimeService`
+
+Relevant file:
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/docs/docs.component.ts`
+
+### 10) Current release caveat
+At time of this handoff:
+- library source has many new changes after `0.0.1`
+- attempting to republish `0.0.1` fails with:
+  - `409 Conflict - Cannot publish over existing version`
+
+So next real release must:
+1. bump version in `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/package.json`
+2. commit/push library repo
+3. run `npm run release:publish`
+4. switch demo app back to published package mode
+5. verify build
+6. commit/push demo app repo
 - Modal Popup Playground header has inline `Modal Pop-up Mode` switch.
 - This makes testing possible without going to global Mode Studio.
 

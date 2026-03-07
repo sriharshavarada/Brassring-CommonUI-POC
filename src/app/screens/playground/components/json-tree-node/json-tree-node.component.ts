@@ -56,6 +56,14 @@ export class JsonTreeNodeComponent {
     return String(this.value);
   }
 
+  get canUseColorPicker(): boolean {
+    return typeof this.value === 'string' && this.isColorLikeKey(this.keyLabel) && this.isHexColor(this.value);
+  }
+
+  get colorPickerValue(): string {
+    return this.canUseColorPicker ? this.normalizeHexColor(this.value as string) : '#000000';
+  }
+
   objectKeys(value: any): string[] {
     return Object.keys(value || {});
   }
@@ -102,6 +110,14 @@ export class JsonTreeNodeComponent {
     this.emitChange(raw);
   }
 
+  onColorChange(raw: string): void {
+    if (!this.canUseColorPicker) {
+      return;
+    }
+
+    this.emitChange(this.normalizeHexColor(raw));
+  }
+
   trackByIndex(index: number): number {
     return index;
   }
@@ -132,5 +148,23 @@ export class JsonTreeNodeComponent {
     }
 
     return text;
+  }
+
+  private isColorLikeKey(key: string): boolean {
+    return /color/i.test(key);
+  }
+
+  private isHexColor(value: string): boolean {
+    return /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(value.trim());
+  }
+
+  private normalizeHexColor(value: string): string {
+    const trimmed = value.trim();
+    if (/^#[0-9a-f]{3}$/i.test(trimmed)) {
+      const [, r, g, b] = trimmed;
+      return `#${r}${r}${g}${g}${b}${b}`.toLowerCase();
+    }
+
+    return trimmed.toLowerCase();
   }
 }

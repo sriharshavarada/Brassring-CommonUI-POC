@@ -185,7 +185,7 @@ npm install`,
               kind: 'table',
               columns: ['Category', 'Available from `@sriharshavarada/br-ui-wrapper`'],
               rows: [
-                ['Wrapper components', 'BrGridComponent, BrModalComponent, BrTextComponent, BrDateComponent, BrSingleSelectComponent, BrMultiSelectComponent, BrCheckboxComponent, BrRadioComponent, BrAutocompleteComponent'],
+                ['Wrapper components', 'BrGridComponent, BrModalComponent, BrTextComponent, BrTextAreaComponent, BrDateComponent, BrSingleSelectComponent, BrMultiSelectComponent, BrCheckboxComponent, BrRadioComponent, BrAutocompleteComponent'],
                 ['Config and event types', 'BrGridConfig, BrGridActionEvent, BrModalConfig, BrModalActionEvent, BrDateConfig, BrAdvancedDateConfiguration, BrTextConfig, BrSingleSelectConfig, BrMultiSelectConfig, BrCheckboxConfig, BrRadioConfig, BrAutocompleteConfig, BrControlsConfig, BrControlField, BrControlActionEvent, BrControlEvent'],
                 ['Services', 'RuntimeUiConfigService, ControlRegistryService'],
                 ['Mode exports', 'UI_MODE_BY_CONTROL, UI_MODE, UiMode and related mode types'],
@@ -195,6 +195,37 @@ npm install`,
               kind: 'callout',
               title: 'Use the public package only',
               text: 'Treat `@sriharshavarada/br-ui-wrapper` as the only consumer entry point. Do not reference internal file paths, adapters, or implementation folders from application code.',
+            },
+          ],
+        },
+        {
+          id: 'runtime-branding-model',
+          title: 'Runtime Branding and Light/Dark Mode',
+          blocks: [
+            {
+              kind: 'callout',
+              title: 'App-level concern',
+              text: 'Branding and light/dark mode are runtime app-level settings, not per-control inputs. You set them once through BrandingRuntimeService, and branded controls read the current runtime state automatically.',
+            },
+            {
+              kind: 'text',
+              text: 'Do not pass branding through every br-text or br-text-area config object. The normal flow is: app loads branding -> optional adapter normalizes it -> BrandingRuntimeService.setBranding(...) -> BrandingRuntimeService.setMode(...) -> controls update through runtime styling.',
+            },
+            {
+              kind: 'code',
+              language: 'typescript',
+              code: `constructor(private readonly brandingRuntimeService: BrandingRuntimeService) {}
+
+initializeBranding(): void {
+  this.brandingRuntimeService.setBranding({
+    light: {
+      focusColor: '#ea580c',
+      inputBorderColor: '#cbd5e1',
+      primaryButtonColor: '#0f766e'
+    }
+  });
+  this.brandingRuntimeService.setMode('light');
+}`,
             },
           ],
         },
@@ -209,6 +240,7 @@ npm install`,
                 ['BrGridComponent', 'Tabular data wrapper with toolbar, actions, sorting, filtering, selection, and pagination.'],
                 ['BrModalComponent', 'Modal/popup wrapper with action-driven close and confirm flows.'],
                 ['BrTextComponent', 'Text input wrapper with CVA/event support.'],
+                ['BrTextAreaComponent', 'Multi-line text wrapper with CVA/event support and textarea-specific config.'],
                 ['BrDateComponent', 'Date input wrapper with locale, format, and advanced DateConfiguration support.'],
                 ['BrSingleSelectComponent', 'Single-choice select/dropdown wrapper.'],
                 ['BrMultiSelectComponent', 'Multi-value select wrapper.'],
@@ -407,6 +439,9 @@ readValues(): void {
       ],
     },
     this.controlPage('br-text', 'Text Box', 'string', true, true, false),
+    this.brandingReferencePage('br-text', 'Text Box', false, 1.1),
+    this.controlPage('br-text-area', 'Text Area', 'string', true, true, false, false, true),
+    this.brandingReferencePage('br-text-area', 'Text Area', true, 1.2),
     this.controlPage('br-date', 'Date', 'string | Date | null', true, true, false, true),
     {
       slug: 'br-date-configuration',
@@ -760,6 +795,7 @@ onModalClose(): void {
     hasPlaceholder: boolean,
     hasOptions: boolean,
     includeDateChange = false,
+    isTextArea = false,
   ): DocPage {
     const inputRows: string[][] = [
       ['config', 'Typed config object for config-based usage.'],
@@ -775,6 +811,10 @@ onModalClose(): void {
 
     if (hasLabel) inputRows.splice(8, 0, ['label', 'Display label.']);
     if (hasPlaceholder) inputRows.splice(9, 0, ['placeholder', 'Placeholder text.']);
+    if (isTextArea) {
+      inputRows.splice(10, 0, ['rows', 'Visible row count for the textarea.']);
+      inputRows.splice(11, 0, ['maxLength', 'Optional maximum character length.']);
+    }
     if (hasOptions) inputRows.splice(9, 0, ['options', 'Selectable options list.']);
 
     const outputRows: string[][] = [
@@ -795,9 +835,11 @@ onModalClose(): void {
 
     const optionsSnippet = hasOptions ? "\n  [options]=\"options\"" : '';
     const placeholderSnippet = hasPlaceholder ? "\n  [placeholder]=\"'Enter value'\"" : '';
+    const textAreaSnippet = isTextArea ? "\n  [rows]=\"4\"\n  [maxLength]=\"500\"" : '';
     const optionInitSnippet = hasOptions
       ? `\n  options = [\n    { label: 'Option A', value: 'a' },\n    { label: 'Option B', value: 'b' }\n  ];`
       : '';
+    const textAreaInitSnippet = isTextArea ? `,\n    rows: 4,\n    maxLength: 500` : '';
 
     return {
       slug,
@@ -817,7 +859,7 @@ onModalClose(): void {
             {
               kind: 'table',
               columns: ['Key term', 'Simple meaning'],
-              rows: this.controlKeyTerms(hasOptions, includeDateChange),
+              rows: this.controlKeyTerms(hasOptions, includeDateChange, isTextArea),
             },
           ],
         },
@@ -860,7 +902,7 @@ export class YourScreenComponent {
   ${this.controlConfigVar(slug)}: ${this.controlConfigType(slug)} = {
     id: 'sample-${slug}',
     label: '${label}',
-    value: ${this.defaultValueForType(valueType)}${optionInitSnippet}
+    value: ${this.defaultValueForType(valueType)}${textAreaInitSnippet}${optionInitSnippet}
   };
 }`,
             },
@@ -879,7 +921,7 @@ export class YourScreenComponent {
   className: 'profile-field',
   meta: { source: 'docs' },
   label: '${label}',
-  value: ${this.defaultValueForType(valueType)}${optionInitSnippet}
+  value: ${this.defaultValueForType(valueType)}${textAreaInitSnippet}${optionInitSnippet}
 };`,
             },
             {
@@ -909,7 +951,7 @@ export class YourScreenComponent {
   [id]="'sample-${slug}'"
   [name]="'sampleControl'"
   [className]="'profile-field'"
-  [label]="'${label}'"${placeholderSnippet}${optionsSnippet}
+  [label]="'${label}'"${placeholderSnippet}${textAreaSnippet}${optionsSnippet}
   [(ngModel)]="value"
   (controlEvent)="onControlEvent($event)">
 </${slug}>`,
@@ -931,7 +973,7 @@ export class YourScreenComponent {
               kind: 'code',
               language: 'html',
               code: `<form [formGroup]="form">
-  <${slug} formControlName="sample"${optionsSnippet}></${slug}>
+  <${slug} formControlName="sample"${textAreaSnippet}${optionsSnippet}></${slug}>
 </form>`,
             },
           ],
@@ -964,9 +1006,196 @@ export class YourScreenComponent {
     };
   }
 
+  private brandingReferencePage(parentSlug: 'br-text' | 'br-text-area', label: string, isTextArea: boolean, order: number): DocPage {
+    const wrapper = parentSlug === 'br-text' ? 'BrTextComponent' : 'BrTextAreaComponent';
+    const configType = parentSlug === 'br-text' ? 'BrTextConfig' : 'BrTextAreaConfig';
+    const controlTag = parentSlug;
+    const textAreaConfig = isTextArea ? `\n  rows: 5,\n  maxLength: 500,` : '';
+    const textAreaInputs = isTextArea ? `\n  [rows]="5"\n  [maxLength]="500"` : '';
+
+    return {
+      slug: `${parentSlug}-branding-reference`,
+      title: `${parentSlug} branding reference`,
+      summary: `${label} branding integration using Enterprise or Talent Gateway adapters and the runtime branding service.`,
+      group: 'controls',
+      order,
+      parentSlug,
+      sections: [
+        {
+          id: 'overview',
+          title: 'Overview',
+          blocks: [
+            {
+              kind: 'text',
+              text: `${parentSlug} supports runtime branding through @sriharshavarada/br-ui-wrapper. Consumers normalize team-specific branding payloads through an adapter, then set the result on BrandingRuntimeService.`,
+            },
+            {
+              kind: 'callout',
+              title: 'Recommended flow',
+              text: 'Raw team branding -> library adapter -> BrBrandingConfig -> BrandingRuntimeService.setBranding(...) -> setMode(light/dark).',
+            },
+            {
+              kind: 'callout',
+              title: 'Important scope',
+              text: 'Branding and light/dark mode are not passed through individual control configs. They are app-level runtime settings. Once you update BrandingRuntimeService, all branded controls in the current runtime instance use the latest values.',
+            },
+          ],
+        },
+        {
+          id: 'api-pieces',
+          title: 'Imports You Need',
+          blocks: [
+            {
+              kind: 'code',
+              language: 'typescript',
+              code: `import {
+  ${wrapper},
+  ${configType},
+  BrandingRuntimeService,
+  EnterpriseBrandingAdapter,
+  EnterpriseBrandingPayload,
+  TalentGatewayBrandingAdapter,
+  TalentGatewayBrandingPayload,
+  BrBrandingMode
+} from '@sriharshavarada/br-ui-wrapper';`,
+            },
+          ],
+        },
+        {
+          id: 'enterprise-example',
+          title: 'Enterprise Branding Example',
+          blocks: [
+            {
+              kind: 'code',
+              language: 'typescript',
+              code: `${parentSlug === 'br-text' ? 'textConfig' : 'textAreaConfig'}: ${configType} = {
+  id: 'branding-demo',
+  label: '${label}',
+  value: ''${textAreaConfig}
+};
+
+enterpriseBranding: EnterpriseBrandingPayload = {
+  baseFontColor: '#f4f4f4',
+  baseFontSize: '14px',
+  titleFontColor: '#f4f4f4',
+  fontFamily: 'Tahoma',
+  primaryButtonColor: '#0f62fe',
+  primaryButtonHoverColor: '#393939',
+  secondaryButtonColor: '#393939',
+  secondaryButtonHoverColor: '#4c4c4c',
+  primaryButtonTextColor: '#fff',
+  secondaryButtonTextColor: '#fff',
+  linkColor: '#f4f4f4',
+  labelFontColor: '#f4f4f4',
+  foreGroundColor: '#008571',
+  backgroundColor: '#fff',
+  sectionBackgroundColor: '#f0f2f4'
+};
+
+brandingMode: BrBrandingMode = 'light';
+
+constructor(private readonly brandingRuntimeService: BrandingRuntimeService) {}
+
+applyEnterpriseBranding(): void {
+  this.brandingRuntimeService.setBranding(
+    EnterpriseBrandingAdapter.toBrBrandingConfig(this.enterpriseBranding)
+  );
+  this.brandingRuntimeService.setMode(this.brandingMode);
+}
+
+onValueChange(value: string): void {
+  ${parentSlug === 'br-text' ? 'this.textConfig' : 'this.textAreaConfig'} = {
+    ...${parentSlug === 'br-text' ? 'this.textConfig' : 'this.textAreaConfig'},
+    value,
+  };
+}`,
+            },
+          ],
+        },
+        {
+          id: 'talent-gateway-example',
+          title: 'Talent Gateway Branding Example',
+          blocks: [
+            {
+              kind: 'code',
+              language: 'typescript',
+              code: `${parentSlug === 'br-text' ? 'textConfig' : 'textAreaConfig'}: ${configType} = {
+  id: 'branding-demo',
+  label: '${label}',
+  value: ''${textAreaConfig}
+};
+
+talentGatewayBranding: TalentGatewayBrandingPayload = {
+  Responsive_BackgroundColor: '#ffffff',
+  Responsive_BackgroundImage: 'https://sstagingjobs.brassring.com/img/26679/Thompson-External-careersite.png',
+  Responsive_BaseFontColor: '#000000',
+  Responsive_BaseFontFamily: "'Lato',sans-serif",
+  Responsive_BaseFontSize: '16px',
+  Responsive_ButtonBackgroundColor: '#FDBF77'
+};
+
+applyTalentGatewayBranding(): void {
+  this.brandingRuntimeService.setBranding(
+    TalentGatewayBrandingAdapter.toBrBrandingConfig(this.talentGatewayBranding)
+  );
+  this.brandingRuntimeService.setMode(this.brandingMode);
+}
+
+setBrandingMode(mode: BrBrandingMode): void {
+  this.brandingMode = mode;
+  this.brandingRuntimeService.setMode(mode);
+}
+
+onValueChange(value: string): void {
+  ${parentSlug === 'br-text' ? 'this.textConfig' : 'this.textAreaConfig'} = {
+    ...${parentSlug === 'br-text' ? 'this.textConfig' : 'this.textAreaConfig'},
+    value,
+  };
+}`,
+            },
+          ],
+        },
+        {
+          id: 'consumer-usage',
+          title: 'Consumer Usage',
+          blocks: [
+            {
+              kind: 'code',
+              language: 'html',
+              code: `<${controlTag}
+  [config]="${parentSlug === 'br-text' ? 'textConfig' : 'textAreaConfig'}"${textAreaInputs}
+  (valueChange)="onValueChange($event)">
+</${controlTag}>
+
+<button type="button" (click)="applyEnterpriseBranding()">Enterprise</button>
+<button type="button" (click)="applyTalentGatewayBranding()">Talent Gateway</button>
+<button type="button" (click)="setBrandingMode('light')">Light</button>
+<button type="button" (click)="setBrandingMode('dark')">Dark</button>`,
+            },
+          ],
+        },
+        {
+          id: 'notes',
+          title: 'Important Notes',
+          blocks: [
+            {
+              kind: 'list',
+              items: [
+                'If no branding is provided, library defaults are used.',
+                'Light mode respects team branding more directly; dark mode uses the normalized dark palette path in the runtime service.',
+                'Current branded consumers in the library are br-text and br-text-area.',
+              ],
+            },
+          ],
+        },
+      ],
+    };
+  }
+
   private controlOrder(slug: string): number {
     const ordered = [
       'br-text',
+      'br-text-area',
       'br-date',
       'br-single-select',
       'br-multi-select',
@@ -977,7 +1206,7 @@ export class YourScreenComponent {
     return ordered.indexOf(slug) + 1;
   }
 
-  private controlKeyTerms(hasOptions: boolean, includeDateChange: boolean): string[][] {
+  private controlKeyTerms(hasOptions: boolean, includeDateChange: boolean, isTextArea = false): string[][] {
     const rows: string[][] = [
       ['config', 'Single object configuration style.'],
       ['valueChange', 'Primary output when control value changes.'],
@@ -987,6 +1216,10 @@ export class YourScreenComponent {
     ];
     if (hasOptions) {
       rows.push(['options', 'Selectable values used by the control.']);
+    }
+    if (isTextArea) {
+      rows.push(['rows', 'Visible line count for the textarea.']);
+      rows.push(['maxLength', 'Optional maximum allowed characters.']);
     }
     if (includeDateChange) {
       rows.push(['dateChange', 'Date-specific output emitted by br-date.']);
@@ -1006,6 +1239,7 @@ export class YourScreenComponent {
   private controlComponentName(slug: string): string {
     const map: Record<string, string> = {
       'br-text': 'BrTextComponent',
+      'br-text-area': 'BrTextAreaComponent',
       'br-date': 'BrDateComponent',
       'br-single-select': 'BrSingleSelectComponent',
       'br-multi-select': 'BrMultiSelectComponent',
@@ -1019,6 +1253,7 @@ export class YourScreenComponent {
   private controlConfigType(slug: string): string {
     const map: Record<string, string> = {
       'br-text': 'BrTextConfig',
+      'br-text-area': 'BrTextAreaConfig',
       'br-date': 'BrDateConfig',
       'br-single-select': 'BrSingleSelectConfig',
       'br-multi-select': 'BrMultiSelectConfig',
@@ -1032,6 +1267,7 @@ export class YourScreenComponent {
   private controlConfigVar(slug: string): string {
     const map: Record<string, string> = {
       'br-text': 'textConfig',
+      'br-text-area': 'textAreaConfig',
       'br-date': 'dateConfig',
       'br-single-select': 'singleSelectConfig',
       'br-multi-select': 'multiSelectConfig',

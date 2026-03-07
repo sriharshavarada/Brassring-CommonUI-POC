@@ -6,11 +6,13 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "dev:use-local-lib": "yalc add @sriharshavarada/br-ui-wrapper && npm install",
+    "dev:refresh-local-lib": "yalc update @sriharshavarada/br-ui-wrapper && npm install",
+    "dev:use-published-lib": "yalc remove @sriharshavarada/br-ui-wrapper && npm install"
   },
   "private": true,
   "dependencies": {
-    "@sriharshavarada/br-ui-wrapper": "^0.0.1",
     "@angular/animations": "^19.1.0",
     "@angular/cdk": "^19.2.19",
     "@angular/common": "^19.1.0",
@@ -21,6 +23,7 @@
     "@angular/platform-browser": "^19.1.0",
     "@angular/platform-browser-dynamic": "^19.1.0",
     "@angular/router": "^19.1.0",
+    "@sriharshavarada/br-ui-wrapper": "^0.0.2",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
@@ -36,6 +39,7 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.7.2"
+    "typescript": "~5.7.2",
+    "yalc": "^1.0.0-pre.53"
   }
 }

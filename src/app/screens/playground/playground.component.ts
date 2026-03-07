@@ -4,6 +4,11 @@ import { FormsModule } from '@angular/forms';
 
 import {
   BrAdvancedDateConfiguration,
+  BrBrandingConfig,
+  BrBrandingMode,
+  BrandingRuntimeService,
+  EnterpriseBrandingAdapter,
+  EnterpriseBrandingPayload,
   BrGridActionEvent,
   BrGridComponent,
   BrGridConfig,
@@ -28,6 +33,10 @@ import {
   BrSingleSelectComponent,
   BrTextConfig,
   BrTextComponent,
+  BrTextAreaConfig,
+  BrTextAreaComponent,
+  TalentGatewayBrandingAdapter,
+  TalentGatewayBrandingPayload,
   ControlRegistryService,
   ControlUiMode,
   DateUiMode,
@@ -45,9 +54,10 @@ type GridPreset = 'complex' | 'moderate' | 'simple';
 type DatePreset = 'default' | 'compact' | 'disabled';
 type ModalPreset = 'custom' | 'info' | 'confirm' | 'delete' | 'form';
 type FormPreset = 'all-controls' | 'simple';
-type ControlPlayground = 'all' | 'date' | 'text' | 'single-select' | 'multi-select' | 'checkbox' | 'radio' | 'autocomplete';
+type ControlPlayground = 'all' | 'date' | 'text' | 'text-area' | 'single-select' | 'multi-select' | 'checkbox' | 'radio' | 'autocomplete';
 type ControlConfig =
   | BrTextConfig
+  | BrTextAreaConfig
   | BrSingleSelectConfig
   | BrMultiSelectConfig
   | BrCheckboxConfig
@@ -66,6 +76,16 @@ interface DemoCodeState {
   htmlAfter: string;
 }
 
+type BrandingDemoKind = 'enterprise' | 'talent-gateway' | 'library';
+
+interface PlaygroundBrandingDemoConfig {
+  kind: BrandingDemoKind;
+  mode: BrBrandingMode;
+  payload: EnterpriseBrandingPayload | TalentGatewayBrandingPayload | BrBrandingConfig;
+}
+
+type BrandingStudioTab = 'config' | 'code';
+
 const PLAYGROUND_DATE_CONFIGURATION: BrAdvancedDateConfiguration = {
   Disabledaysofweek: ['', '', '', 3, '', '', ''],
   Firstdayofweek: '3',
@@ -80,6 +100,116 @@ const PLAYGROUND_DATE_CONFIGURATION: BrAdvancedDateConfiguration = {
   includeToday: false,
 };
 
+const ENTERPRISE_BRANDING_SAMPLE: EnterpriseBrandingPayload = {
+  baseFontColor: '#f4f4f4',
+  baseFontSize: '14px',
+  titleFontColor: '#f4f4f4',
+  fontFamily: 'Tahoma',
+  primaryButtonColor: '#0f62fe',
+  primaryButtonHoverColor: '#393939',
+  secondaryButtonColor: '#393939',
+  secondaryButtonHoverColor: '#4c4c4c',
+  primaryButtonTextColor: '#fff',
+  secondaryButtonTextColor: '#fff',
+  primaryButtonTextHoverColor: '#fff',
+  secondaryButtonTextHoverColor: '#fff',
+  linkColor: '#f4f4f4',
+  labelFontColor: '#f4f4f4',
+  foreGroundColor: '#008571',
+  welcomeTextFontSize: '24px',
+  welcomeTextFontColor: '#ffffff',
+  backgroundImage: '/mobile/img/welcomebackground.jpg',
+  backgroundColor: '#fff',
+  heroImage: '/mobile/img/herospace.jpg',
+  headerBackgroundColor: '#008571',
+  headerTextColor: '#fff',
+  sectionBackgroundColor: '#f0f2f4',
+  tableHeaderBackgroundColor: '#ffffff',
+  tableHeaderFontColor: '#121212',
+  tableAltColor: 'transparent',
+};
+
+const TALENT_GATEWAY_BRANDING_SAMPLE: TalentGatewayBrandingPayload = {
+  Responsive_BackgroundColor: '#ffffff',
+  Responsive_BackgroundImage: 'https://sstagingjobs.brassring.com/img/26679/Thompson-External-careersite.png',
+  Responsive_BaseFontColor: '#000000',
+  Responsive_BaseFontFamily: "'Lato',sans-serif",
+  Responsive_BaseFontSize: '16px',
+  Responsive_ButtonBackgroundColor: '#FDBF77',
+};
+
+const LIBRARY_BRANDING_SAMPLE: BrBrandingConfig = {
+  fontFamily: 'Georgia, serif',
+  baseFontSize: '15px',
+  welcomeTextFontSize: '24px',
+  light: {
+    baseFontColor: '#1f2937',
+    titleFontColor: '#0f172a',
+    labelFontColor: '#334155',
+    foregroundColor: '#0f766e',
+    accentColor: '#0f766e',
+    focusColor: '#ea580c',
+    focusRingColor: 'color-mix(in srgb, #ea580c 24%, transparent)',
+    backgroundColor: '#ffffff',
+    sectionBackgroundColor: '#f8fafc',
+    sectionBorderColor: '#dbe4ee',
+    inputBackgroundColor: '#ffffff',
+    inputBorderColor: '#cbd5e1',
+    inputTextColor: '#1f2937',
+    inputPlaceholderColor: '#94a3b8',
+    inputDisabledBackgroundColor: '#e2e8f0',
+    inputDisabledTextColor: '#64748b',
+    primaryButtonColor: '#0f766e',
+    primaryButtonHoverColor: '#115e59',
+    primaryButtonTextColor: '#ffffff',
+    primaryButtonTextHoverColor: '#ffffff',
+    secondaryButtonColor: '#e2e8f0',
+    secondaryButtonHoverColor: '#cbd5e1',
+    secondaryButtonTextColor: '#0f172a',
+    secondaryButtonTextHoverColor: '#0f172a',
+    linkColor: '#0f766e',
+    welcomeTextFontColor: '#ffffff',
+    headerBackgroundColor: '#0f766e',
+    headerTextColor: '#ffffff',
+    tableHeaderBackgroundColor: '#f8fafc',
+    tableHeaderFontColor: '#0f172a',
+    tableAltColor: '#f8fafc',
+  },
+  dark: {
+    baseFontColor: '#e2e8f0',
+    titleFontColor: '#f8fafc',
+    labelFontColor: '#cbd5e1',
+    foregroundColor: '#5eead4',
+    accentColor: '#5eead4',
+    focusColor: '#f59e0b',
+    focusRingColor: 'color-mix(in srgb, #f59e0b 28%, transparent)',
+    backgroundColor: '#0f172a',
+    sectionBackgroundColor: '#111827',
+    sectionBorderColor: '#334155',
+    inputBackgroundColor: '#111827',
+    inputBorderColor: '#334155',
+    inputTextColor: '#e2e8f0',
+    inputPlaceholderColor: '#94a3b8',
+    inputDisabledBackgroundColor: '#1f2937',
+    inputDisabledTextColor: '#64748b',
+    primaryButtonColor: '#14b8a6',
+    primaryButtonHoverColor: '#0d9488',
+    primaryButtonTextColor: '#042f2e',
+    primaryButtonTextHoverColor: '#042f2e',
+    secondaryButtonColor: '#334155',
+    secondaryButtonHoverColor: '#475569',
+    secondaryButtonTextColor: '#f8fafc',
+    secondaryButtonTextHoverColor: '#f8fafc',
+    linkColor: '#5eead4',
+    welcomeTextFontColor: '#f8fafc',
+    headerBackgroundColor: '#111827',
+    headerTextColor: '#f8fafc',
+    tableHeaderBackgroundColor: '#1e293b',
+    tableHeaderFontColor: '#f8fafc',
+    tableAltColor: '#111827',
+  },
+};
+
 @Component({
   selector: 'app-playground',
   standalone: true,
@@ -90,6 +220,7 @@ const PLAYGROUND_DATE_CONFIGURATION: BrAdvancedDateConfiguration = {
     BrDateComponent,
     BrModalComponent,
     BrTextComponent,
+    BrTextAreaComponent,
     BrSingleSelectComponent,
     BrMultiSelectComponent,
     BrCheckboxComponent,
@@ -137,6 +268,7 @@ export class PlaygroundComponent {
     all: 'All Controls',
     date: 'Date',
     text: 'Text Box',
+    'text-area': 'Text Area',
     'single-select': 'Single Select',
     'multi-select': 'Multi Select',
     checkbox: 'Checkbox',
@@ -145,6 +277,7 @@ export class PlaygroundComponent {
   };
 
   readonly codeFiles: CodeFile[] = ['ts', 'html', 'scss'];
+  readonly brandingModes: BrBrandingMode[] = ['light', 'dark'];
 
   activeGridPreset: GridPreset = 'complex';
   activeDatePreset: DatePreset = 'default';
@@ -162,6 +295,10 @@ export class PlaygroundComponent {
   dateConfig: BrDateConfig = this.defaultDateConfig();
   modalConfig: BrModalConfig = this.defaultModalConfig();
   formConfig: BrFormConfig = this.allControlsFormConfig();
+  brandingDemoConfig: PlaygroundBrandingDemoConfig | null = null;
+  brandingStudioDraft: PlaygroundBrandingDemoConfig | null = null;
+  brandingStudioOpen = false;
+  brandingStudioTab: BrandingStudioTab = 'config';
   modalPresetConfigs!: Record<ModalPreset, BrModalConfig>;
 
   gridCode: DemoCodeState = this.createEmptyCodeState();
@@ -188,6 +325,7 @@ export class PlaygroundComponent {
 
   constructor(
     public readonly runtimeUiConfig: RuntimeUiConfigService,
+    public readonly brandingRuntime: BrandingRuntimeService,
     private readonly controlRegistry: ControlRegistryService,
   ) {
     this.modalPresetConfigs = this.createModalPresetConfigs();
@@ -201,6 +339,10 @@ export class PlaygroundComponent {
 
   get modes() {
     return this.runtimeUiConfig.getModesSnapshot();
+  }
+
+  get brandingMode(): BrBrandingMode {
+    return this.brandingRuntime.getModeSnapshot();
   }
 
   get gridPresets(): GridPreset[] {
@@ -220,7 +362,7 @@ export class PlaygroundComponent {
   }
 
   get controlPlaygrounds(): ControlPlayground[] {
-    return ['all', 'date', 'text', 'single-select', 'multi-select', 'checkbox', 'radio', 'autocomplete'];
+    return ['all', 'date', 'text', 'text-area', 'single-select', 'multi-select', 'checkbox', 'radio', 'autocomplete'];
   }
 
   get controlVariants(): string[] {
@@ -228,6 +370,8 @@ export class PlaygroundComponent {
       case 'date':
         return ['default-config', 'bounded-config', 'disabled-config', 'events-demo', 'registry-demo', 'ngmodel-simple'];
       case 'text':
+        return ['default-config', 'required-config', 'disabled-config', 'events-demo', 'registry-demo', 'ngmodel-simple'];
+      case 'text-area':
         return ['default-config', 'required-config', 'disabled-config', 'events-demo', 'registry-demo', 'ngmodel-simple'];
       case 'single-select':
         return ['default-config', 'required-config', 'disabled-config', 'events-demo', 'registry-demo', 'ngmodel-simple'];
@@ -352,6 +496,39 @@ export class PlaygroundComponent {
     this.pushLog(`Applied variant: ${this.controlVariantLabel(variant)}`);
   }
 
+  setBrandingMode(mode: BrBrandingMode): void {
+    if (!this.brandingStudioDraft) {
+      return;
+    }
+    this.brandingStudioDraft = {
+      ...this.brandingStudioDraft,
+      mode,
+    };
+  }
+
+  setBrandingStudioTab(tab: BrandingStudioTab): void {
+    this.brandingStudioTab = tab;
+  }
+
+  get brandingStudioSourceLabel(): string {
+    if (!this.brandingDemoConfig) {
+      return 'Default Branding';
+    }
+    return this.brandingDemoConfig.kind === 'enterprise'
+      ? 'Enterprise Branding'
+      : this.brandingDemoConfig.kind === 'talent-gateway'
+        ? 'Talent Gateway Branding'
+        : 'Library Branding';
+  }
+
+  get brandingStudioActiveMode(): BrBrandingMode {
+    return this.brandingDemoConfig?.mode ?? 'light';
+  }
+
+  brandingStudioCode(): string {
+    return this.buildBrandingDemoTsBlock(this.brandingStudioDraft ?? this.defaultBrandingDemoConfig('enterprise'));
+  }
+
   controlVariantLabel(variant: string): string {
     return variant.replace(/-/g, ' ').replace(/\b\w/g, (x) => x.toUpperCase());
   }
@@ -368,6 +545,19 @@ export class PlaygroundComponent {
       return 'Controls Config';
     }
     return `${this.controlPlaygroundLabels[this.activeControlPlayground]} Config`;
+  }
+
+  brandingConfigWorkbenchTitle(): string {
+    if (!this.brandingStudioDraft) {
+      return 'Branding Config';
+    }
+    if (this.brandingStudioDraft.kind === 'enterprise') {
+      return 'Enterprise Branding Config';
+    }
+    if (this.brandingStudioDraft.kind === 'talent-gateway') {
+      return 'Talent Gateway Branding Config';
+    }
+    return 'Library Branding Config';
   }
 
   controlsCodeStudioTitle(): string {
@@ -387,6 +577,7 @@ export class PlaygroundComponent {
 
     const keyMap: Record<Exclude<ControlPlayground, 'all' | 'date'>, 'text' | 'singleSelect' | 'multiSelect' | 'checkbox' | 'radio' | 'autocomplete'> = {
       text: 'text',
+      'text-area': 'text',
       'single-select': 'singleSelect',
       'multi-select': 'multiSelect',
       checkbox: 'checkbox',
@@ -410,6 +601,7 @@ export class PlaygroundComponent {
 
     const keyMap: Record<Exclude<ControlPlayground, 'all' | 'date'>, 'text' | 'singleSelect' | 'multiSelect' | 'checkbox' | 'radio' | 'autocomplete'> = {
       text: 'text',
+      'text-area': 'text',
       'single-select': 'singleSelect',
       'multi-select': 'multiSelect',
       checkbox: 'checkbox',
@@ -527,13 +719,62 @@ export class PlaygroundComponent {
 
   onFormConfigChange(config: BrFormConfig): void {
     this.formConfig = config;
-    this.activeControlPlayground = 'all';
-    this.activeControlVariant = 'default';
-    this.activeFormPreset = 'all-controls';
+    if (this.activeControlPlayground === 'all') {
+      this.activeFormPreset = 'all-controls';
+    }
     this.rebuildFormControlConfigs();
     this.syncFormTsCode();
     this.syncFormHtmlCode();
     this.pushLog('Controls JSON applied');
+  }
+
+  onBrandingConfigChange(config: EnterpriseBrandingPayload | TalentGatewayBrandingPayload | BrBrandingConfig): void {
+    if (!this.brandingStudioDraft) {
+      return;
+    }
+
+    this.brandingStudioDraft = {
+      ...this.brandingStudioDraft,
+      payload: config,
+    };
+  }
+
+  openBrandingStudio(): void {
+    this.brandingStudioDraft = this.clone(this.brandingDemoConfig ?? this.defaultBrandingDemoConfig('enterprise'));
+    this.brandingStudioTab = 'config';
+    this.brandingStudioOpen = true;
+  }
+
+  closeBrandingStudio(): void {
+    this.brandingStudioOpen = false;
+  }
+
+  selectBrandingSource(kind: BrandingDemoKind): void {
+    const currentMode = this.brandingStudioDraft?.mode ?? this.brandingDemoConfig?.mode ?? 'light';
+    this.brandingStudioDraft = this.defaultBrandingDemoConfig(kind, currentMode);
+  }
+
+  applyBrandingStudio(): void {
+    if (!this.brandingStudioDraft) {
+      return;
+    }
+
+    this.brandingDemoConfig = this.clone(this.brandingStudioDraft);
+    this.applyBrandingDemo(this.brandingDemoConfig);
+    this.brandingStudioOpen = false;
+  }
+
+  resetBrandingStudioToDefaults(): void {
+    if (!this.brandingStudioDraft) {
+      this.brandingStudioDraft = this.defaultBrandingDemoConfig('enterprise');
+      return;
+    }
+
+    this.brandingStudioDraft = this.defaultBrandingDemoConfig(this.brandingStudioDraft.kind, this.brandingStudioDraft.mode);
+  }
+
+  clearAppliedBranding(): void {
+    this.resetBrandingDemo();
   }
 
   openModalPreview(): void {
@@ -654,6 +895,23 @@ export class PlaygroundComponent {
     };
   }
 
+  asTextAreaConfig(field: BrFormField): BrTextAreaConfig {
+    return {
+      id: field.id,
+      controlId: field.controlId,
+      name: field.name,
+      className: field.className,
+      meta: field.meta,
+      label: field.label,
+      value: String(this.controlValue(field) ?? ''),
+      placeholder: field.placeholder,
+      rows: field.rows,
+      maxLength: field.maxLength,
+      disabled: field.disabled,
+      required: field.required,
+    };
+  }
+
   asSingleSelectConfig(field: BrFormField): BrSingleSelectConfig {
     return {
       id: field.id,
@@ -761,6 +1019,10 @@ export class PlaygroundComponent {
 
   getTextConfig(field: BrFormField): BrTextConfig {
     return this.formControlConfigMap[field.id] as BrTextConfig;
+  }
+
+  getTextAreaConfig(field: BrFormField): BrTextAreaConfig {
+    return this.formControlConfigMap[field.id] as BrTextAreaConfig;
   }
 
   getSingleSelectConfig(field: BrFormField): BrSingleSelectConfig {
@@ -962,6 +1224,8 @@ export class PlaygroundComponent {
     for (const field of this.formConfig.fields || []) {
       if (field.type === 'text') {
         next[field.id] = this.asTextConfig(field);
+      } else if (field.type === 'text-area') {
+        next[field.id] = this.asTextAreaConfig(field);
       } else if (field.type === 'single-select') {
         next[field.id] = this.asSingleSelectConfig(field);
       } else if (field.type === 'multi-select') {
@@ -1155,6 +1419,7 @@ export class YourFeatureComponent {
     }
     if (isRegistryDemo) commonTypeImports.push('ControlRegistryService');
     if (fieldTypes.has('text')) libraryTypeImports.push('BrTextConfig');
+    if (fieldTypes.has('text-area')) libraryTypeImports.push('BrTextAreaConfig');
     if (fieldTypes.has('single-select')) libraryTypeImports.push('BrSingleSelectConfig');
     if (fieldTypes.has('multi-select')) libraryTypeImports.push('BrMultiSelectConfig');
     if (fieldTypes.has('checkbox')) libraryTypeImports.push('BrCheckboxConfig');
@@ -1180,6 +1445,25 @@ export class YourFeatureComponent {
       label: field.label,
       value: String(this.controlValue(field) ?? ''),
       placeholder: field.placeholder,
+      disabled: field.disabled,
+      required: field.required,
+    };
+  }`);
+    }
+
+    if (fieldTypes.has('text-area')) {
+      helperMethods.push(`  asTextAreaConfig(field: BrControlField): BrTextAreaConfig {
+    return {
+      id: field.id,
+      controlId: field.controlId,
+      name: field.name,
+      className: field.className,
+      meta: field.meta,
+      label: field.label,
+      value: String(this.controlValue(field) ?? ''),
+      placeholder: field.placeholder,
+      rows: field.rows,
+      maxLength: field.maxLength,
       disabled: field.disabled,
       required: field.required,
     };
@@ -1305,7 +1589,6 @@ export class YourFeatureComponent {
   }
 `
       : '';
-
     const allTypeImports = [...commonTypeImports, ...libraryTypeImports];
     const libraryImportLine = `import { ${allTypeImports.join(', ')} } from '@sriharshavarada/br-ui-wrapper';`;
 
@@ -1390,10 +1673,76 @@ ${helperBlock}
     return (config.description || '').toLowerCase().includes('registry demo');
   }
 
+  private applyBrandingDemo(demo: PlaygroundBrandingDemoConfig): void {
+    if (demo.kind === 'enterprise') {
+      this.brandingRuntime.setBranding(
+        EnterpriseBrandingAdapter.toBrBrandingConfig(demo.payload as EnterpriseBrandingPayload)
+      );
+      this.brandingRuntime.setMode(demo.mode);
+      this.pushLog('Applied Enterprise branding');
+      return;
+    }
+
+    if (demo.kind === 'library') {
+      this.brandingRuntime.setBranding(demo.payload as BrBrandingConfig);
+      this.brandingRuntime.setMode(demo.mode);
+      this.pushLog('Applied Library branding');
+      return;
+    }
+
+    this.brandingRuntime.setBranding(
+      TalentGatewayBrandingAdapter.toBrBrandingConfig(demo.payload as TalentGatewayBrandingPayload)
+    );
+    this.brandingRuntime.setMode(demo.mode);
+    this.pushLog('Applied Talent Gateway branding');
+  }
+
+  private resetBrandingDemo(): void {
+    this.brandingDemoConfig = null;
+    this.brandingStudioDraft = null;
+    this.brandingRuntime.reset();
+  }
+
+  private buildBrandingDemoTsBlock(demo: PlaygroundBrandingDemoConfig): string {
+    const payloadType = demo.kind === 'enterprise'
+      ? 'EnterpriseBrandingPayload'
+      : demo.kind === 'talent-gateway'
+        ? 'TalentGatewayBrandingPayload'
+        : 'BrBrandingConfig';
+    const applyExpression = demo.kind === 'enterprise'
+      ? 'EnterpriseBrandingAdapter.toBrBrandingConfig(this.rawBranding)'
+      : demo.kind === 'talent-gateway'
+        ? 'TalentGatewayBrandingAdapter.toBrBrandingConfig(this.rawBranding)'
+        : 'this.rawBranding';
+    const payload = JSON.stringify(demo.payload, null, 2);
+    const mode = demo.mode;
+
+    return `
+  constructor(private readonly brandingRuntimeService: BrandingRuntimeService) {}
+
+  rawBranding: ${payloadType} = ${payload};
+  brandingMode: BrBrandingMode = '${mode}';
+
+  applyBranding(): void {
+    this.brandingRuntimeService.setBranding(
+      ${applyExpression}
+    );
+    this.brandingRuntimeService.setMode(this.brandingMode);
+  }
+
+  setBrandingMode(mode: BrBrandingMode): void {
+    this.brandingMode = mode;
+    this.brandingRuntimeService.setMode(mode);
+  }`;
+  }
+
   private controlHtmlSnippet(field: BrFormField): string {
     if (this.isNgModelOnlyField(field)) {
       if (field.type === 'text') {
         return `<br-text [id]="'${field.id}'" [label]="'${field.label}'" [placeholder]="'${field.placeholder || ''}'" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ngModel]="controlValue(${this.fieldRef(field.id)})" (ngModelChange)="updateControlValue('${field.id}', $event)"></br-text>`;
+      }
+      if (field.type === 'text-area') {
+        return `<br-text-area [id]="'${field.id}'" [label]="'${field.label}'" [placeholder]="'${field.placeholder || ''}'" [rows]="${field.rows ?? 4}" [maxLength]="${field.maxLength ?? 'null'}" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ngModel]="controlValue(${this.fieldRef(field.id)})" (ngModelChange)="updateControlValue('${field.id}', $event)"></br-text-area>`;
       }
       if (field.type === 'single-select') {
         return `<br-single-select [id]="'${field.id}'" [label]="'${field.label}'" [options]="${JSON.stringify(field.options || [])}" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ngModel]="controlValue(${this.fieldRef(field.id)})" (ngModelChange)="updateControlValue('${field.id}', $event)"></br-single-select>`;
@@ -1415,6 +1764,9 @@ ${helperBlock}
 
     if (field.type === 'text') {
       return `<br-text [config]="asTextConfig(${this.fieldRef(field.id)})" (valueChange)="updateControlValue('${field.id}', $event)"></br-text>`;
+    }
+    if (field.type === 'text-area') {
+      return `<br-text-area [config]="asTextAreaConfig(${this.fieldRef(field.id)})" (valueChange)="updateControlValue('${field.id}', $event)"></br-text-area>`;
     }
     if (field.type === 'single-select') {
       return `<br-single-select [config]="asSingleSelectConfig(${this.fieldRef(field.id)})" (valueChange)="updateControlValue('${field.id}', $event)"></br-single-select>`;
@@ -1972,6 +2324,7 @@ ${helperBlock}
       title: 'Simple Form',
       fields: [
         { id: 'name', type: 'text', label: 'Name', required: true },
+        { id: 'summary', type: 'text-area', label: 'Summary', placeholder: 'Add a short summary', rows: 4, maxLength: 280 },
         { id: 'agree', type: 'checkbox', label: 'I Agree' },
         {
           id: 'when',
@@ -1983,7 +2336,7 @@ ${helperBlock}
           DateConfiguration: this.clone(PLAYGROUND_DATE_CONFIGURATION),
         },
       ],
-      value: { name: '', agree: false, when: '' },
+      value: { name: '', summary: '', agree: false, when: '' },
       showActions: true,
       submitLabel: 'Submit',
       resetLabel: 'Reset',
@@ -1993,6 +2346,7 @@ ${helperBlock}
   private buildSingleControlVariantConfig(control: Exclude<ControlPlayground, 'all'>, variant: string): BrFormConfig {
     const variantKey = variant.replace(/-config$/, '');
     const ngModelOnly = variantKey === 'ngmodel-simple';
+    this.brandingDemoConfig = null;
     if (variantKey === 'events-demo') {
       return this.buildControlEventsDemoVariantConfig(control);
     }
@@ -2024,6 +2378,24 @@ ${helperBlock}
       return this.singleControlConfig(
         { id: 'textControl', type: 'text', label: 'Employee Name', placeholder: 'Type full name', required: variantKey === 'required', disabled: variantKey === 'disabled' },
         variantKey === 'disabled' ? 'Read-only value' : '',
+        `${this.controlPlaygroundLabels[control]} Playground`,
+        `Variant: ${this.controlVariantLabel(variant)}${ngModelOnly ? ' (No Config)' : ''}`,
+      );
+    }
+
+    if (control === 'text-area') {
+      return this.singleControlConfig(
+        {
+          id: 'textAreaControl',
+          type: 'text-area',
+          label: 'Manager Notes',
+          placeholder: 'Capture a longer note',
+          rows: 5,
+          maxLength: 500,
+          required: variantKey === 'required',
+          disabled: variantKey === 'disabled',
+        },
+        variantKey === 'disabled' ? 'Read-only note content.' : '',
         `${this.controlPlaygroundLabels[control]} Playground`,
         `Variant: ${this.controlVariantLabel(variant)}${ngModelOnly ? ' (No Config)' : ''}`,
       );
@@ -2129,6 +2501,19 @@ ${helperBlock}
           { id: 'textControlB', type: 'text', label: 'Text B', placeholder: 'Click here after A' },
         ],
         value: { textControlA: '', textControlB: '' },
+        showActions: false,
+      };
+    }
+
+    if (control === 'text-area') {
+      return {
+        title: 'Text Area Playground',
+        description: 'Events Demo: type in the first text area, tab to the second, and click back to trigger input, keyup, focus, blur, and click.',
+        fields: [
+          { id: 'textAreaControlA', type: 'text-area', label: 'Notes A', placeholder: 'Type detailed notes', rows: 4, maxLength: 400 },
+          { id: 'textAreaControlB', type: 'text-area', label: 'Notes B', placeholder: 'Click here after A', rows: 5, maxLength: 400 },
+        ],
+        value: { textAreaControlA: '', textAreaControlB: '' },
         showActions: false,
       };
     }
@@ -2301,6 +2686,19 @@ ${helperBlock}
       };
     }
 
+    if (control === 'text-area') {
+      return {
+        title: 'Text Area Playground',
+        description: 'Registry Demo: Read text area values using valueById, valuesByName, valuesByClass.',
+        fields: [
+          { id: 'textAreaRegistryA', type: 'text-area', label: 'Notes A', name: sharedName, className: sharedClass, meta: metaA, placeholder: 'Type note A', rows: 4, maxLength: 400 },
+          { id: 'textAreaRegistryB', type: 'text-area', label: 'Notes B', name: sharedName, className: sharedClass, meta: metaB, placeholder: 'Type note B', rows: 5, maxLength: 400 },
+        ],
+        value: { textAreaRegistryA: 'Alpha note', textAreaRegistryB: 'Beta note' },
+        showActions: false,
+      };
+    }
+
     if (control === 'date') {
       return {
         title: 'Date Playground',
@@ -2355,8 +2753,8 @@ ${helperBlock}
         title: 'Checkbox Playground',
         description: 'Registry Demo: Read values using valueById, valuesByName, valuesByClass.',
         fields: [
-          { id: 'checkboxRegistryA', type: 'checkbox', label: 'Notify A', name: sharedName, className: sharedClass, meta: metaA },
-          { id: 'checkboxRegistryB', type: 'checkbox', label: 'Notify B', name: sharedName, className: sharedClass, meta: metaB },
+          { id: 'checkboxRegistryA', type: 'checkbox', label: 'Alerts', name: sharedName, className: sharedClass, meta: metaA },
+          { id: 'checkboxRegistryB', type: 'checkbox', label: 'Notifications', name: sharedName, className: sharedClass, meta: metaB },
         ],
         value: { checkboxRegistryA: true, checkboxRegistryB: false },
         showActions: false,
@@ -2380,19 +2778,40 @@ ${helperBlock}
       };
     }
 
-    const options = [
-      { label: 'Austin', value: 'Austin' },
-      { label: 'Seattle', value: 'Seattle' },
-      { label: 'New York', value: 'New York' },
-    ];
     return {
       title: 'Autocomplete Playground',
       description: 'Registry Demo: Read values using valueById, valuesByName, valuesByClass.',
       fields: [
-        { id: 'autoRegistryA', type: 'autocomplete', label: 'Location A', name: sharedName, className: sharedClass, meta: metaA, placeholder: 'Type location', options },
-        { id: 'autoRegistryB', type: 'autocomplete', label: 'Location B', name: sharedName, className: sharedClass, meta: metaB, placeholder: 'Type location', options },
+        {
+          id: 'autocompleteRegistryA',
+          type: 'autocomplete',
+          label: 'Location A',
+          name: sharedName,
+          className: sharedClass,
+          meta: metaA,
+          placeholder: 'Type location',
+          options: [
+            { label: 'Austin', value: 'Austin' },
+            { label: 'Seattle', value: 'Seattle' },
+            { label: 'New York', value: 'New York' },
+          ],
+        },
+        {
+          id: 'autocompleteRegistryB',
+          type: 'autocomplete',
+          label: 'Location B',
+          name: sharedName,
+          className: sharedClass,
+          meta: metaB,
+          placeholder: 'Type location',
+          options: [
+            { label: 'Austin', value: 'Austin' },
+            { label: 'Seattle', value: 'Seattle' },
+            { label: 'New York', value: 'New York' },
+          ],
+        },
       ],
-      value: { autoRegistryA: 'Austin', autoRegistryB: 'Seattle' },
+      value: { autocompleteRegistryA: 'Austin', autocompleteRegistryB: 'Seattle' },
       showActions: false,
     };
   }
@@ -2408,6 +2827,16 @@ ${helperBlock}
       submitLabel: 'Apply',
       resetLabel: 'Clear',
     };
+  }
+
+  private defaultBrandingDemoConfig(kind: BrandingDemoKind, mode: BrBrandingMode = 'light'): PlaygroundBrandingDemoConfig {
+    if (kind === 'enterprise') {
+      return { kind, mode, payload: this.clone(ENTERPRISE_BRANDING_SAMPLE) };
+    }
+    if (kind === 'talent-gateway') {
+      return { kind, mode, payload: this.clone(TALENT_GATEWAY_BRANDING_SAMPLE) };
+    }
+    return { kind, mode, payload: this.clone(LIBRARY_BRANDING_SAMPLE) };
   }
 
   private defaultModalConfig(): BrModalConfig {
