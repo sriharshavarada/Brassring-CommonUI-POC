@@ -124,27 +124,23 @@ What this cleanup did **not** remove:
 - the app’s local `yalc` library flow
 - the library repo’s PrimeNG source changes
 
-### 2C) Current local-only verification state for PrimeNG
-After the above, local-only compatibility testing was done without publishing any package and without pushing these dependency tweaks.
+### 2C) PrimeNG compatibility state now
+PrimeNG was normalized to Angular 19-compatible versions and is now part of the freeze-ready state.
 
-Local-only changes made to get PrimeNG running on this machine:
-- app repo dependency versions changed locally to:
+Current version alignment:
+- app repo:
   - `primeng@19.1.4`
   - `@primeng/themes@19.1.4`
-- library repo workspace dependency changed locally to:
+- library repo workspace:
   - `primeng@19.1.4`
-- library repo publishable package peer deps changed locally to:
+- library repo publishable peer deps:
   - `primeng@^19.0.0`
   - `@primeng/themes@^19.0.0`
 
-These PrimeNG 19 adjustments are **local only right now**:
-- not pushed to git
-- not published to GitHub Packages
-
-With those local-only version changes:
+Current result:
 - library repo builds successfully
-- `npm run dev:yalc:push` succeeds
-- app repo builds successfully
+- published package `@sriharshavarada/br-ui-wrapper@0.0.3` includes PrimeNG support
+- app repo builds successfully against the published package
 - local app runs successfully with PrimeNG mode at:
   - `http://localhost:4200/`
 
@@ -169,7 +165,11 @@ Existing types expanded in a backward-compatible way:
 - `BrGridActionEvent`
 - `BrGridConfig`
 
-This is scaffolding only for now. Engine parity work is still pending.
+This started as scaffolding, but the library has now moved further than the initial draft:
+- separate engine boundaries exist for all current grid variants
+- rich cell types are implemented
+- template override plumbing is implemented
+- the contract is now part of the release state, not just a plan
 
 ### 2E) Grid scaffolding adopted locally without breaking demos
 After the Phase 1 contract scaffolding was added, the grid adapter and shared shell were updated locally to understand the new model areas without changing current consumer demos.
@@ -211,24 +211,24 @@ At that bridge step:
 
 This was intentionally a temporary bridge state, not the final architecture.
 
-### 2G) PrimeNG grid real engine extraction started
-The first real shell/engine split is now in place for PrimeNG grid.
+### 2G) Grid shell/engine split is now in place for all variants
+The grid is no longer using shell-owned table markup for any variant. Each variant now has its own engine component, while the shell keeps shared product-level behavior.
 
-New library engine component:
-- `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/grid/primeng-grid/prime-grid-engine.component.ts`
-
-Current structure now is:
+Current structure:
 - `br-grid`
-- `br-prime-grid`
+- variant wrapper (`br-custom-grid`, `br-material-grid`, `br-canvas-grid`, `br-prime-grid`)
 - `br-grid-shell`
-- `br-prime-grid-engine`
-- `p-table` (PrimeNG component from `TableModule`)
+- variant-specific engine
 
-What moved out of the shell:
-- PrimeNG table markup
-- PrimeNG row template
-- PrimeNG row-level DOM events
-- PrimeNG table-specific styling
+Engine files:
+- custom:
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/grid/custom/engine/custom-grid-engine.component.ts`
+- material:
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/grid/material/engine/material-grid-engine.component.ts`
+- canvas:
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/grid/canvas/engine/canvas-grid-engine.component.ts`
+- primeng:
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/grid/primeng-grid/engine/prime-grid-engine.component.ts`
 
 What remains in the shell:
 - title/header
@@ -236,28 +236,95 @@ What remains in the shell:
 - search
 - settings / columns panel
 - selection bar
-- pagination framing
+- pagination placement
 - sort/filter/columns overlays
 - context-menu orchestration
 
-Important refinement done after extraction:
-- shell no longer uses PrimeNG-specific handler names
-- shell bridge methods were renamed to engine-neutral names:
+What moved into engines:
+- table body rendering
+- row templates
+- row selection DOM
+- engine-specific table markup
+- engine-specific styling
+
+Boundary normalization already done:
+- shell uses generic engine bridge methods:
   - `onEngineSelectAllChange`
   - `onEngineRowSelectionChange`
   - `onEngineRowContextMenu`
   - `onEngineRowMenuClick`
-- PrimeNG engine outputs were renamed to the same neutral boundary style:
+- engines emit the matching generic outputs:
   - `engineSelectAllChange`
   - `engineRowSelectionChange`
   - `engineRowContextMenu`
   - `engineRowMenuClick`
 
-This is important because Material should reuse the same boundary pattern next.
+Additional important note:
+- `material` grid is now a real Material table engine (`mat-table`), not only a Material-styled shell variant.
 
-Validation of this extraction:
-- library build passed
-- library refreshed into app through `yalc`
+### 2H) Grid rich cell contract is implemented
+Built-in rich cell types now render in the library engines:
+- `text`
+- `link`
+- `badge`
+- `icon`
+- `button`
+- `button-group`
+- `dropdown`
+- `dropdown-action`
+- `route-link`
+- `custom-template`
+
+Supporting files:
+- `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/grid/engine/grid-cell-render.utils.ts`
+- `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/grid/engine/_grid-rich-cell-styles.scss`
+
+Consumer guidance:
+- plain text remains the default when `type` is omitted
+- richer cell behavior uses `type` + `cellConfig`
+- business logic stays in the consumer through one `BrGridActionEvent` handler
+
+### 2I) Grid template override support is implemented
+The library now supports cell-level template overrides as a controlled escape hatch on top of the config-driven grid.
+
+Directive:
+- `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/components/br-grid/br-grid-cell-template.directive.ts`
+
+Consumer shape:
+```html
+<br-grid [config]="gridConfig" (action)="onGridAction($event)">
+  <ng-template brGridCell="hrStatus" let-row let-value="value" let-meta="meta">
+    ...
+  </ng-template>
+</br-grid>
+```
+
+Intent:
+- grid still renders from config
+- only the named cell/field is overridden
+- row/table/shell are not opened for arbitrary override
+
+### 2J) Grid native paginator adoption started
+Pagination is now mixed by variant:
+- `CUSTOM` and `CANVAS` still use shell pagination
+- `MATERIAL` uses native Material paginator within the shell footer area
+- `PRIMENG` uses native PrimeNG paginator within the shell footer area
+
+This is not the final paginator polish state, but it is the current structural direction.
+
+### 2K) Grid docs were expanded for real consumer use
+`br-grid` docs now cover:
+- plain columns
+- rich cell types
+- row/cell feedback via meta state
+- template overrides
+- one consumer-side action handler pattern
+
+Files updated in app docs:
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/docs/docs.component.ts`
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/docs/03-consumer-integration-guide.md`
+
+Live grid previews were added to the docs so code and output can be compared directly.
 - app restarted cleanly
 - PrimeNG grid continued to work in the app with shell parity
 
