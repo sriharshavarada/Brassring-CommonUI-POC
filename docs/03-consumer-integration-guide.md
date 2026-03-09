@@ -58,7 +58,7 @@ Do not import:
   - normalize through adapter if needed
   - call `BrandingRuntimeService.setBranding(...)`
   - call `BrandingRuntimeService.setMode('light' | 'dark')`
-- Branded controls such as `br-text` and `br-text-area` read the current runtime branding automatically.
+- Branded controls such as `br-text`, `br-text-area`, `br-grid`, `br-modal`, and future branded controls read the current runtime branding automatically.
 
 Example:
 ```ts
@@ -77,6 +77,103 @@ initializeBranding(): void {
 - Put behavior options in config (`features`, actions, sorting/filter defaults).
 - Optional visual tuning with `uiConfig`.
 
+### Grid usage model
+
+#### Plain columns first
+- For normal text columns, keep config simple.
+- You usually only need:
+  - `field`
+  - `header`
+  - `sortable`
+  - `filterable`
+- Do not specify `type` unless the cell is richer than plain text.
+
+Example:
+```ts
+gridConfig: BrGridConfig = {
+  title: 'Users',
+  columns: [
+    { field: 'id', header: 'ID', sortable: true },
+    { field: 'name', header: 'Name', sortable: true },
+    { field: 'status', header: 'Status', sortable: true }
+  ],
+  data: [
+    { id: 'U-101', name: 'Alex Ross', status: 'Active' }
+  ],
+  pagination: true,
+  pageSize: 10
+};
+```
+
+What you will see:
+- A normal grid with plain text cells for ID, Name, and Status.
+
+What event comes out:
+- Only normal grid events such as sorting, paging, selection, or toolbar actions.
+
+#### Rich cells only where needed
+- Supported rich cell types include:
+  - `link`
+  - `badge`
+  - `icon`
+  - `button`
+  - `button-group`
+  - `dropdown`
+  - `dropdown-action`
+  - `route-link`
+  - `custom-template`
+
+Example:
+```ts
+gridConfig: BrGridConfig = {
+  title: 'Candidate Grid',
+  columns: [
+    { field: 'id', header: 'ID', sortable: true },
+    {
+      field: 'candidateName',
+      header: 'Candidate',
+      type: 'link',
+      cellConfig: {
+        actions: [{ id: 'open-profile', label: 'Open Profile', variant: 'link' }]
+      }
+    },
+    {
+      field: 'status',
+      header: 'Status',
+      type: 'badge',
+      cellConfig: {
+        badgeVariant: 'neutral'
+      }
+    },
+    {
+      field: 'hrStatus',
+      header: 'HR Status',
+      type: 'dropdown-action',
+      cellConfig: {
+        buttonLabel: 'Update',
+        submitActionId: 'update-stage',
+        options: [
+          { label: 'Applied', value: 'Applied' },
+          { label: 'First Interview', value: 'First Interview' },
+          { label: 'Second Interview', value: 'Second Interview' }
+        ]
+      }
+    }
+  ],
+  data: []
+};
+```
+
+What you will see:
+- Candidate name renders as clickable text.
+- Status renders as a badge.
+- HR status renders as dropdown plus Update button.
+
+What event comes out:
+- `cell-action` for clickable cells and inline buttons
+- `cell-value-change` when dropdown value changes
+- `inline-submit` when dropdown-action update is clicked
+
 ## 4. Handle behavior outside the control
 - Do not put business logic inside grid/date components.
 - Handle actions in screen/container/service:
@@ -89,15 +186,67 @@ Example:
 ```ts
 onGridAction(event: BrGridActionEvent): void {
   switch (event.actionId) {
-    case 'edit':
-      // open edit flow
+    case 'open-profile':
+      // open profile
       break;
-    case 'sort-apply':
-      // persist sort criteria
+    case 'update-stage':
+      // call backend and then update grid input state
       break;
   }
 }
 ```
+
+### Send feedback back into the grid with `rowMeta`
+- `data` is business data.
+- `rowMeta` is temporary UI state such as saving, success, error, or helper text.
+
+Example:
+```ts
+this.gridConfig = {
+  ...this.gridConfig,
+  rowMeta: {
+    ...(this.gridConfig.rowMeta || {}),
+    'C-1001': {
+      cells: {
+        hrStatus: {
+          state: 'success',
+          tone: 'success',
+          message: 'Updated to Second Interview'
+        }
+      }
+    }
+  }
+};
+```
+
+What you will see:
+- The cell keeps the real business value from `data`.
+- The UI can additionally show success/error/helper feedback from `rowMeta`.
+
+### Template override is the escape hatch
+- Use built-in cell types first.
+- Use template override only when config is not enough.
+
+Example:
+```html
+<br-grid [config]="gridConfig" (action)="onGridAction($event)">
+  <ng-template brGridCell="hrStatus" let-row let-value="value" let-meta="meta">
+    <div class="custom-stage-cell">
+      <select [ngModel]="value" (ngModelChange)="onStageDraftChange(row, $event)"></select>
+      <button type="button" (click)="saveStage(row)">Update</button>
+      <small *ngIf="meta?.message">{{ meta?.message }}</small>
+    </div>
+  </ng-template>
+</br-grid>
+```
+
+What you will see:
+- The grid still renders from config.
+- Only the `hrStatus` cell is replaced by your custom Angular template.
+
+What event comes out:
+- Your template can call its own handlers directly.
+- The surrounding grid still emits its normal standardized action events.
 
 ## 6. Mode control
 - Central control-level mode config is in:

@@ -72,6 +72,224 @@ Also exposed:
 - Modal: `CUSTOM`, `MATERIAL`
 - Controls (separate wrappers per control): `CUSTOM`, `MATERIAL`
 
+### 2A) PrimeNG work added later by another contributor
+Two later commits introduced PrimeNG as a third implementation family:
+
+- library repo:
+  - `07cc1d4` `Prime Ng Changes`
+- app repo:
+  - `fde3a31` `Prime NG changes`
+
+What those commits added:
+- `PRIMENG` mode added to:
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/config/ui-mode.config.ts`
+- PrimeNG implementation components added in the library repo for:
+  - text
+  - text-area
+  - single-select
+  - multi-select
+  - checkbox
+  - radio
+  - autocomplete
+  - date
+  - grid
+  - modal
+- Wrappers and adapters updated to branch on `PRIMENG`
+- App-side mode/playground UI updated to expose PrimeNG mode options
+
+Important caveat discovered during verification:
+- the committed PrimeNG package versions were `21.x`
+- this workspace is Angular 19
+- PrimeNG 21 is not compatible with Angular 19 build tooling here
+
+Result:
+- committed PrimeNG source changes exist in both repos
+- but the committed dependency versions were not locally buildable on Angular 19 as-is
+
+### 2B) App repo cleanup after that PrimeNG commit
+Later app cleanup commit:
+- app repo:
+  - `e2f6b3c` `Cleanup local artifacts and remove app primeicons`
+
+This commit intentionally removed only the unnecessary app-side friend changes:
+- tracked `.vs/` files
+- tracked `.yalc/` package artifacts
+- `yalc.lock`
+- `poc_build_output.txt`
+- `poc_serve_output.txt`
+- `primeicons` from app `package.json` / `package-lock.json`
+
+What this cleanup did **not** remove:
+- the PrimeNG app wiring itself
+- the app’s local `yalc` library flow
+- the library repo’s PrimeNG source changes
+
+### 2C) Current local-only verification state for PrimeNG
+After the above, local-only compatibility testing was done without publishing any package and without pushing these dependency tweaks.
+
+Local-only changes made to get PrimeNG running on this machine:
+- app repo dependency versions changed locally to:
+  - `primeng@19.1.4`
+  - `@primeng/themes@19.1.4`
+- library repo workspace dependency changed locally to:
+  - `primeng@19.1.4`
+- library repo publishable package peer deps changed locally to:
+  - `primeng@^19.0.0`
+  - `@primeng/themes@^19.0.0`
+
+These PrimeNG 19 adjustments are **local only right now**:
+- not pushed to git
+- not published to GitHub Packages
+
+With those local-only version changes:
+- library repo builds successfully
+- `npm run dev:yalc:push` succeeds
+- app repo builds successfully
+- local app runs successfully with PrimeNG mode at:
+  - `http://localhost:4200/`
+
+### 2D) Grid redesign planning started
+Grid requirements have now outgrown the current implementation shape. A dedicated architecture plan was added here:
+- `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/docs/07-grid-architecture-plan.md`
+
+Phase 1 contract scaffolding has been added locally in the library model file:
+- `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/models/grid-config.model.ts`
+
+Draft types added:
+- `BrGridCellType`
+- `BrGridCellConfig`
+- `BrGridCellActionConfig`
+- `BrGridCellOption`
+- `BrGridQueryState`
+- `BrGridDataResult`
+- `BrGridColumnLayoutState`
+
+Existing types expanded in a backward-compatible way:
+- `BrGridColumn`
+- `BrGridActionEvent`
+- `BrGridConfig`
+
+This is scaffolding only for now. Engine parity work is still pending.
+
+### 2E) Grid scaffolding adopted locally without breaking demos
+After the Phase 1 contract scaffolding was added, the grid adapter and shared shell were updated locally to understand the new model areas without changing current consumer demos.
+
+Library files updated locally:
+- `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/adapters/grid.adapter.ts`
+- `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/grid/shell/grid-shell.component.ts`
+
+What was added to the shell/adapter flow:
+- `dataMode`
+- `queryState`
+- `result`
+- `layoutState`
+
+The shared grid shell now emits additional normalized events:
+- `query-change`
+- `columns-layout-change`
+
+Remote-mode behavior is scaffolded but not yet consumer-integrated:
+- if `dataMode === 'remote'`, shell uses `result.rows` and `result.totalCount`
+- search/sort/filter/page changes emit normalized query state
+
+This step was verified locally as non-breaking:
+- library build passed
+- app still ran successfully after local `yalc` refresh
+
+### 2F) PrimeNG grid first proof: shell parity before full engine split
+PrimeNG grid was first moved from a thin standalone table into the shared shell experience so it could inherit:
+- top toolbar
+- search
+- settings icon / column panel
+- selection bar
+- pagination framing
+- shared context-menu orchestration
+
+At that bridge step:
+- `br-prime-grid` rendered `br-grid-shell`
+- `grid-shell.component.html` contained PrimeNG `p-table` markup directly for the Prime variant
+
+This was intentionally a temporary bridge state, not the final architecture.
+
+### 2G) PrimeNG grid real engine extraction started
+The first real shell/engine split is now in place for PrimeNG grid.
+
+New library engine component:
+- `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/grid/primeng-grid/prime-grid-engine.component.ts`
+
+Current structure now is:
+- `br-grid`
+- `br-prime-grid`
+- `br-grid-shell`
+- `br-prime-grid-engine`
+- `p-table` (PrimeNG component from `TableModule`)
+
+What moved out of the shell:
+- PrimeNG table markup
+- PrimeNG row template
+- PrimeNG row-level DOM events
+- PrimeNG table-specific styling
+
+What remains in the shell:
+- title/header
+- toolbar
+- search
+- settings / columns panel
+- selection bar
+- pagination framing
+- sort/filter/columns overlays
+- context-menu orchestration
+
+Important refinement done after extraction:
+- shell no longer uses PrimeNG-specific handler names
+- shell bridge methods were renamed to engine-neutral names:
+  - `onEngineSelectAllChange`
+  - `onEngineRowSelectionChange`
+  - `onEngineRowContextMenu`
+  - `onEngineRowMenuClick`
+- PrimeNG engine outputs were renamed to the same neutral boundary style:
+  - `engineSelectAllChange`
+  - `engineRowSelectionChange`
+  - `engineRowContextMenu`
+  - `engineRowMenuClick`
+
+This is important because Material should reuse the same boundary pattern next.
+
+Validation of this extraction:
+- library build passed
+- library refreshed into app through `yalc`
+- app restarted cleanly
+- PrimeNG grid continued to work in the app with shell parity
+
+### 2H) Branding status across implementations
+Branding work is much further along locally than the older KT sections imply.
+
+Completed locally in the library:
+- normalized branding contract exists
+- Enterprise and Talent Gateway adapters exist
+- `BrandingRuntimeService` exists
+- branding studio integration exists in the app
+
+Branding coverage status:
+- `CUSTOM`: broadly complete at practical contract level
+- `MATERIAL`: brought to the same semantic token level as custom
+- `PRIMENG`: real branding implementation added for controls, modal, and grid
+
+Important runtime/default work also done locally:
+- default light/dark palettes were tuned for better contrast and professional UX
+- additional branding tokens were added for:
+  - badge colors
+  - danger
+  - overlay
+  - shadow
+  - input/focus semantics
+
+Specific bug fixes already handled locally:
+- dark-mode grid pagination text visibility
+- Enterprise branding sample in Playground had inconsistent light-mode text colors and was corrected
+- Material text/text-area now correctly honor branded typed text color via explicit WebKit text fill handling
+- PrimeNG dark grid row contrast issue was fixed by removing the white row fallback and giving all rows a branded base background
+
 ### 3) Shared advanced grid behavior
 - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/grid/shell/grid-shell.component.ts`
 - Supports:
@@ -795,3 +1013,13 @@ If continuing from here, run `git status --short` first and avoid reverting unre
 
 ## One-line context for next AI prompt
 Use `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/docs/00-project-handoff-so-far.md` as the authoritative handoff; project now has a dedicated `/modes` page for global mode control, local per-playground mode switches, advanced grid shell (custom/material/canvas), popup modal playground, controls wrappers/adapters/implementations, and a large uncommitted Playground/Code Studio UX iteration.
+
+## March 9, 2026 freeze checkpoint
+- Separate library repo:
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper`
+- Library repo pushed commits:
+  - `38edb42` `Stabilize library release with branding, date, and grid contracts`
+  - `1dff902` `Bump library package version to 0.0.3`
+- Published GitHub package:
+  - `@sriharshavarada/br-ui-wrapper@0.0.3`
+- App repo should use the published package version `0.0.3` for freeze/CI/GitHub Pages readiness instead of local `file:.yalc/...`.

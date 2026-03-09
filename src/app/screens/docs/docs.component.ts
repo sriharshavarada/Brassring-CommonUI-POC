@@ -2,15 +2,18 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { BrDateComponent, BrDateConfig, BrGridActionEvent, BrGridCellTemplateDirective, BrGridComponent, BrGridConfig } from '@sriharshavarada/br-ui-wrapper';
 
-type DocGroupId = 'overview' | 'forms' | 'controls' | 'containers';
+type DocGroupId = 'overview' | 'forms' | 'runtime' | 'controls' | 'containers';
 
 type DocBlock =
   | { kind: 'text'; text: string }
   | { kind: 'list'; items: string[] }
   | { kind: 'code'; language: 'html' | 'typescript' | 'json'; code: string }
   | { kind: 'table'; columns: string[]; rows: string[][] }
-  | { kind: 'callout'; title: string; text: string };
+  | { kind: 'callout'; title: string; text: string }
+  | { kind: 'date-preview' }
+  | { kind: 'grid-preview'; preview: 'plain' | 'rich' | 'meta' | 'template' };
 
 interface DocSection {
   id: string;
@@ -41,17 +44,305 @@ interface NavPageNode {
 @Component({
   selector: 'app-docs',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, BrDateComponent, BrGridComponent, BrGridCellTemplateDirective],
   templateUrl: './docs.component.html',
   styleUrls: ['./docs.component.scss'],
 })
 export class DocsComponent {
   readonly repoPath = '/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/docs';
   navSearch = '';
+  docDateValueText = 'No date selected.';
+  docGridEventText: Record<'plain' | 'rich' | 'meta' | 'template', string> = {
+    plain: 'No action yet.',
+    rich: 'No action yet.',
+    meta: 'No action yet.',
+    template: 'No action yet.',
+  };
+  docTemplateDraftByRow: Record<string, string> = {
+    'C-3001': 'First Interview',
+  };
+
+  readonly plainGridPreviewConfig: BrGridConfig = {
+    title: 'Users',
+    columns: [
+      { field: 'id', header: 'ID', sortable: true },
+      { field: 'name', header: 'Name', sortable: true },
+      { field: 'status', header: 'Status', sortable: true },
+    ],
+    data: [
+      { id: 'U-101', name: 'Alex Ross', status: 'Active' },
+    ],
+    pagination: true,
+    pageSize: 10,
+    sorting: true,
+    features: {
+      enableTopBar: false,
+      enableRowSelection: false,
+      enableSelectionActions: false,
+      enableContextMenu: false,
+      enableRowActionButton: false,
+      enableColumnPersonalization: false,
+      enableColumnVisibilityToggle: false,
+      enableColumnReorder: false,
+      enableSorting: true,
+      sortLevels: 1,
+      enableFiltering: false,
+      filterLevels: 1,
+      enableSearch: false,
+      enableRefresh: false,
+      enableShare: false,
+      enableViewMode: false,
+      enablePrimaryAction: false,
+      enablePrimaryActionMenu: false,
+      showPaginationSizeSelector: false,
+      showPaginationSummary: false,
+      showPaginationNavigation: false,
+    },
+  };
+
+  readonly docDatePreviewConfig: BrDateConfig = {
+    id: 'docs-start-date',
+    label: 'Start Date',
+    value: '',
+    locale: 'fr-FR',
+    dateFormat: 'dd-MM-yyyy',
+    dateConfiguration: {
+      Disabledaysofweek: [0, 6],
+      Firstdayofweek: 1,
+      Defaulttodaysdate: true,
+      Mindate: '-1m',
+      Maxdate: '+3m',
+      includeToday: true,
+    },
+  };
+
+  readonly richGridPreviewConfig: BrGridConfig = {
+    title: 'Rich Cells Preview',
+    columns: [
+      { field: 'id', header: 'ID', sortable: true },
+      {
+        field: 'candidateName',
+        header: 'Candidate',
+        type: 'link',
+        cellConfig: {
+          actions: [{ id: 'open-profile', label: 'Open Profile', variant: 'link' }],
+        },
+      },
+      {
+        field: 'status',
+        header: 'Status',
+        type: 'badge',
+        cellConfig: { badgeVariant: 'neutral' },
+      },
+      {
+        field: 'pin',
+        header: 'Pin',
+        type: 'icon',
+        cellConfig: {
+          icon: 'pin',
+          actions: [{ id: 'toggle-pin', label: 'Toggle Pin', icon: 'pin', variant: 'ghost' }],
+        },
+      },
+      {
+        field: 'hrStatus',
+        header: 'HR Status',
+        type: 'dropdown-action',
+        cellConfig: {
+          buttonLabel: 'Update',
+          submitActionId: 'update-stage',
+          options: [
+            { label: 'Applied', value: 'Applied' },
+            { label: 'First Interview', value: 'First Interview' },
+            { label: 'Second Interview', value: 'Second Interview' },
+          ],
+        },
+      },
+      {
+        field: 'team',
+        header: 'Team',
+        type: 'route-link',
+        cellConfig: {
+          route: '/users',
+        },
+      },
+      {
+        field: 'actions',
+        header: 'Actions',
+        type: 'button-group',
+        cellConfig: {
+          actions: [
+            { id: 'edit-user', label: 'Edit', variant: 'secondary' },
+            { id: 'delete-user', label: 'Delete', variant: 'danger' },
+          ],
+        },
+      },
+    ],
+    data: [
+      {
+        id: 'C-1001',
+        candidateName: 'Anya Ross',
+        status: 'Active',
+        pin: 'pin',
+        hrStatus: 'First Interview',
+        team: 'Platform',
+        actions: '',
+      },
+    ],
+    pagination: false,
+    sorting: true,
+    features: {
+      enableTopBar: false,
+      enableRowSelection: false,
+      enableSelectionActions: false,
+      enableContextMenu: false,
+      enableRowActionButton: false,
+      enableColumnPersonalization: false,
+      enableColumnVisibilityToggle: false,
+      enableColumnReorder: false,
+      enableSorting: true,
+      sortLevels: 1,
+      enableFiltering: false,
+      filterLevels: 1,
+      enableSearch: false,
+      enableRefresh: false,
+      enableShare: false,
+      enableViewMode: false,
+      enablePrimaryAction: false,
+      enablePrimaryActionMenu: false,
+      showPaginationSizeSelector: false,
+      showPaginationSummary: false,
+      showPaginationNavigation: false,
+    },
+  };
+
+  readonly metaGridPreviewConfig: BrGridConfig = {
+    title: 'rowMeta Feedback Preview',
+    columns: [
+      { field: 'id', header: 'ID' },
+      { field: 'candidateName', header: 'Candidate' },
+      {
+        field: 'hrStatus',
+        header: 'HR Status',
+        type: 'dropdown-action',
+        cellConfig: {
+          buttonLabel: 'Update',
+          submitActionId: 'update-stage',
+          options: [
+            { label: 'Applied', value: 'Applied' },
+            { label: 'First Interview', value: 'First Interview' },
+            { label: 'Second Interview', value: 'Second Interview' },
+          ],
+        },
+      },
+    ],
+    data: [
+      {
+        id: 'C-2101',
+        candidateName: 'Ravi Singh',
+        hrStatus: 'Second Interview',
+      },
+    ],
+    rowMeta: {
+      'C-2101': {
+        cells: {
+          hrStatus: {
+            state: 'success',
+            tone: 'success',
+            message: 'Updated to Second Interview',
+          },
+        },
+      },
+    },
+    pagination: false,
+    sorting: false,
+    features: {
+      enableTopBar: false,
+      enableRowSelection: false,
+      enableSelectionActions: false,
+      enableContextMenu: false,
+      enableRowActionButton: false,
+      enableColumnPersonalization: false,
+      enableColumnVisibilityToggle: false,
+      enableColumnReorder: false,
+      enableSorting: false,
+      sortLevels: 1,
+      enableFiltering: false,
+      filterLevels: 1,
+      enableSearch: false,
+      enableRefresh: false,
+      enableShare: false,
+      enableViewMode: false,
+      enablePrimaryAction: false,
+      enablePrimaryActionMenu: false,
+      showPaginationSizeSelector: false,
+      showPaginationSummary: false,
+      showPaginationNavigation: false,
+    },
+  };
+
+  readonly templateGridPreviewConfig: BrGridConfig = {
+    title: 'Template Override Preview',
+    columns: [
+      { field: 'id', header: 'ID' },
+      { field: 'candidateName', header: 'Candidate' },
+      {
+        field: 'hrStatus',
+        header: 'HR Status',
+        type: 'custom-template',
+        cellConfig: {
+          emptyText: 'Custom template expected',
+        },
+      },
+    ],
+    data: [
+      {
+        id: 'C-3001',
+        candidateName: 'Mia Chen',
+        hrStatus: 'First Interview',
+      },
+    ],
+    rowMeta: {
+      'C-3001': {
+        cells: {
+          hrStatus: {
+            state: 'idle',
+            message: 'No update yet',
+            tone: 'neutral',
+          },
+        },
+      },
+    },
+    pagination: false,
+    sorting: false,
+    features: {
+      enableTopBar: false,
+      enableRowSelection: false,
+      enableSelectionActions: false,
+      enableContextMenu: false,
+      enableRowActionButton: false,
+      enableColumnPersonalization: false,
+      enableColumnVisibilityToggle: false,
+      enableColumnReorder: false,
+      enableSorting: false,
+      sortLevels: 1,
+      enableFiltering: false,
+      filterLevels: 1,
+      enableSearch: false,
+      enableRefresh: false,
+      enableShare: false,
+      enableViewMode: false,
+      enablePrimaryAction: false,
+      enablePrimaryActionMenu: false,
+      showPaginationSizeSelector: false,
+      showPaginationSummary: false,
+      showPaginationNavigation: false,
+    },
+  };
 
   readonly groups: DocGroup[] = [
     { id: 'overview', label: 'Overview' },
     { id: 'forms', label: 'Forms and Events' },
+    { id: 'runtime', label: 'Runtime and Branding' },
     { id: 'controls', label: 'Form Controls' },
     { id: 'containers', label: 'Containers' },
   ];
@@ -438,10 +729,9 @@ readValues(): void {
         },
       ],
     },
+    this.runtimeBrandingPage(),
     this.controlPage('br-text', 'Text Box', 'string', true, true, false),
-    this.brandingReferencePage('br-text', 'Text Box', false, 1.1),
     this.controlPage('br-text-area', 'Text Area', 'string', true, true, false, false, true),
-    this.brandingReferencePage('br-text-area', 'Text Area', true, 1.2),
     this.controlPage('br-date', 'Date', 'string | Date | null', true, true, false, true),
     {
       slug: 'br-date-configuration',
@@ -562,6 +852,9 @@ readValues(): void {
               language: 'html',
               code: `<br-date\n  [config]=\"dateConfig\"\n  (dateChange)=\"onDateChange($event)\"\n  (controlEvent)=\"onDateEvent($event)\">\n</br-date>`,
             },
+            {
+              kind: 'date-preview',
+            },
           ],
         },
       ],
@@ -574,7 +867,7 @@ readValues(): void {
     {
       slug: 'br-grid',
       title: 'br-grid',
-      summary: 'Grid container wrapper (action-driven).',
+      summary: 'Grid container wrapper with plain columns, rich cells, actions, paging, and controlled template overrides.',
       group: 'containers',
       order: 1,
       sections: [
@@ -588,6 +881,7 @@ readValues(): void {
                 'Need rich tabular UI with common interaction model.',
                 'Need ability to switch rendering library without screen rewrite.',
                 'Need action events for toolbar, rows, selection, pagination.',
+                'Need simple text columns for most fields but richer cells only where required.',
               ],
             },
           ],
@@ -602,6 +896,10 @@ readValues(): void {
               rows: [
                 ['config', 'Grid structure and behavior object passed from consumer.'],
                 ['action event', 'User intent signal emitted from grid wrapper.'],
+                ['plain column', 'A normal text column. You usually pass only field, header, sortable, filterable.'],
+                ['rich cell', 'A column that renders as link, badge, icon, button, dropdown, route link, or button group.'],
+                ['rowMeta', 'Consumer-controlled UI feedback state for rows/cells such as saving, success, or error.'],
+                ['template override', 'Optional Angular template for one specific cell/field when config is not enough.'],
                 ['selection action', 'Action on selected rows.'],
                 ['toolbar action', 'Action triggered from top controls (search/sort/filter/etc.).'],
               ],
@@ -609,29 +907,342 @@ readValues(): void {
           ],
         },
         {
-          id: 'consumer-example',
-          title: 'Consumer Example',
+          id: 'import-and-setup',
+          title: 'Import and Setup',
           blocks: [
             {
               kind: 'code',
               language: 'typescript',
-              code: `import { BrGridActionEvent, BrGridConfig } from '@sriharshavarada/br-ui-wrapper';
+              code: `import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
+import { BrGridComponent, BrGridActionEvent, BrGridConfig } from '@sriharshavarada/br-ui-wrapper';
 
-gridConfig: BrGridConfig = {
-  title: 'Users',
-  columns: [
-    { field: 'id', header: 'ID' },
-    { field: 'name', header: 'Name' }
-  ],
-  data: [{ id: 1, name: 'Alex' }],
-  pagination: true,
-  pageSize: 10
-};
+@Component({
+  standalone: true,
+  imports: [CommonModule, BrGridComponent],
+  templateUrl: './your-screen.component.html',
+})
+export class YourScreenComponent {
+  gridConfig: BrGridConfig = {
+    columns: [],
+    data: [],
+  };
 
-onGridAction(event: BrGridActionEvent): void {
-  console.log(event.source, event.actionId, event.selectedRows);
+  onGridAction(event: BrGridActionEvent): void {
+    console.log(event);
+  }
 }`,
             },
+          ],
+        },
+        {
+          id: 'plain-columns-first',
+          title: 'Start With Plain Columns',
+          blocks: [
+            {
+              kind: 'callout',
+              title: 'Default rule',
+              text: 'Do not specify `type` for simple text columns. Plain text is the default. Only use `type` and `cellConfig` when a cell is richer than normal text.',
+            },
+            {
+              kind: 'code',
+              language: 'typescript',
+              code: `gridConfig: BrGridConfig = {
+  title: 'Users',
+  columns: [
+    { field: 'id', header: 'ID', sortable: true },
+    { field: 'name', header: 'Name', sortable: true },
+    { field: 'status', header: 'Status', sortable: true }
+  ],
+  data: [
+    { id: 'U-101', name: 'Alex Ross', status: 'Active' }
+  ],
+  pagination: true,
+  pageSize: 10
+};`,
+            },
+            {
+              kind: 'code',
+              language: 'html',
+              code: `<br-grid [config]="gridConfig" (action)="onGridAction($event)"></br-grid>`,
+            },
+            {
+              kind: 'grid-preview',
+              preview: 'plain',
+            },
+          ],
+        },
+        {
+          id: 'rich-cell-types',
+          title: 'Rich Cell Types (Use Only Where Needed)',
+          blocks: [
+            {
+              kind: 'table',
+              columns: ['Cell type', 'Typical use'],
+              rows: [
+                ['link', 'Clickable text that emits an action event.'],
+                ['badge', 'Status pill such as Active, Pending, Inactive.'],
+                ['icon', 'Pin, delete, star, or lightweight icon action.'],
+                ['button', 'Single inline button in a cell.'],
+                ['button-group', 'Multiple inline actions like Edit/Delete/Remind.'],
+                ['dropdown', 'Editable select-only cell.'],
+                ['dropdown-action', 'Editable select plus an explicit Update button.'],
+                ['route-link', 'Text that emits navigation intent.'],
+                ['custom-template', 'Use only when config-driven cell types are not enough.'],
+              ],
+            },
+            {
+              kind: 'code',
+              language: 'typescript',
+              code: `gridConfig: BrGridConfig = {
+  title: 'Candidate Grid',
+  columns: [
+    { field: 'id', header: 'ID', sortable: true },
+    {
+      field: 'candidateName',
+      header: 'Candidate',
+      type: 'link',
+      cellConfig: {
+        actions: [{ id: 'open-profile', label: 'Open Profile', variant: 'link' }]
+      }
+    },
+    {
+      field: 'status',
+      header: 'Status',
+      type: 'badge',
+      cellConfig: {
+        badgeVariant: 'neutral'
+      }
+    },
+    {
+      field: 'pin',
+      header: 'Pin',
+      type: 'icon',
+      cellConfig: {
+        icon: 'pin',
+        actions: [{ id: 'toggle-pin', label: 'Toggle Pin', icon: 'pin', variant: 'ghost' }]
+      }
+    },
+    {
+      field: 'hrStatus',
+      header: 'HR Status',
+      type: 'dropdown-action',
+      cellConfig: {
+        buttonLabel: 'Update',
+        submitActionId: 'update-stage',
+        options: [
+          { label: 'Applied', value: 'Applied' },
+          { label: 'First Interview', value: 'First Interview' },
+          { label: 'Second Interview', value: 'Second Interview' }
+        ]
+      }
+    },
+    {
+      field: 'team',
+      header: 'Team',
+      type: 'route-link',
+      cellConfig: {
+        route: '/users'
+      }
+    },
+    {
+      field: 'actions',
+      header: 'Actions',
+      type: 'button-group',
+      cellConfig: {
+        actions: [
+          { id: 'edit-user', label: 'Edit', variant: 'secondary' },
+          { id: 'delete-user', label: 'Delete', variant: 'danger' }
+        ]
+      }
+    }
+  ],
+  data: [
+    {
+      id: 'C-1001',
+      candidateName: 'Anya Ross',
+      status: 'Active',
+      pin: 'pin',
+      hrStatus: 'First Interview',
+      team: 'Platform',
+      actions: ''
+    }
+  ]
+};`,
+            },
+            {
+              kind: 'grid-preview',
+              preview: 'rich',
+            },
+            {
+              kind: 'callout',
+              title: 'What you will see',
+              text: 'Candidate name renders as clickable text, status renders as a badge, pin renders as an icon action, HR status renders as dropdown plus Update button, and Actions renders as multiple inline buttons.',
+            },
+            {
+              kind: 'callout',
+              title: 'What event comes out',
+              text: 'The grid still emits one standard `BrGridActionEvent`. For example: link/icon/button clicks emit `cell-action`, dropdown changes emit `cell-value-change`, and dropdown-action submit emits `inline-submit`.',
+            },
+          ],
+        },
+        {
+          id: 'single-handler-pattern',
+          title: 'Use One Grid Handler in the Consumer',
+          blocks: [
+            {
+              kind: 'code',
+              language: 'typescript',
+              code: `onGridAction(event: BrGridActionEvent): void {
+  switch (event.actionId) {
+    case 'open-profile':
+      this.openProfile(event.row);
+      break;
+    case 'toggle-pin':
+      this.togglePin(event.row);
+      break;
+    case 'update-stage':
+      this.updateCandidateStage(event.rowId, event.value, event.previousValue);
+      break;
+    case 'edit-user':
+      this.editUser(event.row);
+      break;
+    case 'delete-user':
+      this.deleteUser(event.rowId);
+      break;
+    default:
+      console.log('Grid action:', event);
+  }
+}`,
+            },
+            {
+              kind: 'callout',
+              title: 'Keep logic in the consumer',
+              text: 'Do not pass real method references through grid JSON. Put stable action ids in config, let the grid emit intent, and let the consumer switch on `actionId` and call services or router methods.',
+            },
+          ],
+        },
+        {
+          id: 'feedback-back-into-grid',
+          title: 'Send Feedback Back Into the Grid With rowMeta',
+          blocks: [
+            {
+              kind: 'text',
+              text: 'After an inline action succeeds or fails, the consumer should update grid input state. Business data goes in `data`. Temporary UI feedback such as saving/success/error goes in `rowMeta`.',
+            },
+            {
+              kind: 'code',
+              language: 'typescript',
+              code: `gridConfig = {
+  ...this.gridConfig,
+  rowMeta: {
+    ...(this.gridConfig.rowMeta || {}),
+    'C-1001': {
+      cells: {
+        hrStatus: {
+          state: 'success',
+          tone: 'success',
+          message: 'Updated to Second Interview'
+        }
+      }
+    }
+  }
+};`,
+            },
+            {
+              kind: 'callout',
+              title: 'Data vs meta',
+              text: '`data` is the real business row value. `rowMeta` is temporary UI state such as saving, success, error, disabled, or helper message.',
+            },
+            {
+              kind: 'grid-preview',
+              preview: 'meta',
+            },
+            {
+              kind: 'callout',
+              title: 'What you will see',
+              text: 'The cell keeps its real value from `data`, but the UI can additionally show helper text, success state, warning state, or error message based on `rowMeta`.',
+            },
+            {
+              kind: 'callout',
+              title: 'What event comes out',
+              text: 'The grid does not emit a special “meta updated” event. The consumer updates `rowMeta`, and the grid re-renders from the new input state.',
+            },
+          ],
+        },
+        {
+          id: 'server-side-grid-model',
+          title: 'Server-Side Sorting, Filtering, and Paging',
+          blocks: [
+            {
+              kind: 'text',
+              text: 'Keep server calls outside the grid. The grid should emit query intent; the consumer should call the backend and then pass updated rows/total count back into `BrGridConfig`.',
+            },
+            {
+              kind: 'code',
+              language: 'typescript',
+              code: `onGridAction(event: BrGridActionEvent): void {
+  if (event.source === 'query-change' && event.query) {
+    this.loadUsers(event.query);
+  }
+}
+
+loadUsers(query: BrGridQueryState): void {
+  // call backend here, then update gridConfig.result or gridConfig.data
+}`,
+            },
+          ],
+        },
+        {
+          id: 'template-override',
+          title: 'Template Override (Only When Config Is Not Enough)',
+          blocks: [
+            {
+              kind: 'callout',
+              title: 'Use this sparingly',
+              text: 'First try built-in cell types. Use template override only for a very custom cell. The grid still renders from config; the template only overrides one field/cell.',
+            },
+            {
+              kind: 'code',
+              language: 'html',
+              code: `<br-grid [config]="gridConfig" (action)="onGridAction($event)">
+  <ng-template brGridCell="hrStatus" let-row let-value="value" let-column="column" let-meta="meta">
+    <div class="custom-stage-cell">
+      <select [ngModel]="value" (ngModelChange)="onStageDraftChange(row, $event)">
+        <option>Applied</option>
+        <option>First Interview</option>
+        <option>Second Interview</option>
+      </select>
+      <button type="button" (click)="saveStage(row)">Update</button>
+      <small *ngIf="meta?.message">{{ meta?.message }}</small>
+    </div>
+  </ng-template>
+</br-grid>`,
+            },
+            {
+              kind: 'text',
+              text: 'In that template, `row` is the full row object, `value` is the current cell value, `column` is the column definition, and `meta` is the optional row/cell feedback state for that cell.',
+            },
+            {
+              kind: 'grid-preview',
+              preview: 'template',
+            },
+            {
+              kind: 'callout',
+              title: 'What you will see',
+              text: 'The grid still renders normally, but the `hrStatus` cell uses your custom Angular template instead of the built-in cell renderer.',
+            },
+            {
+              kind: 'callout',
+              title: 'What event comes out',
+              text: 'Anything inside the template is your consumer code. You can still call your own handlers there, and the surrounding grid continues to emit its normal standardized action events.',
+            },
+          ],
+        },
+        {
+          id: 'consumer-example',
+          title: 'Minimal Consumer Example',
+          blocks: [
             {
               kind: 'code',
               language: 'html',
@@ -646,9 +1257,11 @@ onGridAction(event: BrGridActionEvent): void {
             {
               kind: 'list',
               items: [
-                'Treat emitted actions as user intent; map intent to screen service calls.',
-                'Keep server-side query/pagination/filter logic outside wrapper.',
-                'Use one canonical config builder per screen for maintainability.',
+                'Keep simple text columns simple. Do not add `type` unless the cell is richer than text.',
+                'Treat emitted actions as user intent; map intent to consumer service/API/router calls.',
+                'Use `rowMeta` for temporary UI feedback after inline actions.',
+                'Keep server-side query logic outside the wrapper.',
+                'Use template override only for specific cells, not as the default grid approach.',
               ],
             },
           ],
@@ -785,6 +1398,57 @@ onModalClose(): void {
 
   clearNavSearch(): void {
     this.navSearch = '';
+  }
+
+  getDocGridConfig(preview: 'plain' | 'rich' | 'meta' | 'template'): BrGridConfig {
+    switch (preview) {
+      case 'plain':
+        return this.plainGridPreviewConfig;
+      case 'rich':
+        return this.richGridPreviewConfig;
+      case 'meta':
+        return this.metaGridPreviewConfig;
+      default:
+        return this.templateGridPreviewConfig;
+    }
+  }
+
+  onDocGridAction(preview: 'plain' | 'rich' | 'meta' | 'template', event: BrGridActionEvent): void {
+    this.docGridEventText[preview] = `${event.source} -> ${event.actionId}${event.field ? ` (${event.field})` : ''}`;
+  }
+
+  onDocDateChange(value: string | Date | null): void {
+    this.docDateValueText = value ? String(value) : 'No date selected.';
+  }
+
+  onDocTemplateStageDraftChange(rowId: string, value: string): void {
+    this.docTemplateDraftByRow = {
+      ...this.docTemplateDraftByRow,
+      [rowId]: value,
+    };
+  }
+
+  saveDocTemplateStage(row: any): void {
+    const rowId = String(row.id);
+    const nextValue = this.docTemplateDraftByRow[rowId] || row.hrStatus;
+    this.templateGridPreviewConfig.data = this.templateGridPreviewConfig.data.map((candidate) =>
+      String(candidate.id) === rowId ? { ...candidate, hrStatus: nextValue } : candidate,
+    );
+    this.templateGridPreviewConfig.rowMeta = {
+      ...(this.templateGridPreviewConfig.rowMeta || {}),
+      [rowId]: {
+        ...((this.templateGridPreviewConfig.rowMeta || {})[rowId] || {}),
+        cells: {
+          ...(((this.templateGridPreviewConfig.rowMeta || {})[rowId] || {}).cells || {}),
+          hrStatus: {
+            state: 'success',
+            tone: 'success',
+            message: `Template saved: ${nextValue}`,
+          },
+        },
+      },
+    };
+    this.docGridEventText.template = `template-save -> hrStatus (${rowId})`;
   }
 
   private controlPage(
@@ -1006,20 +1670,13 @@ export class YourScreenComponent {
     };
   }
 
-  private brandingReferencePage(parentSlug: 'br-text' | 'br-text-area', label: string, isTextArea: boolean, order: number): DocPage {
-    const wrapper = parentSlug === 'br-text' ? 'BrTextComponent' : 'BrTextAreaComponent';
-    const configType = parentSlug === 'br-text' ? 'BrTextConfig' : 'BrTextAreaConfig';
-    const controlTag = parentSlug;
-    const textAreaConfig = isTextArea ? `\n  rows: 5,\n  maxLength: 500,` : '';
-    const textAreaInputs = isTextArea ? `\n  [rows]="5"\n  [maxLength]="500"` : '';
-
+  private runtimeBrandingPage(): DocPage {
     return {
-      slug: `${parentSlug}-branding-reference`,
-      title: `${parentSlug} branding reference`,
-      summary: `${label} branding integration using Enterprise or Talent Gateway adapters and the runtime branding service.`,
-      group: 'controls',
-      order,
-      parentSlug,
+      slug: 'runtime-branding',
+      title: 'runtime branding',
+      summary: 'App-level branding, light/dark mode, and team adapter flow for the library.',
+      group: 'runtime',
+      order: 0.9,
       sections: [
         {
           id: 'overview',
@@ -1027,35 +1684,34 @@ export class YourScreenComponent {
           blocks: [
             {
               kind: 'text',
-              text: `${parentSlug} supports runtime branding through @sriharshavarada/br-ui-wrapper. Consumers normalize team-specific branding payloads through an adapter, then set the result on BrandingRuntimeService.`,
+              text: 'Branding is a runtime library concern, not a per-control config. You set branding once through BrandingRuntimeService, and branded controls such as text, text area, grid, modal, and future controls read that runtime state automatically.',
             },
             {
               kind: 'callout',
               title: 'Recommended flow',
-              text: 'Raw team branding -> library adapter -> BrBrandingConfig -> BrandingRuntimeService.setBranding(...) -> setMode(light/dark).',
+              text: 'Raw team branding -> optional library adapter -> BrBrandingConfig -> BrandingRuntimeService.setBranding(...) -> BrandingRuntimeService.setMode(light/dark).',
             },
             {
               kind: 'callout',
               title: 'Important scope',
-              text: 'Branding and light/dark mode are not passed through individual control configs. They are app-level runtime settings. Once you update BrandingRuntimeService, all branded controls in the current runtime instance use the latest values.',
+              text: 'Do not pass branding through individual control config objects. Branding and light/dark mode are app-level runtime settings.',
             },
           ],
         },
         {
-          id: 'api-pieces',
+          id: 'imports',
           title: 'Imports You Need',
           blocks: [
             {
               kind: 'code',
               language: 'typescript',
               code: `import {
-  ${wrapper},
-  ${configType},
   BrandingRuntimeService,
   EnterpriseBrandingAdapter,
   EnterpriseBrandingPayload,
   TalentGatewayBrandingAdapter,
   TalentGatewayBrandingPayload,
+  BrBrandingConfig,
   BrBrandingMode
 } from '@sriharshavarada/br-ui-wrapper';`,
             },
@@ -1068,27 +1724,21 @@ export class YourScreenComponent {
             {
               kind: 'code',
               language: 'typescript',
-              code: `${parentSlug === 'br-text' ? 'textConfig' : 'textAreaConfig'}: ${configType} = {
-  id: 'branding-demo',
-  label: '${label}',
-  value: ''${textAreaConfig}
-};
-
-enterpriseBranding: EnterpriseBrandingPayload = {
-  baseFontColor: '#f4f4f4',
+              code: `enterpriseBranding: EnterpriseBrandingPayload = {
+  baseFontColor: '#1f2937',
   baseFontSize: '14px',
-  titleFontColor: '#f4f4f4',
+  titleFontColor: '#0f172a',
   fontFamily: 'Tahoma',
   primaryButtonColor: '#0f62fe',
-  primaryButtonHoverColor: '#393939',
+  primaryButtonHoverColor: '#0b4acc',
   secondaryButtonColor: '#393939',
   secondaryButtonHoverColor: '#4c4c4c',
-  primaryButtonTextColor: '#fff',
-  secondaryButtonTextColor: '#fff',
-  linkColor: '#f4f4f4',
-  labelFontColor: '#f4f4f4',
+  primaryButtonTextColor: '#ffffff',
+  secondaryButtonTextColor: '#ffffff',
+  linkColor: '#0f62fe',
+  labelFontColor: '#334155',
   foreGroundColor: '#008571',
-  backgroundColor: '#fff',
+  backgroundColor: '#ffffff',
   sectionBackgroundColor: '#f0f2f4'
 };
 
@@ -1101,14 +1751,12 @@ applyEnterpriseBranding(): void {
     EnterpriseBrandingAdapter.toBrBrandingConfig(this.enterpriseBranding)
   );
   this.brandingRuntimeService.setMode(this.brandingMode);
-}
-
-onValueChange(value: string): void {
-  ${parentSlug === 'br-text' ? 'this.textConfig' : 'this.textAreaConfig'} = {
-    ...${parentSlug === 'br-text' ? 'this.textConfig' : 'this.textAreaConfig'},
-    value,
-  };
 }`,
+            },
+            {
+              kind: 'callout',
+              title: 'What you will see',
+              text: 'Branded controls switch to the Enterprise palette without changing individual control configs.',
             },
           ],
         },
@@ -1119,13 +1767,7 @@ onValueChange(value: string): void {
             {
               kind: 'code',
               language: 'typescript',
-              code: `${parentSlug === 'br-text' ? 'textConfig' : 'textAreaConfig'}: ${configType} = {
-  id: 'branding-demo',
-  label: '${label}',
-  value: ''${textAreaConfig}
-};
-
-talentGatewayBranding: TalentGatewayBrandingPayload = {
+              code: `talentGatewayBranding: TalentGatewayBrandingPayload = {
   Responsive_BackgroundColor: '#ffffff',
   Responsive_BackgroundImage: 'https://sstagingjobs.brassring.com/img/26679/Thompson-External-careersite.png',
   Responsive_BaseFontColor: '#000000',
@@ -1139,38 +1781,72 @@ applyTalentGatewayBranding(): void {
     TalentGatewayBrandingAdapter.toBrBrandingConfig(this.talentGatewayBranding)
   );
   this.brandingRuntimeService.setMode(this.brandingMode);
-}
+}`,
+            },
+          ],
+        },
+        {
+          id: 'direct-library-branding',
+          title: 'Direct Library Branding',
+          blocks: [
+            {
+              kind: 'code',
+              language: 'typescript',
+              code: `libraryBranding: BrBrandingConfig = {
+  fontFamily: 'Lato, sans-serif',
+  light: {
+    baseFontColor: '#111827',
+    labelFontColor: '#334155',
+    focusColor: '#2563eb',
+    primaryButtonColor: '#2563eb',
+    primaryButtonTextColor: '#ffffff'
+  },
+  dark: {
+    baseFontColor: '#f8fafc',
+    labelFontColor: '#cbd5e1',
+    focusColor: '#5eead4',
+    primaryButtonColor: '#0f766e',
+    primaryButtonTextColor: '#ffffff'
+  }
+};
 
-setBrandingMode(mode: BrBrandingMode): void {
-  this.brandingMode = mode;
-  this.brandingRuntimeService.setMode(mode);
-}
-
-onValueChange(value: string): void {
-  ${parentSlug === 'br-text' ? 'this.textConfig' : 'this.textAreaConfig'} = {
-    ...${parentSlug === 'br-text' ? 'this.textConfig' : 'this.textAreaConfig'},
-    value,
-  };
+applyLibraryBranding(): void {
+  this.brandingRuntimeService.setBranding(this.libraryBranding);
+  this.brandingRuntimeService.setMode(this.brandingMode);
 }`,
             },
           ],
         },
         {
           id: 'consumer-usage',
-          title: 'Consumer Usage',
+          title: 'Recommended Consumer Usage',
           blocks: [
             {
               kind: 'code',
-              language: 'html',
-              code: `<${controlTag}
-  [config]="${parentSlug === 'br-text' ? 'textConfig' : 'textAreaConfig'}"${textAreaInputs}
-  (valueChange)="onValueChange($event)">
-</${controlTag}>
+              language: 'typescript',
+              code: `constructor(private readonly brandingRuntimeService: BrandingRuntimeService) {}
 
+ngOnInit(): void {
+  this.brandingRuntimeService.setBranding(
+    EnterpriseBrandingAdapter.toBrBrandingConfig(this.enterpriseBranding)
+  );
+  this.brandingRuntimeService.setMode('light');
+}`,
+            },
+            {
+              kind: 'callout',
+              title: 'Typical real usage',
+              text: 'Apply branding when the page, shell, or app initializes. This is the normal production path. End users should not usually click buttons to switch branding sources.',
+            },
+            {
+              kind: 'code',
+              language: 'html',
+              code: `<!-- Demo-only pattern for docs or playground -->
 <button type="button" (click)="applyEnterpriseBranding()">Enterprise</button>
 <button type="button" (click)="applyTalentGatewayBranding()">Talent Gateway</button>
-<button type="button" (click)="setBrandingMode('light')">Light</button>
-<button type="button" (click)="setBrandingMode('dark')">Dark</button>`,
+<button type="button" (click)="applyLibraryBranding()">Library Branding</button>
+<button type="button" (click)="brandingRuntimeService.setMode('light')">Light</button>
+<button type="button" (click)="brandingRuntimeService.setMode('dark')">Dark</button>`,
             },
           ],
         },
@@ -1182,8 +1858,8 @@ onValueChange(value: string): void {
               kind: 'list',
               items: [
                 'If no branding is provided, library defaults are used.',
-                'Light mode respects team branding more directly; dark mode uses the normalized dark palette path in the runtime service.',
-                'Current branded consumers in the library are br-text and br-text-area.',
+                'Team adapters map only what the team payload actually means. Missing values fall back to normalized library defaults.',
+                'Use direct library branding only when you already have or want to build the normalized BrBrandingConfig yourself.',
               ],
             },
           ],

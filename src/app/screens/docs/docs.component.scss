@@ -255,6 +255,63 @@ th {
   padding-top: 12px;
 }
 
+.doc-grid-preview {
+  margin: 12px 0 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.doc-date-preview {
+  margin: 12px 0 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #fff;
+  padding: 16px;
+}
+
+.doc-grid-event {
+  padding: 10px 12px;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #334155;
+  font-size: 13px;
+}
+
+.doc-template-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  select {
+    height: 34px;
+    min-width: 150px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 0 10px;
+    background: #fff;
+    color: #0f172a;
+  }
+
+  button {
+    height: 34px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #2563eb;
+    color: #fff;
+    padding: 0 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  small {
+    color: #0f766e;
+    font-size: 12px;
+    font-weight: 600;
+  }
+}
+
 .doc-toc {
   position: sticky;
   top: 86px;

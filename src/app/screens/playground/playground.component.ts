@@ -12,6 +12,7 @@ import {
   BrGridActionEvent,
   BrGridComponent,
   BrGridConfig,
+  BrGridRowMetaMap,
   BrModalActionEvent,
   BrModalComponent,
   BrModalConfig,
@@ -50,7 +51,7 @@ import { CodeEditorComponent, CodeLanguage } from './components/code-editor/code
 type PlaygroundTab = 'grid' | 'date' | 'modal' | 'form';
 type CodeFile = 'ts' | 'html' | 'scss';
 
-type GridPreset = 'complex' | 'moderate' | 'simple';
+type GridPreset = 'complex' | 'moderate' | 'rich' | 'simple';
 type DatePreset = 'default' | 'compact' | 'disabled';
 type ModalPreset = 'custom' | 'info' | 'confirm' | 'delete' | 'form';
 type FormPreset = 'all-controls' | 'simple';
@@ -95,15 +96,15 @@ const PLAYGROUND_DATE_CONFIGURATION: BrAdvancedDateConfiguration = {
   Customdate: 'year',
   Minslidervalue: '-10',
   Maxslidervalue: '10',
-  Mindate: '0d',
-  Maxdate: '',
-  includeToday: false,
+  Mindate: '-1m',
+  Maxdate: '+3m',
+  includeToday: true,
 };
 
 const ENTERPRISE_BRANDING_SAMPLE: EnterpriseBrandingPayload = {
-  baseFontColor: '#f4f4f4',
+  baseFontColor: '#1f2937',
   baseFontSize: '14px',
-  titleFontColor: '#f4f4f4',
+  titleFontColor: '#0f172a',
   fontFamily: 'Tahoma',
   primaryButtonColor: '#0f62fe',
   primaryButtonHoverColor: '#393939',
@@ -113,8 +114,8 @@ const ENTERPRISE_BRANDING_SAMPLE: EnterpriseBrandingPayload = {
   secondaryButtonTextColor: '#fff',
   primaryButtonTextHoverColor: '#fff',
   secondaryButtonTextHoverColor: '#fff',
-  linkColor: '#f4f4f4',
-  labelFontColor: '#f4f4f4',
+  linkColor: '#0f62fe',
+  labelFontColor: '#334155',
   foreGroundColor: '#008571',
   welcomeTextFontSize: '24px',
   welcomeTextFontColor: '#ffffff',
@@ -150,6 +151,12 @@ const LIBRARY_BRANDING_SAMPLE: BrBrandingConfig = {
     accentColor: '#0f766e',
     focusColor: '#ea580c',
     focusRingColor: 'color-mix(in srgb, #ea580c 24%, transparent)',
+    badgeBackgroundColor: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+    badgeTextColor: '#92400e',
+    badgeDotColor: '#d97706',
+    dangerColor: '#dc2626',
+    overlayColor: 'rgba(15, 23, 42, 0.22)',
+    shadowColor: 'rgba(15, 23, 42, 0.18)',
     backgroundColor: '#ffffff',
     sectionBackgroundColor: '#f8fafc',
     sectionBorderColor: '#dbe4ee',
@@ -183,6 +190,12 @@ const LIBRARY_BRANDING_SAMPLE: BrBrandingConfig = {
     accentColor: '#5eead4',
     focusColor: '#f59e0b',
     focusRingColor: 'color-mix(in srgb, #f59e0b 28%, transparent)',
+    badgeBackgroundColor: 'linear-gradient(135deg, #1f2937 0%, #334155 100%)',
+    badgeTextColor: '#fde68a',
+    badgeDotColor: '#f59e0b',
+    dangerColor: '#f87171',
+    overlayColor: 'rgba(2, 6, 23, 0.58)',
+    shadowColor: 'rgba(2, 6, 23, 0.42)',
     backgroundColor: '#0f172a',
     sectionBackgroundColor: '#111827',
     sectionBorderColor: '#334155',
@@ -243,6 +256,7 @@ export class PlaygroundComponent {
   readonly gridPresetLabels: Record<GridPreset, string> = {
     complex: 'Complex Grid',
     moderate: 'Moderate Grid',
+    rich: 'Rich Cells Grid',
     simple: 'Simple Grid',
   };
 
@@ -346,7 +360,7 @@ export class PlaygroundComponent {
   }
 
   get gridPresets(): GridPreset[] {
-    return ['complex', 'moderate', 'simple'];
+    return ['complex', 'moderate', 'rich', 'simple'];
   }
 
   get datePresets(): DatePreset[] {
@@ -431,6 +445,8 @@ export class PlaygroundComponent {
     this.activeGridPreset = preset;
     if (preset === 'simple') {
       this.gridConfig = this.clone(this.simpleGridConfig());
+    } else if (preset === 'rich') {
+      this.gridConfig = this.clone(this.richGridConfig());
     } else if (preset === 'moderate') {
       this.gridConfig = this.clone(this.moderateGridConfig());
     } else {
@@ -698,7 +714,6 @@ export class PlaygroundComponent {
 
   onGridConfigChange(config: BrGridConfig): void {
     this.gridConfig = config;
-    this.activeGridPreset = 'complex';
     this.syncGridTsCode();
     this.pushLog('Grid JSON applied');
   }
@@ -793,6 +808,7 @@ export class PlaygroundComponent {
     if (this.runtimeHandlers.gridAction) {
       this.runtimeHandlers.gridAction(event, this.createRuntimeConsole('grid'));
     }
+    this.applyRichGridDemoFeedback(event);
     this.pushLog(`Grid action: ${event.source} -> ${event.actionId}`);
   }
 
@@ -1373,15 +1389,43 @@ export class PlaygroundComponent {
   }
 
   private buildGridTsCode(config: BrGridConfig): string {
+    const hasRichCells = (config.columns || []).some((col) => !!col.type && col.type !== 'text');
+    const richHandler = hasRichCells
+      ? `
+  onGridAction(event: BrGridActionEvent): void {
+    switch (event.actionId) {
+      case 'open-profile':
+        console.log('Open profile for row', event.rowId);
+        break;
+      case 'toggle-pin':
+        console.log('Toggle pin for row', event.rowId);
+        break;
+      case 'cell-value-change':
+        console.log('Cell value changed', event.field, event.previousValue, '->', event.value);
+        break;
+      case 'update-stage':
+        console.log('Persist stage change for row', event.rowId, 'new value:', event.value);
+        break;
+      case 'edit-user':
+      case 'delete-user':
+      case 'send-reminder':
+        console.log('Row action:', event.actionId, event.row);
+        break;
+      default:
+        console.log('Grid action:', event);
+    }
+  }`
+      : `
+  onGridAction(event: BrGridActionEvent): void {
+    console.log('Grid action:', event);
+    // hook to service/API calls here.
+  }`;
+
     return `import { BrGridConfig, BrGridActionEvent } from '@sriharshavarada/br-ui-wrapper';
 
 export class YourFeatureComponent {
   gridConfig: BrGridConfig = ${JSON.stringify(config, null, 2)};
-
-  onGridAction(event: BrGridActionEvent): void {
-    console.log('Grid action:', event);
-    // hook to service/API calls here.
-  }
+${richHandler}
 }`;
   }
 
@@ -2101,6 +2145,149 @@ ${helperBlock}
     };
   }
 
+  private richGridConfig(): BrGridConfig {
+    return {
+      title: 'Rich Cells Grid Demo',
+      columns: [
+        { field: 'id', header: 'ID', sortable: true },
+        {
+          field: 'candidateName',
+          header: 'Candidate',
+          sortable: true,
+          type: 'link',
+          cellConfig: {
+            actions: [{ id: 'open-profile', label: 'Open Profile', variant: 'link' }],
+          },
+        },
+        {
+          field: 'status',
+          header: 'Status',
+          sortable: true,
+          type: 'badge',
+          cellConfig: {
+            badgeVariant: 'neutral',
+          },
+        },
+        {
+          field: 'pin',
+          header: 'Pin',
+          align: 'center',
+          type: 'icon',
+          cellConfig: {
+            icon: 'pin',
+            actions: [{ id: 'toggle-pin', label: 'Toggle Pin', icon: 'pin', variant: 'ghost' }],
+          },
+        },
+        {
+          field: 'hrStatus',
+          header: 'HR Status',
+          type: 'dropdown-action',
+          cellConfig: {
+            buttonLabel: 'Update',
+            submitActionId: 'update-stage',
+            options: [
+              { label: 'Applied', value: 'Applied' },
+              { label: 'Phone Screen', value: 'Phone Screen' },
+              { label: 'First Interview', value: 'First Interview' },
+              { label: 'Second Interview', value: 'Second Interview' },
+              { label: 'Offer', value: 'Offer' },
+            ],
+          },
+        },
+        {
+          field: 'team',
+          header: 'Team',
+          sortable: true,
+          type: 'route-link',
+          cellConfig: {
+            route: '/users',
+          },
+        },
+        {
+          field: 'actions',
+          header: 'Actions',
+          type: 'button-group',
+          cellConfig: {
+            actions: [
+              { id: 'edit-user', label: 'Edit', variant: 'secondary' },
+              { id: 'send-reminder', label: 'Remind', variant: 'ghost' },
+              { id: 'delete-user', label: 'Delete', variant: 'danger' },
+            ],
+          },
+        },
+      ],
+      data: this.sampleCandidates(),
+      rowMeta: {
+        'C-1003': {
+          cells: {
+            hrStatus: {
+              state: 'saving',
+              message: 'Waiting to persist',
+              tone: 'warning',
+            },
+          },
+        },
+      },
+      pagination: true,
+      pageSize: 5,
+      sorting: true,
+      toolbar: {
+        showSort: true,
+        showFilter: true,
+        showSearch: true,
+        showRefresh: true,
+        showColumnSettings: true,
+        showShare: false,
+        showViewMode: false,
+        primaryActionLabel: 'Add Candidate',
+      },
+      contextMenuActions: [
+        { id: 'view-candidate', label: 'View Candidate' },
+        { id: 'move-stage', label: 'Move Stage' },
+        { id: 'delete-user', label: 'Delete Candidate' },
+      ],
+      selectionActions: [
+        { id: 'activate-selected', label: 'Activate' },
+        { id: 'deactivate-selected', label: 'Deactivate' },
+      ],
+      personalization: {
+        availableColumns: [
+          { field: 'id', label: 'Candidate ID', group: 'Core' },
+          { field: 'candidateName', label: 'Candidate', group: 'Core' },
+          { field: 'status', label: 'Status', group: 'Status' },
+          { field: 'pin', label: 'Pin', group: 'Status' },
+          { field: 'hrStatus', label: 'HR Status', group: 'Workflow' },
+          { field: 'team', label: 'Team', group: 'Org' },
+          { field: 'actions', label: 'Actions', group: 'Workflow' },
+        ],
+        selectedColumns: ['id', 'candidateName', 'status', 'pin', 'hrStatus', 'team', 'actions'],
+      },
+      features: {
+        enableTopBar: true,
+        enableRowSelection: true,
+        enableSelectionActions: true,
+        enableContextMenu: true,
+        enableRowActionButton: true,
+        enableColumnPersonalization: true,
+        enableColumnVisibilityToggle: true,
+        enableColumnReorder: true,
+        enableSorting: true,
+        sortLevels: 2,
+        enableFiltering: true,
+        filterLevels: 2,
+        enableSearch: true,
+        enableRefresh: true,
+        enableShare: false,
+        enableViewMode: false,
+        enablePrimaryAction: true,
+        enablePrimaryActionMenu: false,
+        showPaginationSizeSelector: true,
+        showPaginationSummary: true,
+        showPaginationNavigation: true,
+      },
+    };
+  }
+
   private complexGridConfig(): BrGridConfig {
     return {
       title: 'Complex Grid Demo (All Features)',
@@ -2187,8 +2374,8 @@ ${helperBlock}
     return {
       label: 'Start Date',
       value: '2026-01-15',
-      minDate: new Date('2025-01-01'),
-      maxDate: new Date('2026-12-31'),
+      minDate: null,
+      maxDate: null,
       language: 'en-US',
       locale: 'en-US',
       dateFormat: 'MM/dd/yyyy',
@@ -2208,8 +2395,8 @@ ${helperBlock}
     return {
       label: 'Compact Date',
       value: '2026-02-01',
-      minDate: new Date('2026-01-01'),
-      maxDate: new Date('2026-12-31'),
+      minDate: null,
+      maxDate: null,
       language: 'fr-FR',
       locale: 'fr-FR',
       dateFormat: 'dd/MM/yyyy',
@@ -2942,6 +3129,101 @@ ${helperBlock}
       location: locations[i % locations.length],
       status: statuses[i % statuses.length],
     }));
+  }
+
+  private sampleCandidates(): any[] {
+    return [
+      { id: 'C-1001', candidateName: 'Anya Ross', status: 'Active', pin: 'pin', hrStatus: 'First Interview', team: 'Platform', actions: '' },
+      { id: 'C-1002', candidateName: 'Ravi Singh', status: 'Pending', pin: 'pin', hrStatus: 'Phone Screen', team: 'Cloud', actions: '' },
+      { id: 'C-1003', candidateName: 'Mia Chen', status: 'Inactive', pin: 'pin', hrStatus: 'Second Interview', team: 'Security', actions: '' },
+      { id: 'C-1004', candidateName: 'Noah Lee', status: 'Active', pin: 'pin', hrStatus: 'Offer', team: 'Data', actions: '' },
+      { id: 'C-1005', candidateName: 'Emma Brown', status: 'Pending', pin: 'pin', hrStatus: 'Applied', team: 'Mobile', actions: '' },
+      { id: 'C-1006', candidateName: 'Ava Nguyen', status: 'Active', pin: 'pin', hrStatus: 'First Interview', team: 'Payments', actions: '' },
+    ];
+  }
+
+  private applyRichGridDemoFeedback(event: BrGridActionEvent): void {
+    if (this.activeGridPreset !== 'rich') {
+      return;
+    }
+
+    const rowId = event.rowId ? String(event.rowId) : '';
+    if (!rowId) {
+      return;
+    }
+
+    if (event.actionId === 'update-stage') {
+      const nextData = (this.gridConfig.data || []).map((row) =>
+        String(row.id) === rowId ? { ...row, hrStatus: event.value } : row,
+      );
+      const nextMeta: BrGridRowMetaMap = {
+        ...(this.gridConfig.rowMeta || {}),
+        [rowId]: {
+          ...((this.gridConfig.rowMeta || {})[rowId] || {}),
+          cells: {
+            ...(((this.gridConfig.rowMeta || {})[rowId] || {}).cells || {}),
+            hrStatus: {
+              state: 'success' as const,
+              tone: 'success' as const,
+              message: `Updated to ${String(event.value || '')}`,
+            },
+          },
+        },
+      };
+      this.gridConfig = {
+        ...this.gridConfig,
+        data: nextData,
+        rowMeta: nextMeta,
+      };
+      this.syncGridTsCode();
+      return;
+    }
+
+    if (event.actionId === 'toggle-pin') {
+      const nextMeta: BrGridRowMetaMap = {
+        ...(this.gridConfig.rowMeta || {}),
+        [rowId]: {
+          ...((this.gridConfig.rowMeta || {})[rowId] || {}),
+          cells: {
+            ...(((this.gridConfig.rowMeta || {})[rowId] || {}).cells || {}),
+            pin: {
+              state: 'success' as const,
+              tone: 'primary' as const,
+              message: 'Pin toggled',
+            },
+          },
+        },
+      };
+      this.gridConfig = {
+        ...this.gridConfig,
+        rowMeta: nextMeta,
+      };
+      this.syncGridTsCode();
+      return;
+    }
+
+    if (event.actionId === 'delete-user' || event.actionId === 'edit-user' || event.actionId === 'send-reminder') {
+      const field = event.field || 'actions';
+      const nextMeta: BrGridRowMetaMap = {
+        ...(this.gridConfig.rowMeta || {}),
+        [rowId]: {
+          ...((this.gridConfig.rowMeta || {})[rowId] || {}),
+          cells: {
+            ...(((this.gridConfig.rowMeta || {})[rowId] || {}).cells || {}),
+            [field]: {
+              state: 'success' as const,
+              tone: (event.actionId === 'delete-user' ? 'danger' : 'primary') as 'danger' | 'primary',
+              message: `${event.label || event.actionId} fired`,
+            },
+          },
+        },
+      };
+      this.gridConfig = {
+        ...this.gridConfig,
+        rowMeta: nextMeta,
+      };
+      this.syncGridTsCode();
+    }
   }
 
   private clone<T>(value: T): T {

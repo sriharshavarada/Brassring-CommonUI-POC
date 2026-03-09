@@ -79,6 +79,32 @@
                 </tbody>
               </table>
             </div>
+
+            <div class="doc-grid-preview" *ngIf="block.kind === 'grid-preview'">
+              <br-grid [config]="getDocGridConfig(block.preview)" (action)="onDocGridAction(block.preview, $event)">
+                <ng-template *ngIf="block.preview === 'template'" brGridCell="hrStatus" let-row let-value="value" let-meta="meta">
+                  <div class="doc-template-cell">
+                    <select [ngModel]="docTemplateDraftByRow[row.id] || value" (ngModelChange)="onDocTemplateStageDraftChange(row.id, $event)">
+                      <option>Applied</option>
+                      <option>First Interview</option>
+                      <option>Second Interview</option>
+                    </select>
+                    <button type="button" (click)="saveDocTemplateStage(row)">Update</button>
+                    <small *ngIf="meta?.message">{{ meta?.message }}</small>
+                  </div>
+                </ng-template>
+              </br-grid>
+              <div class="doc-grid-event">
+                <strong>Latest event:</strong> {{ docGridEventText[block.preview] }}
+              </div>
+            </div>
+
+            <div class="doc-date-preview" *ngIf="block.kind === 'date-preview'">
+              <br-date [config]="docDatePreviewConfig" (dateChange)="onDocDateChange($event)"></br-date>
+              <div class="doc-grid-event">
+                <strong>Current value:</strong> {{ docDateValueText }}
+              </div>
+            </div>
           </ng-container>
         </section>
 
