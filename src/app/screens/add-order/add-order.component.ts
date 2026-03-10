@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   BrAutocompleteComponent,
+  BrButtonComponent,
   BrCheckboxComponent,
   BrCheckboxConfig,
   BrControlEvent,
@@ -23,6 +24,7 @@ import {
     CommonModule,
     FormsModule,
     BrTextComponent,
+    BrButtonComponent,
     BrSingleSelectComponent,
     BrDateComponent,
     BrCheckboxComponent,

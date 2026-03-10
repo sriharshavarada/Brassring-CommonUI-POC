@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
+    BrButtonComponent,
     BrModalComponent,
     BrModalConfig,
     BrModalActionEvent
@@ -9,7 +10,7 @@ import {
 @Component({
     selector: 'app-modal-demo',
     standalone: true,
-    imports: [CommonModule, BrModalComponent],
+    imports: [CommonModule, BrModalComponent, BrButtonComponent],
     templateUrl: './modal-demo.component.html',
     styleUrls: ['./modal-demo.component.scss']
 })

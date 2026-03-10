@@ -89,7 +89,7 @@
                       <option>First Interview</option>
                       <option>Second Interview</option>
                     </select>
-                    <button type="button" (click)="saveDocTemplateStage(row)">Update</button>
+                    <br-button label="Update" variant="primary" size="sm" (buttonClick)="saveDocTemplateStage(row)"></br-button>
                     <small *ngIf="meta?.message">{{ meta?.message }}</small>
                   </div>
                 </ng-template>
@@ -103,6 +103,14 @@
               <br-date [config]="docDatePreviewConfig" (dateChange)="onDocDateChange($event)"></br-date>
               <div class="doc-grid-event">
                 <strong>Current value:</strong> {{ docDateValueText }}
+              </div>
+            </div>
+
+            <div class="doc-button-preview" *ngIf="block.kind === 'button-preview'">
+              <br-button [config]="docButtonPreviewConfig" (buttonClick)="onDocButtonClick($event)"
+                (controlEvent)="onDocButtonControlEvent($event)"></br-button>
+              <div class="doc-grid-event">
+                <strong>Latest event:</strong> {{ docButtonEventText }}
               </div>
             </div>
           </ng-container>

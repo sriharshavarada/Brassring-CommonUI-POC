@@ -18,6 +18,8 @@ import {
   BrModalConfig,
   BrAutocompleteComponent,
   BrAutocompleteConfig,
+  BrButtonComponent,
+  BrButtonConfig,
   BrCheckboxComponent,
   BrCheckboxConfig,
   BrControlActionEvent as BrFormActionEvent,
@@ -48,17 +50,19 @@ import {
 import { JsonWorkbenchComponent } from './components/json-workbench/json-workbench.component';
 import { CodeEditorComponent, CodeLanguage } from './components/code-editor/code-editor.component';
 
-type PlaygroundTab = 'grid' | 'date' | 'modal' | 'form';
+type PlaygroundTab = 'grid' | 'date' | 'modal' | 'form' | 'button';
 type CodeFile = 'ts' | 'html' | 'scss';
 
 type GridPreset = 'complex' | 'moderate' | 'rich' | 'simple';
 type DatePreset = 'default' | 'compact' | 'disabled';
 type ModalPreset = 'custom' | 'info' | 'confirm' | 'delete' | 'form';
 type FormPreset = 'all-controls' | 'simple';
+type ButtonPreset = 'primary' | 'secondary' | 'outline' | 'danger' | 'text' | 'icon' | 'loading' | 'full-width' | 'with-icons';
 type ControlPlayground = 'all' | 'date' | 'text' | 'text-area' | 'single-select' | 'multi-select' | 'checkbox' | 'radio' | 'autocomplete';
 type ControlConfig =
   | BrTextConfig
   | BrTextAreaConfig
+  | BrButtonConfig
   | BrSingleSelectConfig
   | BrMultiSelectConfig
   | BrCheckboxConfig
@@ -234,6 +238,7 @@ const LIBRARY_BRANDING_SAMPLE: BrBrandingConfig = {
     BrModalComponent,
     BrTextComponent,
     BrTextAreaComponent,
+    BrButtonComponent,
     BrSingleSelectComponent,
     BrMultiSelectComponent,
     BrCheckboxComponent,
@@ -278,6 +283,17 @@ export class PlaygroundComponent {
     'all-controls': 'All Controls',
     simple: 'Simple Controls',
   };
+  readonly buttonPresetLabels: Record<ButtonPreset, string> = {
+    primary: 'Primary',
+    secondary: 'Secondary',
+    outline: 'Outline',
+    danger: 'Danger',
+    text: 'Text',
+    icon: 'Icon Only',
+    loading: 'Loading',
+    'full-width': 'Full Width',
+    'with-icons': 'With Icons',
+  };
   readonly controlPlaygroundLabels: Record<ControlPlayground, string> = {
     all: 'All Controls',
     date: 'Date',
@@ -297,6 +313,7 @@ export class PlaygroundComponent {
   activeDatePreset: DatePreset = 'default';
   activeModalPreset: ModalPreset = 'custom';
   activeFormPreset: FormPreset = 'all-controls';
+  activeButtonPreset: ButtonPreset = 'primary';
   activeControlPlayground: ControlPlayground = 'all';
   activeControlVariant = 'default';
 
@@ -304,11 +321,13 @@ export class PlaygroundComponent {
   dateConfigCollapsed = false;
   modalConfigCollapsed = true;
   formConfigCollapsed = true;
+  buttonConfigCollapsed = true;
 
   gridConfig: BrGridConfig = this.complexGridConfig();
   dateConfig: BrDateConfig = this.defaultDateConfig();
   modalConfig: BrModalConfig = this.defaultModalConfig();
   formConfig: BrFormConfig = this.allControlsFormConfig();
+  buttonConfig: BrButtonConfig = this.primaryButtonConfig();
   brandingDemoConfig: PlaygroundBrandingDemoConfig | null = null;
   brandingStudioDraft: PlaygroundBrandingDemoConfig | null = null;
   brandingStudioOpen = false;
@@ -319,6 +338,7 @@ export class PlaygroundComponent {
   dateCode: DemoCodeState = this.createEmptyCodeState();
   modalCode: DemoCodeState = this.createEmptyCodeState();
   formCode: DemoCodeState = this.createEmptyCodeState();
+  buttonCode: DemoCodeState = this.createEmptyCodeState();
   private formControlConfigMap: Record<string, ControlConfig> = {};
 
   codeError = {
@@ -326,6 +346,7 @@ export class PlaygroundComponent {
     date: '',
     modal: '',
     form: '',
+    button: '',
   };
 
   eventLog: string[] = [];
@@ -335,6 +356,8 @@ export class PlaygroundComponent {
     dateChange?: (value: string, runtimeConsole: Console) => void;
     modalAction?: (event: BrModalActionEvent, runtimeConsole: Console) => void;
     formAction?: (event: BrFormActionEvent, runtimeConsole: Console) => void;
+    buttonClick?: (event: MouseEvent, runtimeConsole: Console) => void;
+    buttonControlEvent?: (event: any, runtimeConsole: Console) => void;
   } = {};
 
   constructor(
@@ -348,6 +371,7 @@ export class PlaygroundComponent {
     this.resetDateCodeFromConfig();
     this.resetModalCodeFromConfig();
     this.resetFormCodeFromConfig();
+    this.resetButtonCodeFromConfig();
     this.rebuildFormControlConfigs();
   }
 
@@ -375,6 +399,10 @@ export class PlaygroundComponent {
     return ['all-controls', 'simple'];
   }
 
+  get buttonPresets(): ButtonPreset[] {
+    return ['primary', 'secondary', 'outline', 'danger', 'text', 'icon', 'loading', 'full-width', 'with-icons'];
+  }
+
   get controlPlaygrounds(): ControlPlayground[] {
     return ['all', 'date', 'text', 'text-area', 'single-select', 'multi-select', 'checkbox', 'radio', 'autocomplete'];
   }
@@ -384,7 +412,7 @@ export class PlaygroundComponent {
       case 'date':
         return ['default-config', 'bounded-config', 'disabled-config', 'events-demo', 'registry-demo', 'ngmodel-simple'];
       case 'text':
-        return ['default-config', 'required-config', 'disabled-config', 'events-demo', 'registry-demo', 'ngmodel-simple'];
+        return ['default-config', 'required-config', 'disabled-config', 'events-demo', 'registry-demo', 'direct-input', 'ngmodel-simple'];
       case 'text-area':
         return ['default-config', 'required-config', 'disabled-config', 'events-demo', 'registry-demo', 'ngmodel-simple'];
       case 'single-select':
@@ -415,6 +443,11 @@ export class PlaygroundComponent {
   setModalMode(mode: ModalUiMode): void {
     this.runtimeUiConfig.setMode('modal', mode);
     this.pushLog(`Modal mode changed to ${mode}`);
+  }
+
+  setButtonMode(mode: ControlUiMode): void {
+    this.runtimeUiConfig.setMode('button' as any, mode);
+    this.pushLog(`Button mode changed to ${mode}`);
   }
 
   setControlMode(
@@ -474,6 +507,13 @@ export class PlaygroundComponent {
     this.modalConfig = this.clone(this.modalPresetConfigs[preset]);
     this.resetModalCodeFromConfig();
     this.pushLog(`Loaded ${this.modalPresetLabels[preset]} for editing`);
+  }
+
+  selectButtonPreset(preset: ButtonPreset): void {
+    this.activeButtonPreset = preset;
+    this.buttonConfig = this.buildButtonPresetConfig(preset);
+    this.resetButtonCodeFromConfig();
+    this.pushLog(`Loaded ${this.buttonPresetLabels[preset]} button`);
   }
 
   selectFormPreset(preset: FormPreset): void {
@@ -552,6 +592,9 @@ export class PlaygroundComponent {
   controlsConfigEditorTitle(): string {
     if (this.activeControlPlayground === 'all') {
       return 'Controls Config Editor';
+    }
+    if (this.isDirectInputVariant()) {
+      return `${this.controlPlaygroundLabels[this.activeControlPlayground]} - ${this.controlVariantLabel(this.activeControlVariant)} - Direct Input Notes`;
     }
     return `${this.controlPlaygroundLabels[this.activeControlPlayground]} - ${this.controlVariantLabel(this.activeControlVariant)} - Config Editor`;
   }
@@ -644,6 +687,11 @@ export class PlaygroundComponent {
       return;
     }
 
+    if (tab === 'button') {
+      this.buttonConfigCollapsed = !this.buttonConfigCollapsed;
+      return;
+    }
+
     this.modalConfigCollapsed = !this.modalConfigCollapsed;
   }
 
@@ -660,6 +708,11 @@ export class PlaygroundComponent {
 
     if (tab === 'form') {
       this.formCode.collapsed = !this.formCode.collapsed;
+      return;
+    }
+
+    if (tab === 'button') {
+      this.buttonCode.collapsed = !this.buttonCode.collapsed;
       return;
     }
 
@@ -686,6 +739,11 @@ export class PlaygroundComponent {
       return;
     }
 
+    if (tab === 'button') {
+      this.applyButtonCode();
+      return;
+    }
+
     this.applyModalCode();
   }
 
@@ -705,6 +763,12 @@ export class PlaygroundComponent {
     if (tab === 'form') {
       this.resetFormCodeFromConfig();
       this.codeError.form = '';
+      return;
+    }
+
+    if (tab === 'button') {
+      this.resetButtonCodeFromConfig();
+      this.codeError.button = '';
       return;
     }
 
@@ -741,6 +805,13 @@ export class PlaygroundComponent {
     this.syncFormTsCode();
     this.syncFormHtmlCode();
     this.pushLog('Controls JSON applied');
+  }
+
+  onButtonConfigChange(config: BrButtonConfig): void {
+    this.buttonConfig = config;
+    this.buttonCode.ts = this.buildButtonTsCode(this.buttonConfig);
+    this.scheduleAutoApply('button');
+    this.pushLog('Button JSON applied');
   }
 
   onBrandingConfigChange(config: EnterpriseBrandingPayload | TalentGatewayBrandingPayload | BrBrandingConfig): void {
@@ -1069,8 +1140,16 @@ export class PlaygroundComponent {
     return this.activeControlPlayground !== 'all' && this.activeControlVariant === 'ngmodel-simple';
   }
 
+  isDirectInputVariant(): boolean {
+    return this.activeControlPlayground === 'text' && this.activeControlVariant === 'direct-input';
+  }
+
   isNgModelOnlyField(field: BrFormField): boolean {
     return this.isNgModelOnlyVariant() && this.formConfig.fields.length === 1 && this.formConfig.fields[0].id === field.id;
+  }
+
+  isDirectInputField(field: BrFormField): boolean {
+    return this.isDirectInputVariant() && this.formConfig.fields.length === 1 && this.formConfig.fields[0].id === field.id;
   }
 
   isRegistryDemoVariant(): boolean {
@@ -1160,6 +1239,10 @@ export class PlaygroundComponent {
 
   private applyFormCode(): void {
     try {
+      if (this.isDirectInputVariant() && this.activeControlPlayground === 'text') {
+        this.applyDirectInputTextFormCode();
+        return;
+      }
       this.validateTsShape('form', this.formCode.ts);
       const parsed = this.parseConfigFromTs<BrFormConfig>(this.formCode.ts, 'controlsConfig', ['formConfig']);
       const htmlSegments = this.extractControlsHtmlSegments(this.formCode.html);
@@ -1175,6 +1258,26 @@ export class PlaygroundComponent {
       this.pushLog('Applied Controls TS/HTML/SCSS code');
     } catch (error) {
       this.codeError.form = error instanceof Error ? error.message : 'Invalid form TS config block';
+    }
+  }
+
+  private applyButtonCode(): void {
+    try {
+      this.validateTsShape('button', this.buttonCode.ts);
+      const parsed = this.parseConfigFromTs<BrButtonConfig>(this.buttonCode.ts, 'buttonConfig');
+      const htmlSegments = this.extractHtmlSegments(this.buttonCode.html, 'br-button');
+      this.validateScss(this.buttonCode.scss);
+      this.runtimeHandlers.buttonClick = this.parseButtonClickHandler(this.buttonCode.ts);
+      this.runtimeHandlers.buttonControlEvent = this.parseButtonControlEventHandler(this.buttonCode.ts);
+
+      this.buttonConfig = parsed;
+      this.buttonCode.htmlBefore = htmlSegments.before;
+      this.buttonCode.htmlAfter = htmlSegments.after;
+      this.buttonCode.appliedScss = this.buttonCode.scss;
+      this.codeError.button = '';
+      this.pushLog('Applied Button TS/HTML/SCSS code');
+    } catch (error) {
+      this.codeError.button = error instanceof Error ? error.message : 'Invalid button TS config block';
     }
   }
 
@@ -1212,6 +1315,16 @@ export class PlaygroundComponent {
     this.formCode.appliedScss = this.formCode.scss;
   }
 
+  private resetButtonCodeFromConfig(): void {
+    this.buttonCode.ts = this.buildButtonTsCode(this.buttonConfig);
+    this.buttonCode.html = this.defaultButtonHtmlCode();
+    this.buttonCode.scss = this.defaultButtonScssCode();
+    const htmlSegments = this.extractHtmlSegments(this.buttonCode.html, 'br-button');
+    this.buttonCode.htmlBefore = htmlSegments.before;
+    this.buttonCode.htmlAfter = htmlSegments.after;
+    this.buttonCode.appliedScss = this.buttonCode.scss;
+  }
+
   private syncGridTsCode(): void {
     this.gridCode.ts = this.buildGridTsCode(this.gridConfig);
   }
@@ -1233,6 +1346,24 @@ export class PlaygroundComponent {
     const htmlSegments = this.extractControlsHtmlSegments(this.formCode.html);
     this.formCode.htmlBefore = htmlSegments.before;
     this.formCode.htmlAfter = htmlSegments.after;
+  }
+
+  onButtonClick(event: MouseEvent): void {
+    const runtimeConsole = this.createRuntimeConsole('button');
+    if (this.runtimeHandlers.buttonClick) {
+      this.runtimeHandlers.buttonClick(event, runtimeConsole);
+    } else {
+      this.pushLog(`[button] click ${this.buttonConfig.id || this.buttonConfig.label || 'button'}`);
+    }
+  }
+
+  onButtonControlEvent(event: any): void {
+    const runtimeConsole = this.createRuntimeConsole('button');
+    if (this.runtimeHandlers.buttonControlEvent) {
+      this.runtimeHandlers.buttonControlEvent(event, runtimeConsole);
+    } else {
+      this.pushLog(`[button] controlEvent ${this.stringifyArg(event)}`);
+    }
   }
 
   private rebuildFormControlConfigs(): void {
@@ -1259,14 +1390,14 @@ export class PlaygroundComponent {
     this.formControlConfigMap = next;
   }
 
-  private applyHtmlSegments(tab: PlaygroundTab, controlTag: 'br-grid' | 'br-date' | 'br-modal'): void {
+  private applyHtmlSegments(tab: PlaygroundTab, controlTag: 'br-grid' | 'br-date' | 'br-modal' | 'br-button'): void {
     const code = this.getCodeState(tab);
     const segments = this.extractHtmlSegments(code.html, controlTag);
     code.htmlBefore = segments.before;
     code.htmlAfter = segments.after;
   }
 
-  private extractHtmlSegments(html: string, controlTag: 'br-grid' | 'br-date' | 'br-modal'): { before: string; after: string } {
+  private extractHtmlSegments(html: string, controlTag: 'br-grid' | 'br-date' | 'br-modal' | 'br-button'): { before: string; after: string } {
     const pattern = new RegExp(`<${controlTag}[\\s\\S]*?<\\/${controlTag}>`, 'i');
     const match = html.match(pattern);
 
@@ -1454,6 +1585,25 @@ export class YourFeatureComponent {
   }
 
   private buildFormTsCode(config: BrFormConfig): string {
+    if (this.isDirectInputVariant() && this.activeControlPlayground === 'text' && config.fields?.length === 1) {
+      const field = config.fields[0];
+      const value = String((config.value || {})[field.id] ?? '');
+      return `import { BrTextComponent } from '@sriharshavarada/br-ui-wrapper';
+
+export class YourFeatureComponent {
+  employeeName = ${JSON.stringify(value)};
+
+  updateEmployeeName(value: string): void {
+    this.employeeName = value;
+    console.log('valueChange', value);
+  }
+
+  onControlEvent(event: any): void {
+    console.log('controlEvent', event);
+  }
+}`;
+    }
+
     const fieldTypes = new Set((config.fields || []).map((f: BrFormField) => f.type));
     const isRegistryDemo = this.isRegistryDemoConfig(config);
     const commonTypeImports: string[] = ['BrControlsConfig', 'BrControlActionEvent'];
@@ -1691,15 +1841,15 @@ ${helperBlock}
     const registryButton = this.isRegistryDemoConfig(config)
       ? `
   <div class="controls-actions">
-    <button type="button" class="btn ghost" (click)="readRegistryValues()">Read Registry Values</button>
+    <br-button label="Read Registry Values" variant="secondary" size="md" (buttonClick)="readRegistryValues()"></br-button>
   </div>`
       : '';
     const actions = config.showActions === false
       ? ''
       : `
   <div class="controls-actions">
-    <button type="button" class="btn ghost" (click)="onControlsAction('reset')">${config.resetLabel || 'Reset'}</button>
-    <button type="button" class="btn secondary" (click)="onControlsAction('submit')">${config.submitLabel || 'Submit'}</button>
+    <br-button label="${config.resetLabel || 'Reset'}" variant="secondary" size="md" (buttonClick)="onControlsAction('reset')"></br-button>
+    <br-button label="${config.submitLabel || 'Submit'}" variant="primary" size="md" (buttonClick)="onControlsAction('submit')"></br-button>
   </div>`;
 
     return `<section class="controls-demo-shell">
@@ -1806,6 +1956,10 @@ ${helperBlock}
       return `<br-autocomplete [id]="'${field.id}'" [label]="'${field.label}'" [placeholder]="'${field.placeholder || ''}'" [options]="${JSON.stringify(field.options || [])}" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ngModel]="controlValue(${this.fieldRef(field.id)})" (ngModelChange)="updateControlValue('${field.id}', $event)"></br-autocomplete>`;
     }
 
+    if (this.isDirectInputField(field) && field.type === 'text') {
+      return `<br-text [id]="'${field.id}'" [name]="'${field.name || ''}'" [className]="'${field.className || ''}'" [label]="'${field.label}'" [placeholder]="'${field.placeholder || ''}'" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [value]="controlValue(${this.fieldRef(field.id)})" (valueChange)="updateControlValue('${field.id}', $event)" (controlEvent)="onControlEvent($event)"></br-text>`;
+    }
+
     if (field.type === 'text') {
       return `<br-text [config]="asTextConfig(${this.fieldRef(field.id)})" (valueChange)="updateControlValue('${field.id}', $event)"></br-text>`;
     }
@@ -1834,78 +1988,247 @@ ${helperBlock}
     return `controlsConfig.fields.find(f => f.id === '${fieldId}')!`;
   }
 
+  private applyDirectInputTextFormCode(): void {
+    this.validateTsShape('form', this.formCode.ts);
+    this.validateScss(this.formCode.scss);
+    const htmlSegments = this.extractControlsHtmlSegments(this.formCode.html);
+    const field = this.formConfig.fields[0];
+    if (!field || field.type !== 'text') {
+      throw new Error('Direct input text variant requires exactly one text field.');
+    }
+
+    const nextField = this.parseDirectInputTextField(this.formCode.html, field);
+    const nextValue = this.parseStringAssignmentFromTs(this.formCode.ts, 'employeeName') ?? String((this.formConfig.value || {})[field.id] ?? '');
+
+    this.formConfig = {
+      ...this.formConfig,
+      fields: [nextField],
+      value: { ...(this.formConfig.value || {}), [field.id]: nextValue },
+    };
+    this.rebuildFormControlConfigs();
+    this.formCode.htmlBefore = htmlSegments.before;
+    this.formCode.htmlAfter = htmlSegments.after;
+    this.formCode.appliedScss = this.formCode.scss;
+    this.codeError.form = '';
+    this.pushLog('Applied Controls TS/HTML/SCSS code');
+  }
+
+  private parseDirectInputTextField(html: string, fallback: BrFormField): BrFormField {
+    const match = html.match(/<br-text\b([\s\S]*?)><\/br-text>/i);
+    if (!match) {
+      throw new Error('HTML must include <br-text>...</br-text> for the direct input variant.');
+    }
+
+    const attrs = match[1];
+    const stringBinding = (name: string): string | undefined => {
+      const patterns = [
+        new RegExp(`\\[${name}\\]="['"]([^'"]*)['"]`, 'i'),
+        new RegExp(`${name}="([^"]*)"`, 'i'),
+      ];
+      for (const pattern of patterns) {
+        const result = attrs.match(pattern);
+        if (result?.[1] !== undefined) {
+          return result[1];
+        }
+      }
+      return undefined;
+    };
+
+    const booleanBinding = (name: string, current: boolean | undefined): boolean | undefined => {
+      const pattern = new RegExp(`\\[${name}\\]="(true|false)"`, 'i');
+      const result = attrs.match(pattern);
+      if (result?.[1] !== undefined) {
+        return result[1].toLowerCase() === 'true';
+      }
+      return current;
+    };
+
+    return {
+      ...fallback,
+      id: stringBinding('id') || fallback.id,
+      name: stringBinding('name') || fallback.name,
+      className: stringBinding('className') || fallback.className,
+      label: stringBinding('label') || fallback.label,
+      placeholder: stringBinding('placeholder') || fallback.placeholder,
+      required: booleanBinding('required', fallback.required),
+      disabled: booleanBinding('disabled', fallback.disabled),
+    };
+  }
+
+  private parseStringAssignmentFromTs(tsCode: string, variableName: string): string | null {
+    const patterns = [
+      new RegExp(`${variableName}\\s*=\\s*'([^']*)'`),
+      new RegExp(`${variableName}\\s*=\\s*"([^"]*)"`),
+      new RegExp(variableName + '\\s*=\\s*`([^`]*)`'),
+    ];
+
+    for (const pattern of patterns) {
+      const match = tsCode.match(pattern);
+      if (match?.[1] !== undefined) {
+        return match[1];
+      }
+    }
+
+    return null;
+  }
+
   private defaultGridScssCode(): string {
-    return `.grid-live-preview .grid-demo-shell {
-  border: 1px solid #cbd5e0;
-  border-radius: 8px;
-  padding: 12px;
-  background: #ffffff;
-}
-
-.grid-live-preview h3 {
-  margin: 0 0 6px;
-  font-size: 18px;
-}
-
-.grid-live-preview p {
-  margin: 0 0 10px;
-  color: #4a5568;
-  font-size: 13px;
-}`;
+    return this.optionalScssComment('Grid');
   }
 
   private defaultDateScssCode(): string {
-    return `.date-live-preview .date-demo-shell {
-  border: 1px dashed #a0aec0;
-  border-radius: 8px;
-  padding: 12px;
-  background: #fff;
-}
-
-.date-live-preview h3 {
-  margin: 0 0 8px;
-}`;
+    return this.optionalScssComment('Date');
   }
 
   private defaultModalScssCode(): string {
-    return `.modal-live-preview .modal-demo-shell {
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 12px;
-  background: #fff;
-}
-
-.modal-live-preview h3 {
-  margin: 0 0 8px;
-}`;
+    return this.optionalScssComment('Modal');
   }
 
   private defaultFormScssCode(): string {
-    return `.form-live-preview .controls-demo-shell {
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 14px;
-  background: #fff;
-}
+    return this.optionalScssComment('Control');
+  }
 
-.form-live-preview .controls-demo-shell h3 {
-  margin: 0 0 6px;
-}
+  private buildButtonTsCode(config: BrButtonConfig): string {
+    return `import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
+import { BrButtonComponent, BrButtonConfig } from '@sriharshavarada/br-ui-wrapper';
 
-.form-live-preview .controls-demo-shell p {
-  margin: 0 0 12px;
-  color: #4a5568;
-}
+@Component({
+  standalone: true,
+  imports: [CommonModule, BrButtonComponent],
+  templateUrl: './button-demo.component.html',
+})
+export class YourFeatureComponent {
+  buttonConfig: BrButtonConfig = ${JSON.stringify(config, null, 2)};
 
-.form-live-preview .controls-host {
-  display: block;
+  onButtonClick(event: MouseEvent): void {
+    console.log('button-click', {
+      id: this.buttonConfig.id,
+      label: this.buttonConfig.label,
+      variant: this.buttonConfig.variant,
+    });
+  }
+
+  onButtonControlEvent(event: any): void {
+    console.log('button-control-event', event);
+  }
 }`;
+  }
+
+  private defaultButtonHtmlCode(): string {
+    return `<section class="button-demo-shell">
+  <h3>Button Consumer Demo</h3>
+  <p>This is the same consumer HTML you can use in your feature.</p>
+  <br-button
+    [config]="buttonConfig"
+    (buttonClick)="onButtonClick($event)"
+    (controlEvent)="onButtonControlEvent($event)"></br-button>
+</section>`;
+  }
+
+  private defaultButtonScssCode(): string {
+    return this.optionalScssComment('Button');
+  }
+
+  private optionalScssComment(controlName: string): string {
+    return `/* Optional: add host/page layout styles for this ${controlName.toLowerCase()} usage here.
+   The library already styles the ${controlName.toLowerCase()} control itself. */`;
+  }
+
+  private primaryButtonConfig(): BrButtonConfig {
+    return this.buildButtonPresetConfig('primary');
+  }
+
+  private buildButtonPresetConfig(preset: ButtonPreset): BrButtonConfig {
+    switch (preset) {
+      case 'secondary':
+        return {
+          id: 'secondaryButton',
+          label: 'Cancel',
+          variant: 'secondary',
+          size: 'md',
+          type: 'button',
+        };
+      case 'outline':
+        return {
+          id: 'outlineButton',
+          label: 'Preview',
+          variant: 'outline',
+          size: 'md',
+          type: 'button',
+        };
+      case 'danger':
+        return {
+          id: 'dangerButton',
+          label: 'Delete User',
+          variant: 'danger',
+          size: 'md',
+          type: 'button',
+        };
+      case 'text':
+        return {
+          id: 'textButton',
+          label: 'Learn More',
+          variant: 'text',
+          size: 'md',
+          type: 'button',
+        };
+      case 'icon':
+        return {
+          id: 'iconButton',
+          label: '',
+          ariaLabel: 'Refresh data',
+          variant: 'icon',
+          size: 'md',
+          type: 'button',
+          leftIcon: '↻',
+        };
+      case 'loading':
+        return {
+          id: 'loadingButton',
+          label: 'Submitting',
+          variant: 'primary',
+          size: 'md',
+          type: 'button',
+          loading: true,
+          disabled: true,
+        };
+      case 'full-width':
+        return {
+          id: 'fullWidthButton',
+          label: 'Continue',
+          variant: 'primary',
+          size: 'lg',
+          type: 'button',
+          fullWidth: true,
+        };
+      case 'with-icons':
+        return {
+          id: 'withIconsButton',
+          label: 'Download Report',
+          variant: 'secondary',
+          size: 'md',
+          type: 'button',
+          leftIcon: '↓',
+          rightIcon: '→',
+        };
+      case 'primary':
+      default:
+        return {
+          id: 'primaryButton',
+          label: 'Save Changes',
+          variant: 'primary',
+          size: 'md',
+          type: 'button',
+        };
+    }
   }
 
   private getCodeState(tab: PlaygroundTab): DemoCodeState {
     if (tab === 'grid') return this.gridCode;
     if (tab === 'date') return this.dateCode;
     if (tab === 'form') return this.formCode;
+    if (tab === 'button') return this.buttonCode;
     return this.modalCode;
   }
 
@@ -1960,7 +2283,17 @@ ${helperBlock}
     return new Function('event', 'console', body) as (event: BrFormActionEvent, runtimeConsole: Console) => void;
   }
 
-  private extractMethodBody(tsCode: string, methodName: 'onGridAction' | 'onDateChange' | 'onModalAction' | 'onFormAction' | 'onControlsAction'): string {
+  private parseButtonClickHandler(tsCode: string): (event: MouseEvent, runtimeConsole: Console) => void {
+    const body = this.extractMethodBody(tsCode, 'onButtonClick');
+    return new Function('event', 'console', body) as (event: MouseEvent, runtimeConsole: Console) => void;
+  }
+
+  private parseButtonControlEventHandler(tsCode: string): (event: any, runtimeConsole: Console) => void {
+    const body = this.extractMethodBody(tsCode, 'onButtonControlEvent');
+    return new Function('event', 'console', body) as (event: any, runtimeConsole: Console) => void;
+  }
+
+  private extractMethodBody(tsCode: string, methodName: 'onGridAction' | 'onDateChange' | 'onModalAction' | 'onFormAction' | 'onControlsAction' | 'onButtonClick' | 'onButtonControlEvent'): string {
     const regex = new RegExp(`${methodName}\\s*\\([^)]*\\)\\s*:\\s*void\\s*\\{([\\s\\S]*?)\\n\\s*\\}`, 'm');
     const match = tsCode.match(regex);
     if (!match || !match[1]) {
@@ -1978,11 +2311,20 @@ ${helperBlock}
       throw new Error('TS validation failed: missing `export class ...` declaration.');
     }
 
+    if (tab === 'form' && this.isDirectInputVariant() && this.activeControlPlayground === 'text') {
+      const directInputImportRegex = /import\s*\{[^}]*BrTextComponent[^}]*\}\s*from\s*['"]@sriharshavarada\/br-ui-wrapper['"]/;
+      if (!directInputImportRegex.test(tsCode)) {
+        throw new Error('TS validation failed: required import for BrTextComponent from @sriharshavarada/br-ui-wrapper is missing.');
+      }
+      return;
+    }
+
     const importRegexByTab: Record<PlaygroundTab, RegExp> = {
       grid: /import\s*\{[^}]*BrGridConfig[^}]*\}\s*from\s*['"]@sriharshavarada\/br-ui-wrapper['"]/,
       date: /import\s*\{[^}]*BrDateConfig[^}]*\}\s*from\s*['"]@sriharshavarada\/br-ui-wrapper['"]/,
       modal: /import\s*\{[^}]*BrModalConfig[^}]*\}\s*from\s*['"]@sriharshavarada\/br-ui-wrapper['"]/,
       form: /import\s*\{[^}]*Br(ControlsConfig|FormConfig)[^}]*\}\s*from\s*['"]@sriharshavarada\/br-ui-wrapper['"]/,
+      button: /import\s*\{[^}]*BrButtonConfig[^}]*\}\s*from\s*['"]@sriharshavarada\/br-ui-wrapper['"]/,
     };
 
     if (!importRegexByTab[tab].test(tsCode)) {
@@ -1990,7 +2332,7 @@ ${helperBlock}
     }
   }
 
-  private createRuntimeConsole(scope: 'grid' | 'date' | 'modal' | 'form'): Console {
+  private createRuntimeConsole(scope: 'grid' | 'date' | 'modal' | 'form' | 'button'): Console {
     const logLike = (level: 'log' | 'warn' | 'error') => (...args: any[]) => {
       const message = args.map((x) => this.stringifyArg(x)).join(' ');
       this.pushLog(`[${scope}] console.${level}: ${message}`);
@@ -2533,6 +2875,7 @@ ${helperBlock}
   private buildSingleControlVariantConfig(control: Exclude<ControlPlayground, 'all'>, variant: string): BrFormConfig {
     const variantKey = variant.replace(/-config$/, '');
     const ngModelOnly = variantKey === 'ngmodel-simple';
+    const directInputOnly = variantKey === 'direct-input';
     this.brandingDemoConfig = null;
     if (variantKey === 'events-demo') {
       return this.buildControlEventsDemoVariantConfig(control);
@@ -2563,10 +2906,19 @@ ${helperBlock}
 
     if (control === 'text') {
       return this.singleControlConfig(
-        { id: 'textControl', type: 'text', label: 'Employee Name', placeholder: 'Type full name', required: variantKey === 'required', disabled: variantKey === 'disabled' },
+        {
+          id: 'textControl',
+          type: 'text',
+          label: 'Employee Name',
+          placeholder: 'Type full name',
+          required: variantKey === 'required',
+          disabled: variantKey === 'disabled',
+          name: directInputOnly ? 'employeeName' : undefined,
+          className: directInputOnly ? 'employee-name-field' : undefined,
+        },
         variantKey === 'disabled' ? 'Read-only value' : '',
         `${this.controlPlaygroundLabels[control]} Playground`,
-        `Variant: ${this.controlVariantLabel(variant)}${ngModelOnly ? ' (No Config)' : ''}`,
+        `Variant: ${this.controlVariantLabel(variant)}${ngModelOnly ? ' (No Config)' : directInputOnly ? ' (Direct Inputs)' : ''}`,
       );
     }
 

@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { BrDateComponent, BrDateConfig, BrGridActionEvent, BrGridCellTemplateDirective, BrGridComponent, BrGridConfig } from '@sriharshavarada/br-ui-wrapper';
+import { BrButtonComponent, BrButtonConfig, BrDateComponent, BrDateConfig, BrGridActionEvent, BrGridCellTemplateDirective, BrGridComponent, BrGridConfig } from '@sriharshavarada/br-ui-wrapper';
 
 type DocGroupId = 'overview' | 'forms' | 'runtime' | 'controls' | 'containers';
 
@@ -13,6 +13,7 @@ type DocBlock =
   | { kind: 'table'; columns: string[]; rows: string[][] }
   | { kind: 'callout'; title: string; text: string }
   | { kind: 'date-preview' }
+  | { kind: 'button-preview' }
   | { kind: 'grid-preview'; preview: 'plain' | 'rich' | 'meta' | 'template' };
 
 interface DocSection {
@@ -44,7 +45,7 @@ interface NavPageNode {
 @Component({
   selector: 'app-docs',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, BrDateComponent, BrGridComponent, BrGridCellTemplateDirective],
+  imports: [CommonModule, FormsModule, RouterModule, BrDateComponent, BrButtonComponent, BrGridComponent, BrGridCellTemplateDirective],
   templateUrl: './docs.component.html',
   styleUrls: ['./docs.component.scss'],
 })
@@ -52,6 +53,7 @@ export class DocsComponent {
   readonly repoPath = '/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/docs';
   navSearch = '';
   docDateValueText = 'No date selected.';
+  docButtonEventText = 'No action yet.';
   docGridEventText: Record<'plain' | 'rich' | 'meta' | 'template', string> = {
     plain: 'No action yet.',
     rich: 'No action yet.',
@@ -114,6 +116,14 @@ export class DocsComponent {
       Maxdate: '+3m',
       includeToday: true,
     },
+  };
+
+  readonly docButtonPreviewConfig: BrButtonConfig = {
+    id: 'docs-save-button',
+    label: 'Save Changes',
+    variant: 'primary',
+    size: 'md',
+    type: 'button',
   };
 
   readonly richGridPreviewConfig: BrGridConfig = {
@@ -732,6 +742,7 @@ readValues(): void {
     this.runtimeBrandingPage(),
     this.controlPage('br-text', 'Text Box', 'string', true, true, false),
     this.controlPage('br-text-area', 'Text Area', 'string', true, true, false, false, true),
+    this.buttonPage(),
     this.controlPage('br-date', 'Date', 'string | Date | null', true, true, false, true),
     {
       slug: 'br-date-configuration',
@@ -1213,7 +1224,7 @@ loadUsers(query: BrGridQueryState): void {
         <option>First Interview</option>
         <option>Second Interview</option>
       </select>
-      <button type="button" (click)="saveStage(row)">Update</button>
+      <br-button label="Update" variant="primary" size="sm" (buttonClick)="saveStage(row)"></br-button>
       <small *ngIf="meta?.message">{{ meta?.message }}</small>
     </div>
   </ng-template>
@@ -1403,13 +1414,13 @@ onModalClose(): void {
   getDocGridConfig(preview: 'plain' | 'rich' | 'meta' | 'template'): BrGridConfig {
     switch (preview) {
       case 'plain':
-        return this.plainGridPreviewConfig;
+        return this.cloneGridConfig(this.plainGridPreviewConfig);
       case 'rich':
-        return this.richGridPreviewConfig;
+        return this.cloneGridConfig(this.richGridPreviewConfig);
       case 'meta':
-        return this.metaGridPreviewConfig;
+        return this.cloneGridConfig(this.metaGridPreviewConfig);
       default:
-        return this.templateGridPreviewConfig;
+        return this.cloneGridConfig(this.templateGridPreviewConfig);
     }
   }
 
@@ -1419,6 +1430,14 @@ onModalClose(): void {
 
   onDocDateChange(value: string | Date | null): void {
     this.docDateValueText = value ? String(value) : 'No date selected.';
+  }
+
+  onDocButtonClick(_: MouseEvent): void {
+    this.docButtonEventText = 'buttonClick emitted for docs-save-button';
+  }
+
+  onDocButtonControlEvent(event: any): void {
+    this.docButtonEventText = `controlEvent -> ${JSON.stringify(event)}`;
   }
 
   onDocTemplateStageDraftChange(rowId: string, value: string): void {
@@ -1451,6 +1470,10 @@ onModalClose(): void {
     this.docGridEventText.template = `template-save -> hrStatus (${rowId})`;
   }
 
+  private cloneGridConfig(config: BrGridConfig): BrGridConfig {
+    return JSON.parse(JSON.stringify(config)) as BrGridConfig;
+  }
+
   private controlPage(
     slug: string,
     label: string,
@@ -1461,25 +1484,7 @@ onModalClose(): void {
     includeDateChange = false,
     isTextArea = false,
   ): DocPage {
-    const inputRows: string[][] = [
-      ['config', 'Typed config object for config-based usage.'],
-      ['id', 'Control id (used for registry + DOM identity).'],
-      ['controlId', 'Alias for id (normalized internally).'],
-      ['name', 'Grouping name (used by registry valuesByName).'],
-      ['className', 'CSS class + registry class grouping.'],
-      ['value', `Direct value input (${valueType}) for no-config usage.`],
-      ['disabled', 'Disables the control.'],
-      ['required', 'Marks control required.'],
-      ['meta', 'Arbitrary payload forwarded in controlEvent.'],
-    ];
-
-    if (hasLabel) inputRows.splice(8, 0, ['label', 'Display label.']);
-    if (hasPlaceholder) inputRows.splice(9, 0, ['placeholder', 'Placeholder text.']);
-    if (isTextArea) {
-      inputRows.splice(10, 0, ['rows', 'Visible row count for the textarea.']);
-      inputRows.splice(11, 0, ['maxLength', 'Optional maximum character length.']);
-    }
-    if (hasOptions) inputRows.splice(9, 0, ['options', 'Selectable options list.']);
+    const inputRows = this.controlDirectInputsRows(slug, valueType);
 
     const outputRows: string[][] = [
       ['valueChange', `Emits typed value (${valueType}).`],
@@ -1601,7 +1606,7 @@ export class YourScreenComponent {
         },
         {
           id: 'quick-start-no-config',
-          title: 'Quick Start: No Config (ngModel)',
+          title: 'Quick Start: Direct Inputs + ngModel',
           blocks: [
             {
               kind: 'code',
@@ -1663,6 +1668,201 @@ export class YourScreenComponent {
                 'Use `controlEvent` for standardized telemetry and keep event-specific handlers for user UX only.',
                 'If using both config and direct inputs, direct inputs are intended as explicit overrides; keep this consistent in team conventions.',
               ],
+            },
+          ],
+        },
+      ],
+    };
+  }
+
+  private buttonPage(): DocPage {
+    return {
+      slug: 'br-button',
+      title: 'br-button',
+      summary: 'Button wrapper with consistent variants across CUSTOM, MATERIAL, and PRIMENG modes.',
+      group: 'controls',
+      order: this.controlOrder('br-button'),
+      sections: [
+        {
+          id: 'preface',
+          title: 'Preface: Why br-button',
+          blocks: [
+            {
+              kind: 'text',
+              text: 'Use br-button when you want one stable button API while allowing runtime mode changes under the hood.',
+            },
+            {
+              kind: 'table',
+              columns: ['Key term', 'Simple meaning'],
+              rows: [
+                ['variant', 'Visual intent such as primary, secondary, outline, danger, text, or icon.'],
+                ['size', 'Button size: sm, md, lg.'],
+                ['buttonClick', 'Primary click output from the wrapper.'],
+                ['controlEvent', 'Normalized wrapper event payload for logging or generic handlers.'],
+                ['ariaLabel', 'Recommended label for icon-only buttons.'],
+              ],
+            },
+          ],
+        },
+        {
+          id: 'import-and-setup',
+          title: 'Import and Setup',
+          blocks: [
+            {
+              kind: 'code',
+              language: 'typescript',
+              code: `import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
+import { BrButtonComponent, BrButtonConfig } from '@sriharshavarada/br-ui-wrapper';
+
+@Component({
+  standalone: true,
+  imports: [CommonModule, BrButtonComponent],
+  templateUrl: './your-screen.component.html',
+})
+export class YourScreenComponent {
+  buttonConfig: BrButtonConfig = {
+    id: 'save-button',
+    label: 'Save Changes',
+    variant: 'primary',
+    size: 'md',
+    type: 'button'
+  };
+
+  onButtonClick(event: MouseEvent): void {
+    console.log('button-click', event);
+  }
+
+  onButtonControlEvent(event: unknown): void {
+    console.log('button-control-event', event);
+  }
+}`,
+            },
+          ],
+        },
+        {
+          id: 'quick-start-config-style',
+          title: 'Quick Start: Config Style',
+          blocks: [
+            {
+              kind: 'code',
+              language: 'typescript',
+              code: `buttonConfig: BrButtonConfig = {
+  id: 'save-button',
+  label: 'Save Changes',
+  variant: 'primary',
+  size: 'md',
+  type: 'button',
+  leftIcon: '↓',
+  rightIcon: '→'
+};`,
+            },
+            {
+              kind: 'code',
+              language: 'html',
+              code: `<br-button
+  [config]="buttonConfig"
+  (buttonClick)="onButtonClick($event)"
+  (controlEvent)="onButtonControlEvent($event)">
+</br-button>`,
+            },
+          ],
+        },
+        {
+          id: 'direct-input-style',
+          title: 'Quick Start: Direct Inputs',
+          blocks: [
+            {
+              kind: 'code',
+              language: 'html',
+              code: `<br-button
+  [id]="'save-button'"
+  [label]="'Save Changes'"
+  [variant]="'primary'"
+  [size]="'md'"
+  [type]="'button'"
+  [leftIcon]="'↓'"
+  [rightIcon]="'→'"
+  (buttonClick)="onButtonClick($event)"
+  (controlEvent)="onButtonControlEvent($event)">
+</br-button>`,
+            },
+          ],
+        },
+        {
+          id: 'variants-and-sizes',
+          title: 'Variants and Sizes',
+          blocks: [
+            {
+              kind: 'table',
+              columns: ['Property', 'Supported values'],
+              rows: [
+                ['variant', 'primary, secondary, outline, danger, text, icon'],
+                ['size', 'sm, md, lg'],
+                ['type', 'button, submit, reset'],
+              ],
+            },
+          ],
+        },
+        {
+          id: 'inputs',
+          title: 'Supported Direct Inputs',
+          blocks: [
+            {
+              kind: 'table',
+              columns: ['Input', 'Meaning'],
+              rows: [
+                ['config', 'Typed config object for config-based usage.'],
+                ['id', 'Button id for DOM identity and registry lookup.'],
+                ['controlId', 'Legacy alias for id.'],
+                ['name', 'Grouping name for registry lookups.'],
+                ['className', 'CSS class string applied through the wrapper.'],
+                ['meta', 'Consumer payload forwarded in controlEvent.'],
+                ['label', 'Visible button label.'],
+                ['variant', 'Visual intent: primary, secondary, outline, danger, text, icon.'],
+                ['size', 'Button size: sm, md, lg.'],
+                ['type', 'Native button type: button, submit, reset.'],
+                ['disabled', 'Prevents clicks and interaction.'],
+                ['loading', 'Shows loading state and disables action.'],
+                ['fullWidth', 'Expands button to full container width.'],
+                ['leftIcon', 'Leading icon text/symbol.'],
+                ['rightIcon', 'Trailing icon text/symbol.'],
+                ['ariaLabel', 'Accessibility label, especially for icon-only buttons.'],
+              ],
+            },
+          ],
+        },
+        {
+          id: 'outputs',
+          title: 'Outputs',
+          blocks: [
+            {
+              kind: 'table',
+              columns: ['Output', 'Meaning'],
+              rows: [
+                ['buttonClick', 'Primary click output from the button wrapper.'],
+                ['controlEvent', 'Standardized wrapper event payload.'],
+              ],
+            },
+          ],
+        },
+        {
+          id: 'accessibility-note',
+          title: 'Accessibility Note',
+          blocks: [
+            {
+              kind: 'callout',
+              title: 'Icon-only buttons',
+              text: 'If you use variant `icon` or leave the visible label empty, provide `ariaLabel` so the button is still understandable to assistive technologies.',
+            },
+          ],
+        },
+        {
+          id: 'live-preview',
+          title: 'Live Preview',
+          blocks: [
+            {
+              kind: 'button-preview',
             },
           ],
         },
@@ -1842,11 +2042,11 @@ ngOnInit(): void {
               kind: 'code',
               language: 'html',
               code: `<!-- Demo-only pattern for docs or playground -->
-<button type="button" (click)="applyEnterpriseBranding()">Enterprise</button>
-<button type="button" (click)="applyTalentGatewayBranding()">Talent Gateway</button>
-<button type="button" (click)="applyLibraryBranding()">Library Branding</button>
-<button type="button" (click)="brandingRuntimeService.setMode('light')">Light</button>
-<button type="button" (click)="brandingRuntimeService.setMode('dark')">Dark</button>`,
+<br-button label="Enterprise" variant="secondary" size="sm" (buttonClick)="applyEnterpriseBranding()"></br-button>
+<br-button label="Talent Gateway" variant="secondary" size="sm" (buttonClick)="applyTalentGatewayBranding()"></br-button>
+<br-button label="Library Branding" variant="secondary" size="sm" (buttonClick)="applyLibraryBranding()"></br-button>
+<br-button label="Light" variant="secondary" size="sm" (buttonClick)="brandingRuntimeService.setMode('light')"></br-button>
+<br-button label="Dark" variant="secondary" size="sm" (buttonClick)="brandingRuntimeService.setMode('dark')"></br-button>`,
             },
           ],
         },
@@ -1880,6 +2080,60 @@ ngOnInit(): void {
       'br-autocomplete',
     ];
     return ordered.indexOf(slug) + 1;
+  }
+
+  private controlDirectInputsRows(slug: string, valueType: string): string[][] {
+    const shared: string[][] = [
+      ['config', 'Typed config object for config-based usage.'],
+      ['id', 'Control id used for DOM identity and registry lookup.'],
+      ['controlId', 'Legacy alias for id.'],
+      ['name', 'Grouping name used by registry valuesByName.'],
+      ['className', 'CSS class string passed through the wrapper.'],
+      ['disabled', 'Disables the control.'],
+      ['required', 'Marks the control required.'],
+      ['label', 'Display label.'],
+      ['meta', 'Consumer-defined payload forwarded in controlEvent.'],
+      ['showLibraryTag', 'Optional demo/migration badge flag.'],
+    ];
+
+    const bySlug: Record<string, string[][]> = {
+      'br-text': [
+        ['value', `Direct value input (${valueType}).`],
+        ['placeholder', 'Placeholder text.'],
+      ],
+      'br-text-area': [
+        ['value', `Direct value input (${valueType}).`],
+        ['placeholder', 'Placeholder text.'],
+        ['rows', 'Visible row count for the textarea.'],
+        ['maxLength', 'Optional maximum character length.'],
+      ],
+      'br-date': [
+        ['value', 'Direct value input (`string | Date | null`).'],
+        ['placeholder', 'Placeholder text.'],
+      ],
+      'br-single-select': [
+        ['value', `Direct value input (${valueType}).`],
+        ['options', 'Selectable options list.'],
+      ],
+      'br-multi-select': [
+        ['value', `Direct value input (${valueType}).`],
+        ['options', 'Selectable options list.'],
+      ],
+      'br-checkbox': [
+        ['value', `Direct value input (${valueType}).`],
+      ],
+      'br-radio': [
+        ['value', `Direct value input (${valueType}).`],
+        ['options', 'Selectable options list.'],
+      ],
+      'br-autocomplete': [
+        ['value', `Direct value input (${valueType}).`],
+        ['placeholder', 'Placeholder text.'],
+        ['options', 'Selectable options list.'],
+      ],
+    };
+
+    return [...shared.slice(0, 5), ...(bySlug[slug] || []), ...shared.slice(5)];
   }
 
   private controlKeyTerms(hasOptions: boolean, includeDateChange: boolean, isTextArea = false): string[][] {

@@ -328,6 +328,81 @@ Live grid previews were added to the docs so code and output can be compared dir
 - app restarted cleanly
 - PrimeNG grid continued to work in the app with shell parity
 
+### 2L) Button support is now integrated into the consumer app
+The separate library repo added `br-button`, and the app now demonstrates it instead of relying on native buttons for consumer-facing examples.
+
+What the library now exposes:
+- `BrButtonComponent`
+- `ButtonAdapter`
+- button config support in:
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/models/controls-config.model.ts`
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/models/form-config.model.ts`
+- custom / material / primeng button implementations
+
+What the app now demonstrates:
+- a dedicated `Buttons Playground`
+- `br-button` docs with setup, direct-input usage, config usage, and live preview
+- consumer/demo screens now use `br-button` for actual action examples instead of native `<button>`:
+  - add-user
+  - add-order
+  - modal-demo
+  - key consumer-facing actions inside Playground and Docs
+
+What intentionally still uses native buttons:
+- internal editor chrome and tooling controls (tabs, toggles, JSON tree buttons, collapse controls)
+- those are app tooling widgets, not consumer-facing library demos
+
+### 2M) Direct-input support is now demonstrated more honestly
+The wrappers already support direct inputs for common scalar properties, while config remains the advanced/dynamic path.
+
+Current app/doc changes:
+- `Text Box` playground has a `Direct Input` variant
+- that variant no longer shows the JSON config editor
+- generated TS for that variant no longer uses `controlsConfig`
+- `Apply Code` for that variant parses edited wrapper attributes and updates the live preview
+- docs now list supported direct inputs per control based on actual wrapper surface, not assumptions
+
+Current recommendation:
+- simple/common usage -> direct inputs
+- advanced/dynamic usage -> config
+
+### 2N) Playground SCSS was corrected
+Playground Code Studio previously showed demo shell SCSS that looked like required consumer CSS.
+
+That was corrected so the SCSS tab now reflects reality:
+- library controls already style themselves
+- consumer SCSS is optional host/page layout only
+- the app no longer implies consumers must copy fake wrapper/demo styles
+
+### 2O) Date bounds bug was fixed at the real root cause
+The main date bug was not in docs or wrapper forwarding. The root cause was in the library relative-date parser:
+- `-1m` parsed correctly
+- `+3m` did not parse
+
+That caused:
+- past-year bounds to work
+- future-year bounds to remain effectively open
+
+The parser was corrected and the date controls were additionally hardened for:
+- invalid persisted out-of-range values
+- custom month/year navigation clamping
+- material/primeng emitted value guards
+
+Current result:
+- `Mindate: -1m` and `Maxdate: +3m` now behave correctly in Playground/docs across variants
+
+### 2P) Docs/live preview mismatches were cleaned up
+Several docs examples had drifted so the snippet and live preview no longer matched.
+
+Corrected areas:
+- plain grid example
+- rich-cells grid example
+- date configuration live preview
+
+Current rule:
+- docs snippet and live preview should match exactly
+- scaffolding-only features must be described as scaffolding, not as completed behavior
+
 ### 2H) Branding status across implementations
 Branding work is much further along locally than the older KT sections imply.
 
@@ -516,7 +591,7 @@ Without `GH_PACKAGES_TOKEN`, GitHub Pages build will fail during dependency inst
 - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/docs/docs.component.html`
 - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/docs/docs.component.scss`
 
-## Major Work Done (Uncommitted, but implemented)
+## Major Work Done
 
 ### A) Developer Playground (new capability)
 Added a full interactive playground route and screen:

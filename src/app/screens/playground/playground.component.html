@@ -21,6 +21,9 @@
     <button type="button" class="tab-btn" [class.active]="activeTab === 'form'" (click)="activeTab = 'form'">
       Controls Playground
     </button>
+    <button type="button" class="tab-btn" [class.active]="activeTab === 'button'" (click)="activeTab = 'button'">
+      Buttons Playground
+    </button>
   </section>
 
   <section class="workspace" *ngIf="activeTab === 'grid'">
@@ -102,6 +105,87 @@
     </article>
   </section>
 
+  <section class="workspace" *ngIf="activeTab === 'button'">
+    <article class="editor-card full">
+      <div class="card-head">
+        <div class="card-head-inline">
+          <h2>Buttons Playground</h2>
+          <div class="inline-mode-control">
+            <span class="inline-mode-label">Button Mode</span>
+            <div class="segmented compact inline-mode-segmented">
+              <button type="button" class="seg-btn" *ngFor="let mode of controlModes"
+                [class.active]="modes.button === mode" (click)="setButtonMode(mode)">
+                {{ mode }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="preset-row">
+        <span class="preset-label">Button Variants:</span>
+        <button type="button" class="preset-btn" *ngFor="let preset of buttonPresets"
+          [class.active]="activeButtonPreset === preset" (click)="selectButtonPreset(preset)">
+          {{ buttonPresetLabels[preset] }}
+        </button>
+      </div>
+
+      <section class="inline-collapse">
+        <button type="button" class="inline-collapse-toggle" (click)="toggleConfigPanel('button')">
+          <span class="inline-collapse-title">Button Config Editor</span>
+          <span class="inline-collapse-meta">{{ buttonConfigCollapsed ? 'Collapsed' : 'Expanded' }}</span>
+          <span class="inline-collapse-caret" [class.open]="!buttonConfigCollapsed">▾</span>
+        </button>
+        <div class="inline-collapse-body" *ngIf="!buttonConfigCollapsed">
+          <app-json-workbench title="Button Config" [value]="buttonConfig" (valueChange)="onButtonConfigChange($event)">
+          </app-json-workbench>
+        </div>
+      </section>
+
+      <section class="inline-collapse">
+        <button type="button" class="inline-collapse-toggle" (click)="toggleCodePanel('button')">
+          <span class="inline-collapse-title">Button Code Studio</span>
+          <span class="inline-collapse-meta">{{ buttonCode.collapsed ? 'Collapsed' : 'Expanded' }}</span>
+          <span class="inline-collapse-caret" [class.open]="!buttonCode.collapsed">▾</span>
+        </button>
+        <section class="code-studio inline-collapse-body" *ngIf="!buttonCode.collapsed">
+          <div class="code-head">
+            <h3>Consumer Code</h3>
+            <div class="code-actions">
+              <button type="button" class="btn" (click)="applyCode('button')">Apply Code</button>
+              <button type="button" class="btn ghost" (click)="resetCode('button')">Reset</button>
+              <button type="button" class="btn ghost" (click)="toggleCodePanel('button')">Collapse</button>
+            </div>
+          </div>
+          <div class="file-tabs">
+            <button type="button" class="file-tab" *ngFor="let file of codeFiles"
+              [class.active]="buttonCode.activeFile === file" (click)="setCodeFile('button', file)">
+              {{ file.toUpperCase() }}
+            </button>
+          </div>
+          <app-code-editor [language]="codeLanguage(buttonCode.activeFile)"
+            [value]="buttonCode.activeFile === 'ts' ? buttonCode.ts : (buttonCode.activeFile === 'html' ? buttonCode.html : buttonCode.scss)"
+            (valueChange)="onCodeEditorChange('button', $event)">
+          </app-code-editor>
+          <p class="code-error" *ngIf="codeError.button">{{ codeError.button }}</p>
+        </section>
+      </section>
+
+      <div class="preview full-preview button-live-preview">
+        <style [textContent]="buttonCode.appliedScss"></style>
+        <ng-container *ngIf="!codeError.button; else buttonPreviewError">
+          <div [innerHTML]="buttonCode.htmlBefore"></div>
+          <br-button [config]="buttonConfig" (buttonClick)="onButtonClick($event)"
+            (controlEvent)="onButtonControlEvent($event)"></br-button>
+          <div [innerHTML]="buttonCode.htmlAfter"></div>
+        </ng-container>
+        <ng-template #buttonPreviewError>
+          <div class="preview-error">{{ codeError.button }}</div>
+        </ng-template>
+      </div>
+    </article>
+  </section>
+
   <section class="workspace" *ngIf="activeTab === 'form'">
     <article class="editor-card full">
       <div class="card-head">
@@ -162,9 +246,18 @@
           <span class="inline-collapse-caret" [class.open]="!formConfigCollapsed">▾</span>
         </button>
         <div class="inline-collapse-body" *ngIf="!formConfigCollapsed">
-          <app-json-workbench [title]="controlsConfigWorkbenchTitle()" [value]="formConfig"
-            (valueChange)="onFormConfigChange($event)">
-          </app-json-workbench>
+          <ng-container *ngIf="!isDirectInputVariant(); else directInputConfigInfo">
+            <app-json-workbench [title]="controlsConfigWorkbenchTitle()" [value]="formConfig"
+              (valueChange)="onFormConfigChange($event)">
+            </app-json-workbench>
+          </ng-container>
+          <ng-template #directInputConfigInfo>
+            <div class="config-empty-state">
+              <h3>Direct Input Variant</h3>
+              <p>This preview is driven by wrapper inputs and attributes, not by a config object.</p>
+              <p>Use Code Studio to change the real consumer API for this variant.</p>
+            </div>
+          </ng-template>
         </div>
       </section>
 
@@ -202,7 +295,12 @@
           <div [innerHTML]="formCode.htmlBefore"></div>
           <div class="form-controls-grid">
             <div class="form-field-item" *ngFor="let field of formConfig.fields; trackBy: trackByFieldId">
-              <br-text *ngIf="field.type === 'text' && !isNgModelOnlyField(field)" [config]="getTextConfig(field)"
+              <br-text *ngIf="field.type === 'text' && !isNgModelOnlyField(field) && !isDirectInputField(field)" [config]="getTextConfig(field)"
+                (valueChange)="updateControlValue(field.id, $event)"
+                (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-text>
+              <br-text *ngIf="field.type === 'text' && isDirectInputField(field)" [id]="field.id" [name]="field.name"
+                [className]="field.className" [label]="field.label" [placeholder]="field.placeholder"
+                [required]="!!field.required" [disabled]="!!field.disabled" [value]="controlValue(field)"
                 (valueChange)="updateControlValue(field.id, $event)"
                 (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-text>
               <br-text *ngIf="field.type === 'text' && isNgModelOnlyField(field)" [id]="field.id" [label]="field.label"
@@ -274,17 +372,14 @@
             </div>
           </div>
           <div class="form-actions-row" *ngIf="formConfig.showActions !== false">
-            <button type="button" class="btn ghost" (click)="onControlsAction('reset')">
-              {{ formConfig.resetLabel || 'Reset' }}
-            </button>
-            <button type="button" class="btn secondary" (click)="onControlsAction('submit')">
-              {{ formConfig.submitLabel || 'Submit' }}
-            </button>
+            <br-button [label]="formConfig.resetLabel || 'Reset'" variant="secondary" size="md"
+              (buttonClick)="onControlsAction('reset')"></br-button>
+            <br-button [label]="formConfig.submitLabel || 'Submit'" variant="primary" size="md"
+              (buttonClick)="onControlsAction('submit')"></br-button>
           </div>
           <div class="form-actions-row" *ngIf="isRegistryDemoVariant()">
-            <button type="button" class="btn ghost" (click)="runRegistryLookupDemo()">
-              Read Registry Values (byId/byName/byClass)
-            </button>
+            <br-button label="Read Registry Values (byId/byName/byClass)" variant="secondary" size="md"
+              (buttonClick)="runRegistryLookupDemo()"></br-button>
           </div>
           <div [innerHTML]="formCode.htmlAfter"></div>
         </ng-container>
@@ -367,7 +462,8 @@
         <ng-container *ngIf="!codeError.modal; else modalPreviewError">
           <div [innerHTML]="modalCode.htmlBefore"></div>
           <div class="modal-preview-actions">
-            <button type="button" class="btn secondary" (click)="openModalPreview()">Open Current Popup</button>
+            <br-button label="Open Current Popup" variant="primary" size="md"
+              (buttonClick)="openModalPreview()"></br-button>
           </div>
           <br-modal [config]="modalConfig" (action)="onModalAction($event)" (close)="closeModalPreview()"></br-modal>
           <div [innerHTML]="modalCode.htmlAfter"></div>
@@ -382,7 +478,7 @@
   <section class="event-panel">
     <div class="card-head">
       <h2>Event Log</h2>
-      <button type="button" class="btn ghost" (click)="clearEventLog()">Clear</button>
+      <br-button label="Clear" variant="secondary" size="sm" (buttonClick)="clearEventLog()"></br-button>
     </div>
     <div class="log-list">
       <p *ngIf="eventLog.length === 0" class="empty">No events yet.</p>
@@ -397,7 +493,7 @@
           <h3>Branding Studio</h3>
           <p>Apply one runtime branding source across all branded controls in this page.</p>
         </div>
-        <button type="button" class="btn ghost" (click)="closeBrandingStudio()">Close</button>
+        <br-button label="Close" variant="secondary" size="sm" (buttonClick)="closeBrandingStudio()"></br-button>
       </div>
 
       <div class="preset-row">
@@ -448,9 +544,12 @@
       </section>
 
       <div class="branding-studio-actions">
-        <button type="button" class="btn ghost" (click)="resetBrandingStudioToDefaults()">Reset Draft</button>
-        <button type="button" class="btn ghost" (click)="clearAppliedBranding()">Reset Applied Branding</button>
-        <button type="button" class="btn secondary" (click)="applyBrandingStudio()">Apply Branding</button>
+        <br-button label="Reset Draft" variant="secondary" size="md"
+          (buttonClick)="resetBrandingStudioToDefaults()"></br-button>
+        <br-button label="Reset Applied Branding" variant="secondary" size="md"
+          (buttonClick)="clearAppliedBranding()"></br-button>
+        <br-button label="Apply Branding" variant="primary" size="md"
+          (buttonClick)="applyBrandingStudio()"></br-button>
       </div>
     </section>
   </div>

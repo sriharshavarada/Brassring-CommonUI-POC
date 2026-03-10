@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import {
   BrAutocompleteComponent,
   BrAutocompleteConfig,
+  BrButtonComponent,
   BrCheckboxComponent,
   BrCheckboxConfig,
   BrControlEvent,
@@ -32,6 +33,7 @@ import {
     BrRadioComponent,
     BrDateComponent,
     BrAutocompleteComponent,
+    BrButtonComponent,
     FormsModule
   ],
   templateUrl: './add-user.component.html',
