@@ -1163,5 +1163,7 @@ Use `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/docs/00-project-hand
   - `38edb42` `Stabilize library release with branding, date, and grid contracts`
   - `1dff902` `Bump library package version to 0.0.3`
 - Published GitHub package:
-  - `@sriharshavarada/br-ui-wrapper@0.0.3`
-- App repo should use the published package version `0.0.3` for freeze/CI/GitHub Pages readiness instead of local `file:.yalc/...`.
+  - `@sriharshavarada/br-ui-wrapper@0.0.4`
+- App repo should use the published package version `0.0.4` for freeze/CI/GitHub Pages readiness instead of local `file:.yalc/...`.
+
+- Grid wishlist and future capability target is now documented in [docs/08-grid-wishlist.md](docs/08-grid-wishlist.md).

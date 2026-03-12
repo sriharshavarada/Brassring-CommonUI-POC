@@ -51,6 +51,23 @@
         </button>
       </div>
 
+      <div class="preset-row remote-grid-controls" *ngIf="activeGridPreset === 'remote'">
+        <span class="preset-label">Remote Demo:</span>
+        <label class="remote-control-field">
+          <span>Delay (ms)</span>
+          <input type="number" min="0" step="100" [(ngModel)]="remoteDemoDelayMs" />
+        </label>
+        <label class="remote-control-check">
+          <input type="checkbox" [(ngModel)]="remoteDemoForceError" />
+          <span>Force error</span>
+        </label>
+        <label class="remote-control-check">
+          <input type="checkbox" [(ngModel)]="remoteDemoReturnEmpty" />
+          <span>Return empty</span>
+        </label>
+        <button type="button" class="preset-btn" (click)="triggerRemoteGridReload()">Reload Remote Grid</button>
+      </div>
+
       <section class="inline-collapse">
         <button type="button" class="inline-collapse-toggle" (click)="toggleConfigPanel('grid')">
           <span class="inline-collapse-title">Grid Config Editor</span>

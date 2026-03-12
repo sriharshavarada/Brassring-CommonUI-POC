@@ -12,6 +12,8 @@ import {
   BrGridActionEvent,
   BrGridComponent,
   BrGridConfig,
+  BrGridDataResult,
+  BrGridQueryState,
   BrGridRowMetaMap,
   BrModalActionEvent,
   BrModalComponent,
@@ -53,7 +55,7 @@ import { CodeEditorComponent, CodeLanguage } from './components/code-editor/code
 type PlaygroundTab = 'grid' | 'date' | 'modal' | 'form' | 'button';
 type CodeFile = 'ts' | 'html' | 'scss';
 
-type GridPreset = 'complex' | 'moderate' | 'rich' | 'simple';
+type GridPreset = 'complex' | 'moderate' | 'rich' | 'simple' | 'remote';
 type DatePreset = 'default' | 'compact' | 'disabled';
 type ModalPreset = 'custom' | 'info' | 'confirm' | 'delete' | 'form';
 type FormPreset = 'all-controls' | 'simple';
@@ -263,6 +265,7 @@ export class PlaygroundComponent {
     moderate: 'Moderate Grid',
     rich: 'Rich Cells Grid',
     simple: 'Simple Grid',
+    remote: 'Remote Grid',
   };
 
   readonly datePresetLabels: Record<DatePreset, string> = {
@@ -314,6 +317,9 @@ export class PlaygroundComponent {
   activeModalPreset: ModalPreset = 'custom';
   activeFormPreset: FormPreset = 'all-controls';
   activeButtonPreset: ButtonPreset = 'primary';
+  remoteDemoDelayMs = 3000;
+  remoteDemoForceError = false;
+  remoteDemoReturnEmpty = false;
   activeControlPlayground: ControlPlayground = 'all';
   activeControlVariant = 'default';
 
@@ -384,7 +390,7 @@ export class PlaygroundComponent {
   }
 
   get gridPresets(): GridPreset[] {
-    return ['complex', 'moderate', 'rich', 'simple'];
+    return ['complex', 'moderate', 'rich', 'simple', 'remote'];
   }
 
   get datePresets(): DatePreset[] {
@@ -478,6 +484,8 @@ export class PlaygroundComponent {
     this.activeGridPreset = preset;
     if (preset === 'simple') {
       this.gridConfig = this.clone(this.simpleGridConfig());
+    } else if (preset === 'remote') {
+      this.gridConfig = this.clone(this.remoteGridConfig());
     } else if (preset === 'rich') {
       this.gridConfig = this.clone(this.richGridConfig());
     } else if (preset === 'moderate') {
@@ -487,6 +495,9 @@ export class PlaygroundComponent {
     }
     this.resetGridCodeFromConfig();
     this.pushLog(`Loaded ${this.gridPresetLabels[preset]}`);
+    if (preset === 'remote') {
+      this.loadRemoteGridData(this.gridConfig.queryState || { pageIndex: 0, pageSize: this.gridConfig.pageSize || 5 });
+    }
   }
 
   selectDatePreset(preset: DatePreset): void {
@@ -878,6 +889,9 @@ export class PlaygroundComponent {
   onGridAction(event: BrGridActionEvent): void {
     if (this.runtimeHandlers.gridAction) {
       this.runtimeHandlers.gridAction(event, this.createRuntimeConsole('grid'));
+    }
+    if (this.activeGridPreset === 'remote' && event.source === 'query-change' && event.query) {
+      this.loadRemoteGridData(event.query);
     }
     this.applyRichGridDemoFeedback(event);
     this.pushLog(`Grid action: ${event.source} -> ${event.actionId}`);
@@ -1520,6 +1534,142 @@ export class PlaygroundComponent {
   }
 
   private buildGridTsCode(config: BrGridConfig): string {
+    if (config.dataMode === 'remote') {
+      const remoteConfig = {
+        ...config,
+        result: {
+          rows: [],
+          totalCount: 0,
+          loading: false,
+        },
+      };
+
+      return `import { BrGridConfig, BrGridActionEvent, BrGridQueryState, BrGridDataResult } from '@sriharshavarada/br-ui-wrapper';
+
+export class YourFeatureComponent {
+  gridConfig: BrGridConfig = ${JSON.stringify(remoteConfig, null, 2)};
+
+  onGridAction(event: BrGridActionEvent): void {
+    if (event.source === 'query-change' && event.query) {
+      this.loadGridPage(event.query);
+      return;
+    }
+
+    console.log('Grid action:', event);
+  }
+
+  loadGridPage(query: BrGridQueryState): void {
+    this.gridConfig = {
+      ...this.gridConfig,
+      queryState: query,
+      result: {
+        ...(this.gridConfig.result || { rows: [], totalCount: 0 }),
+        loading: true,
+        errorMessage: undefined,
+      },
+    };
+
+    // Replace this with your real AJAX / HttpClient call.
+    // Example:
+    // this.userService.getUsers(query).subscribe((result) => { ... });
+    this.fetchGridPage(query).then((result) => {
+      this.gridConfig = {
+        ...this.gridConfig,
+        queryState: query,
+        result,
+      };
+    });
+  }
+
+  async fetchGridPage(query: BrGridQueryState): Promise<BrGridDataResult> {
+    console.log('Call server with query:', query);
+
+    // Temporary demo-only mock.
+    // In a real feature, move this logic to your API/service layer
+    // and return the backend result.
+    return this.mockServerQuery(query);
+  }
+
+  private async mockServerQuery(query: BrGridQueryState): Promise<BrGridDataResult> {
+    const allRows = this.getAllRowsFromServer();
+    const searchedRows = this.applyServerSearch(allRows, query);
+    const filteredRows = this.applyServerFilters(searchedRows, query);
+    const sortedRows = this.applyServerSorting(filteredRows, query);
+    const pagedRows = this.applyServerPagination(sortedRows, query);
+
+    return {
+      rows: pagedRows,
+      totalCount: filteredRows.length,
+      query,
+    };
+  }
+
+  private getAllRowsFromServer(): any[] {
+    // Replace with real API data.
+    return [];
+  }
+
+  private applyServerSearch(rows: any[], query: BrGridQueryState): any[] {
+    const searchText = (query.searchText || '').trim().toLowerCase();
+    if (!searchText) {
+      return rows;
+    }
+
+    return rows.filter((row) =>
+      Object.values(row).some((value) =>
+        String(value ?? '').toLowerCase().includes(searchText),
+      ),
+    );
+  }
+
+  private applyServerFilters(rows: any[], query: BrGridQueryState): any[] {
+    const filters = query.filters || [];
+    if (!filters.length) {
+      return rows;
+    }
+
+    return rows.filter((row) =>
+      filters.every((filter) => {
+        const left = row[filter.field];
+        const right = filter.value;
+        switch (filter.operator) {
+          case 'equals':
+            return String(left ?? '') === String(right ?? '');
+          case 'startsWith':
+            return String(left ?? '').startsWith(String(right ?? ''));
+          case 'endsWith':
+            return String(left ?? '').endsWith(String(right ?? ''));
+          case 'contains':
+          default:
+            return String(left ?? '').toLowerCase().includes(String(right ?? '').toLowerCase());
+        }
+      }),
+    );
+  }
+
+  private applyServerSorting(rows: any[], query: BrGridQueryState): any[] {
+    const [primarySort] = query.sort || [];
+    if (!primarySort?.field) {
+      return rows;
+    }
+
+    return [...rows].sort((left, right) => {
+      const a = String(left[primarySort.field] ?? '');
+      const b = String(right[primarySort.field] ?? '');
+      const comparison = a.localeCompare(b, undefined, { sensitivity: 'base', numeric: true });
+      return primarySort.direction === 'desc' ? -comparison : comparison;
+    });
+  }
+
+  private applyServerPagination(rows: any[], query: BrGridQueryState): any[] {
+    const pageIndex = Math.max(0, query.pageIndex || 0);
+    const pageSize = Math.max(1, query.pageSize || 5);
+    const start = pageIndex * pageSize;
+    return rows.slice(start, start + pageSize);
+  }
+}`;
+    }
+
     const hasRichCells = (config.columns || []).some((col) => !!col.type && col.type !== 'text');
     const richHandler = hasRichCells
       ? `
@@ -2397,6 +2547,9 @@ export class YourFeatureComponent {
       pagination: true,
       pageSize: 5,
       sorting: true,
+      uiConfig: {
+        maxHeight: '500px',
+      },
       features: {
         enableTopBar: false,
         enableRowSelection: false,
@@ -2423,6 +2576,89 @@ export class YourFeatureComponent {
     };
   }
 
+  private remoteGridConfig(): BrGridConfig {
+    const query: BrGridQueryState = {
+      pageIndex: 0,
+      pageSize: 5,
+      searchText: '',
+      sort: [{ field: 'name', direction: 'asc' }],
+      filters: [],
+    };
+
+    return {
+      title: 'Remote Grid Demo',
+      dataMode: 'remote',
+      columns: [
+        { field: 'id', header: 'ID', sortable: true },
+        { field: 'name', header: 'Name', sortable: true },
+        { field: 'team', header: 'Team', sortable: true },
+        { field: 'role', header: 'Role', sortable: true },
+        { field: 'status', header: 'Status', sortable: true },
+      ],
+      data: [],
+      result: {
+        rows: [],
+        totalCount: 0,
+        loading: false,
+        query,
+      },
+      queryState: query,
+      pagination: true,
+      pageSize: 5,
+      sorting: true,
+      uiConfig: {
+        maxHeight: '500px',
+      },
+      toolbar: {
+        showSort: true,
+        showFilter: false,
+        showSearch: true,
+        showRefresh: true,
+        showColumnSettings: true,
+        showShare: false,
+        showViewMode: false,
+        primaryActionLabel: 'Add User',
+      },
+      personalization: {
+        availableColumns: [
+          { field: 'id', label: 'Employee ID', group: 'Core' },
+          { field: 'name', label: 'Full Name', group: 'Core' },
+          { field: 'team', label: 'Team', group: 'Org' },
+          { field: 'role', label: 'Role', group: 'Org' },
+          { field: 'status', label: 'Status', group: 'State' },
+        ],
+        selectedColumns: ['id', 'name', 'team', 'role', 'status'],
+      },
+      features: {
+        enableTopBar: true,
+        enableRowSelection: true,
+        enableSelectionActions: true,
+        enableContextMenu: false,
+        enableRowActionButton: false,
+        enableColumnPersonalization: true,
+        enableColumnVisibilityToggle: true,
+        enableColumnReorder: false,
+        enableSorting: true,
+        sortLevels: 1,
+        enableFiltering: false,
+        filterLevels: 1,
+        enableSearch: true,
+        enableRefresh: true,
+        enableShare: false,
+        enableViewMode: false,
+        enablePrimaryAction: true,
+        enablePrimaryActionMenu: false,
+        showPaginationSizeSelector: true,
+        showPaginationSummary: true,
+        showPaginationNavigation: true,
+      },
+      selectionActions: [
+        { id: 'activate-selected', label: 'Activate' },
+        { id: 'deactivate-selected', label: 'Deactivate' },
+      ],
+    };
+  }
+
   private moderateGridConfig(): BrGridConfig {
     return {
       title: 'Moderate Grid Demo',
@@ -2437,6 +2673,9 @@ export class YourFeatureComponent {
       pagination: true,
       pageSize: 5,
       sorting: true,
+      uiConfig: {
+        maxHeight: '500px',
+      },
       toolbar: {
         showSort: true,
         showFilter: true,
@@ -2573,6 +2812,9 @@ export class YourFeatureComponent {
       pagination: true,
       pageSize: 5,
       sorting: true,
+      uiConfig: {
+        maxHeight: '500px',
+      },
       toolbar: {
         showSort: true,
         showFilter: true,
@@ -2645,6 +2887,9 @@ export class YourFeatureComponent {
       pagination: true,
       pageSize: 5,
       sorting: true,
+      uiConfig: {
+        maxHeight: '500px',
+      },
       toolbar: {
         showSort: true,
         showFilter: true,
@@ -3576,6 +3821,147 @@ export class YourFeatureComponent {
       };
       this.syncGridTsCode();
     }
+  }
+
+  private loadRemoteGridData(query: BrGridQueryState): void {
+    const loadingResult: BrGridDataResult = {
+      ...(this.gridConfig.result || { rows: [], totalCount: 0 }),
+      loading: true,
+      errorMessage: undefined,
+      query,
+    };
+
+    this.gridConfig = {
+      ...this.gridConfig,
+      queryState: query,
+      result: loadingResult,
+    };
+
+    const requestId = JSON.stringify(query);
+    this.pushLog(`Remote grid query: ${requestId}`);
+
+    setTimeout(() => {
+      if (this.activeGridPreset !== 'remote') {
+        return;
+      }
+
+      if (this.remoteDemoForceError) {
+        const errorResult: BrGridDataResult = {
+          ...(this.gridConfig.result || { rows: [], totalCount: 0 }),
+          rows: this.remoteDemoReturnEmpty ? [] : (this.gridConfig.result?.rows || []),
+          totalCount: this.remoteDemoReturnEmpty ? 0 : (this.gridConfig.result?.totalCount || 0),
+          loading: false,
+          errorMessage: 'Demo remote error: request failed while loading grid data.',
+          query,
+        };
+
+        this.gridConfig = {
+          ...this.gridConfig,
+          queryState: query,
+          result: errorResult,
+        };
+        this.pushLog('Remote grid demo forced an error state');
+        return;
+      }
+
+      const result = this.mockRemoteUsersQuery(query);
+      this.gridConfig = {
+        ...this.gridConfig,
+        queryState: query,
+        result,
+      };
+      this.pushLog(`Remote grid loaded ${result.rows.length} rows (total ${result.totalCount})`);
+    }, this.remoteDemoDelayMs);
+  }
+
+  private mockRemoteUsersQuery(query: BrGridQueryState): BrGridDataResult {
+    const allRows = this.getRemoteUsersSeed();
+    const searchedRows = this.applyRemoteSearch(allRows, query);
+    const filteredRows = this.applyRemoteFilters(searchedRows, query);
+    const sortedRows = this.applyRemoteSorting(filteredRows, query);
+    const pagedRows = this.applyRemotePagination(sortedRows, query);
+    const finalRows = this.remoteDemoReturnEmpty ? [] : pagedRows;
+    const finalTotal = this.remoteDemoReturnEmpty ? 0 : filteredRows.length;
+
+    return {
+      rows: finalRows,
+      totalCount: finalTotal,
+      loading: false,
+      query,
+    };
+  }
+
+  triggerRemoteGridReload(): void {
+    if (this.activeGridPreset !== 'remote') {
+      return;
+    }
+
+    this.loadRemoteGridData(this.gridConfig.queryState || { pageIndex: 0, pageSize: this.gridConfig.pageSize || 5 });
+  }
+
+  private getRemoteUsersSeed(): any[] {
+    // Demo-only fake backend dataset.
+    // In a real app, replace this entire remote pipeline with an API call.
+    return this.sampleUsers(120);
+  }
+
+  private applyRemoteSearch(rows: any[], query: BrGridQueryState): any[] {
+    const search = (query.searchText || '').trim().toLowerCase();
+    if (!search) {
+      return rows;
+    }
+
+    return rows.filter((row) =>
+      [row.id, row.name, row.team, row.role, row.location, row.status]
+        .some((value) => String(value ?? '').toLowerCase().includes(search))
+    );
+  }
+
+  private applyRemoteFilters(rows: any[], query: BrGridQueryState): any[] {
+    const filters = query.filters || [];
+    if (!filters.length) {
+      return rows;
+    }
+
+    return rows.filter((row) =>
+      filters.every((filter) => {
+        const left = row[filter.field];
+        const right = filter.value;
+
+        switch (filter.operator) {
+          case 'equals':
+            return String(left ?? '') === String(right ?? '');
+          case 'startsWith':
+            return String(left ?? '').toLowerCase().startsWith(String(right ?? '').toLowerCase());
+          case 'endsWith':
+            return String(left ?? '').toLowerCase().endsWith(String(right ?? '').toLowerCase());
+          case 'contains':
+          default:
+            return String(left ?? '').toLowerCase().includes(String(right ?? '').toLowerCase());
+        }
+      })
+    );
+  }
+
+  private applyRemoteSorting(rows: any[], query: BrGridQueryState): any[] {
+    const [primarySort] = query.sort || [];
+    if (!primarySort?.field) {
+      return rows;
+    }
+
+    return [...rows].sort((left, right) => {
+      const a = String(left[primarySort.field] ?? '');
+      const b = String(right[primarySort.field] ?? '');
+      const comparison = a.localeCompare(b, undefined, { sensitivity: 'base', numeric: true });
+      return primarySort.direction === 'desc' ? -comparison : comparison;
+    });
+  }
+
+  private applyRemotePagination(rows: any[], query: BrGridQueryState): any[] {
+    const pageIndex = Math.max(0, query.pageIndex || 0);
+    const pageSize = Math.max(1, query.pageSize || 5);
+    const start = pageIndex * pageSize;
+    return rows.slice(start, start + pageSize);
   }
 
   private clone<T>(value: T): T {
