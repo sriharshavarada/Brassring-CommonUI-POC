@@ -18,6 +18,9 @@ import {
   BrModalActionEvent,
   BrModalComponent,
   BrModalConfig,
+  BrAccordionComponent,
+  BrAccordionConfig,
+  BrAccordionToggleEvent,
   BrAutocompleteComponent,
   BrAutocompleteConfig,
   BrButtonComponent,
@@ -52,7 +55,7 @@ import {
 import { JsonWorkbenchComponent } from './components/json-workbench/json-workbench.component';
 import { CodeEditorComponent, CodeLanguage } from './components/code-editor/code-editor.component';
 
-type PlaygroundTab = 'grid' | 'date' | 'modal' | 'form' | 'button';
+type PlaygroundTab = 'grid' | 'date' | 'modal' | 'accordion' | 'form' | 'button';
 type CodeFile = 'ts' | 'html' | 'scss';
 
 type GridPreset = 'complex' | 'moderate' | 'rich' | 'simple' | 'remote';
@@ -60,6 +63,7 @@ type DatePreset = 'default' | 'compact' | 'disabled';
 type ModalPreset = 'custom' | 'info' | 'confirm' | 'delete' | 'form';
 type FormPreset = 'all-controls' | 'simple';
 type ButtonPreset = 'primary' | 'secondary' | 'outline' | 'danger' | 'text' | 'icon' | 'loading' | 'full-width' | 'with-icons';
+type AccordionPreset = 'default' | 'multi' | 'flush' | 'faq' | 'disabled';
 type ControlPlayground = 'all' | 'date' | 'text' | 'text-area' | 'single-select' | 'multi-select' | 'checkbox' | 'radio' | 'autocomplete';
 type ControlConfig =
   | BrTextConfig
@@ -240,6 +244,7 @@ const LIBRARY_BRANDING_SAMPLE: BrBrandingConfig = {
     BrModalComponent,
     BrTextComponent,
     BrTextAreaComponent,
+    BrAccordionComponent,
     BrButtonComponent,
     BrSingleSelectComponent,
     BrMultiSelectComponent,
@@ -297,6 +302,13 @@ export class PlaygroundComponent {
     'full-width': 'Full Width',
     'with-icons': 'With Icons',
   };
+  readonly accordionPresetLabels: Record<AccordionPreset, string> = {
+    default: 'Default Accordion',
+    multi: 'Multi Expand',
+    flush: 'Flush Accordion',
+    faq: 'FAQ Accordion',
+    disabled: 'Disabled Item',
+  };
   readonly controlPlaygroundLabels: Record<ControlPlayground, string> = {
     all: 'All Controls',
     date: 'Date',
@@ -316,6 +328,7 @@ export class PlaygroundComponent {
   activeDatePreset: DatePreset = 'default';
   activeModalPreset: ModalPreset = 'custom';
   activeFormPreset: FormPreset = 'all-controls';
+  activeAccordionPreset: AccordionPreset = 'default';
   activeButtonPreset: ButtonPreset = 'primary';
   remoteDemoDelayMs = 3000;
   remoteDemoForceError = false;
@@ -326,12 +339,14 @@ export class PlaygroundComponent {
   gridConfigCollapsed = true;
   dateConfigCollapsed = false;
   modalConfigCollapsed = true;
+  accordionConfigCollapsed = true;
   formConfigCollapsed = true;
   buttonConfigCollapsed = true;
 
   gridConfig: BrGridConfig = this.complexGridConfig();
   dateConfig: BrDateConfig = this.defaultDateConfig();
   modalConfig: BrModalConfig = this.defaultModalConfig();
+  accordionConfig: BrAccordionConfig = this.defaultAccordionConfig();
   formConfig: BrFormConfig = this.allControlsFormConfig();
   buttonConfig: BrButtonConfig = this.primaryButtonConfig();
   brandingDemoConfig: PlaygroundBrandingDemoConfig | null = null;
@@ -343,6 +358,7 @@ export class PlaygroundComponent {
   gridCode: DemoCodeState = this.createEmptyCodeState();
   dateCode: DemoCodeState = this.createEmptyCodeState();
   modalCode: DemoCodeState = this.createEmptyCodeState();
+  accordionCode: DemoCodeState = this.createEmptyCodeState();
   formCode: DemoCodeState = this.createEmptyCodeState();
   buttonCode: DemoCodeState = this.createEmptyCodeState();
   private formControlConfigMap: Record<string, ControlConfig> = {};
@@ -351,6 +367,7 @@ export class PlaygroundComponent {
     grid: '',
     date: '',
     modal: '',
+    accordion: '',
     form: '',
     button: '',
   };
@@ -361,6 +378,8 @@ export class PlaygroundComponent {
     gridAction?: (event: BrGridActionEvent, runtimeConsole: Console) => void;
     dateChange?: (value: string, runtimeConsole: Console) => void;
     modalAction?: (event: BrModalActionEvent, runtimeConsole: Console) => void;
+    accordionChange?: (expandedIds: string[], runtimeConsole: Console) => void;
+    accordionToggle?: (event: BrAccordionToggleEvent, runtimeConsole: Console) => void;
     formAction?: (event: BrFormActionEvent, runtimeConsole: Console) => void;
     buttonClick?: (event: MouseEvent, runtimeConsole: Console) => void;
     buttonControlEvent?: (event: any, runtimeConsole: Console) => void;
@@ -376,6 +395,7 @@ export class PlaygroundComponent {
     this.resetGridCodeFromConfig();
     this.resetDateCodeFromConfig();
     this.resetModalCodeFromConfig();
+    this.resetAccordionCodeFromConfig();
     this.resetFormCodeFromConfig();
     this.resetButtonCodeFromConfig();
     this.rebuildFormControlConfigs();
@@ -407,6 +427,10 @@ export class PlaygroundComponent {
 
   get buttonPresets(): ButtonPreset[] {
     return ['primary', 'secondary', 'outline', 'danger', 'text', 'icon', 'loading', 'full-width', 'with-icons'];
+  }
+
+  get accordionPresets(): AccordionPreset[] {
+    return ['default', 'multi', 'flush', 'faq', 'disabled'];
   }
 
   get controlPlaygrounds(): ControlPlayground[] {
@@ -449,6 +473,11 @@ export class PlaygroundComponent {
   setModalMode(mode: ModalUiMode): void {
     this.runtimeUiConfig.setMode('modal', mode);
     this.pushLog(`Modal mode changed to ${mode}`);
+  }
+
+  setAccordionMode(mode: ControlUiMode): void {
+    this.runtimeUiConfig.setMode('accordion', mode);
+    this.pushLog(`Accordion mode changed to ${mode}`);
   }
 
   setButtonMode(mode: ControlUiMode): void {
@@ -518,6 +547,13 @@ export class PlaygroundComponent {
     this.modalConfig = this.clone(this.modalPresetConfigs[preset]);
     this.resetModalCodeFromConfig();
     this.pushLog(`Loaded ${this.modalPresetLabels[preset]} for editing`);
+  }
+
+  selectAccordionPreset(preset: AccordionPreset): void {
+    this.activeAccordionPreset = preset;
+    this.accordionConfig = this.buildAccordionPresetConfig(preset);
+    this.resetAccordionCodeFromConfig();
+    this.pushLog(`Loaded ${this.accordionPresetLabels[preset]}`);
   }
 
   selectButtonPreset(preset: ButtonPreset): void {
@@ -693,6 +729,11 @@ export class PlaygroundComponent {
       return;
     }
 
+    if (tab === 'accordion') {
+      this.accordionConfigCollapsed = !this.accordionConfigCollapsed;
+      return;
+    }
+
     if (tab === 'form') {
       this.formConfigCollapsed = !this.formConfigCollapsed;
       return;
@@ -714,6 +755,11 @@ export class PlaygroundComponent {
 
     if (tab === 'date') {
       this.dateCode.collapsed = !this.dateCode.collapsed;
+      return;
+    }
+
+    if (tab === 'accordion') {
+      this.accordionCode.collapsed = !this.accordionCode.collapsed;
       return;
     }
 
@@ -745,6 +791,11 @@ export class PlaygroundComponent {
       return;
     }
 
+    if (tab === 'accordion') {
+      this.applyAccordionCode();
+      return;
+    }
+
     if (tab === 'form') {
       this.applyFormCode();
       return;
@@ -768,6 +819,12 @@ export class PlaygroundComponent {
     if (tab === 'date') {
       this.resetDateCodeFromConfig();
       this.codeError.date = '';
+      return;
+    }
+
+    if (tab === 'accordion') {
+      this.resetAccordionCodeFromConfig();
+      this.codeError.accordion = '';
       return;
     }
 
@@ -805,6 +862,13 @@ export class PlaygroundComponent {
     this.modalPresetConfigs[this.activeModalPreset] = this.clone(config);
     this.syncModalTsCode();
     this.pushLog('Modal JSON applied');
+  }
+
+  onAccordionConfigChange(config: BrAccordionConfig): void {
+    this.accordionConfig = config;
+    this.accordionCode.ts = this.buildAccordionTsCode(this.accordionConfig);
+    this.scheduleAutoApply('accordion');
+    this.pushLog('Accordion JSON applied');
   }
 
   onFormConfigChange(config: BrFormConfig): void {
@@ -1275,6 +1339,25 @@ export class PlaygroundComponent {
     }
   }
 
+  private applyAccordionCode(): void {
+    try {
+      this.validateTsShape('accordion', this.accordionCode.ts);
+      const parsed = this.parseConfigFromTs<BrAccordionConfig>(this.accordionCode.ts, 'accordionConfig');
+      const htmlSegments = this.extractHtmlSegments(this.accordionCode.html, 'br-accordion');
+      this.validateScss(this.accordionCode.scss);
+      this.runtimeHandlers.accordionChange = this.parseAccordionChangeHandler(this.accordionCode.ts);
+      this.runtimeHandlers.accordionToggle = this.parseAccordionToggleHandler(this.accordionCode.ts);
+
+      this.accordionConfig = parsed;
+      this.accordionCode.htmlBefore = htmlSegments.before;
+      this.accordionCode.htmlAfter = htmlSegments.after;
+      this.accordionCode.appliedScss = this.accordionCode.scss;
+      this.codeError.accordion = '';
+      this.pushLog('Applied Accordion TS/HTML/SCSS code');
+    } catch (error) {
+      this.codeError.accordion = error instanceof Error ? error.message : 'Invalid accordion TS config block';
+    }
+  }
   private applyButtonCode(): void {
     try {
       this.validateTsShape('button', this.buttonCode.ts);
@@ -1329,6 +1412,15 @@ export class PlaygroundComponent {
     this.formCode.appliedScss = this.formCode.scss;
   }
 
+  private resetAccordionCodeFromConfig(): void {
+    this.accordionCode.ts = this.buildAccordionTsCode(this.accordionConfig);
+    this.accordionCode.html = this.defaultAccordionHtmlCode();
+    this.accordionCode.scss = this.defaultAccordionScssCode();
+    const htmlSegments = this.extractHtmlSegments(this.accordionCode.html, 'br-accordion');
+    this.accordionCode.htmlBefore = htmlSegments.before;
+    this.accordionCode.htmlAfter = htmlSegments.after;
+    this.accordionCode.appliedScss = this.accordionCode.scss;
+  }
   private resetButtonCodeFromConfig(): void {
     this.buttonCode.ts = this.buildButtonTsCode(this.buttonConfig);
     this.buttonCode.html = this.defaultButtonHtmlCode();
@@ -1339,6 +1431,9 @@ export class PlaygroundComponent {
     this.buttonCode.appliedScss = this.buttonCode.scss;
   }
 
+  private syncAccordionTsCode(): void {
+    this.accordionCode.ts = this.buildAccordionTsCode(this.accordionConfig);
+  }
   private syncGridTsCode(): void {
     this.gridCode.ts = this.buildGridTsCode(this.gridConfig);
   }
@@ -1360,6 +1455,24 @@ export class PlaygroundComponent {
     const htmlSegments = this.extractControlsHtmlSegments(this.formCode.html);
     this.formCode.htmlBefore = htmlSegments.before;
     this.formCode.htmlAfter = htmlSegments.after;
+  }
+
+  onAccordionChange(expandedIds: string[]): void {
+    const runtimeConsole = this.createRuntimeConsole('accordion');
+    if (this.runtimeHandlers.accordionChange) {
+      this.runtimeHandlers.accordionChange(expandedIds, runtimeConsole);
+    } else {
+      this.pushLog(`[accordion] expanded ${this.stringifyArg(expandedIds)}`);
+    }
+  }
+
+  onAccordionToggle(event: BrAccordionToggleEvent): void {
+    const runtimeConsole = this.createRuntimeConsole('accordion');
+    if (this.runtimeHandlers.accordionToggle) {
+      this.runtimeHandlers.accordionToggle(event, runtimeConsole);
+    } else {
+      this.pushLog(`[accordion] toggle ${event.itemId || event.itemHeader} -> ${event.expanded}`);
+    }
   }
 
   onButtonClick(event: MouseEvent): void {
@@ -1404,14 +1517,14 @@ export class PlaygroundComponent {
     this.formControlConfigMap = next;
   }
 
-  private applyHtmlSegments(tab: PlaygroundTab, controlTag: 'br-grid' | 'br-date' | 'br-modal' | 'br-button'): void {
+  private applyHtmlSegments(tab: PlaygroundTab, controlTag: 'br-grid' | 'br-date' | 'br-modal' | 'br-accordion' | 'br-button'): void {
     const code = this.getCodeState(tab);
     const segments = this.extractHtmlSegments(code.html, controlTag);
     code.htmlBefore = segments.before;
     code.htmlAfter = segments.after;
   }
 
-  private extractHtmlSegments(html: string, controlTag: 'br-grid' | 'br-date' | 'br-modal' | 'br-button'): { before: string; after: string } {
+  private extractHtmlSegments(html: string, controlTag: 'br-grid' | 'br-date' | 'br-modal' | 'br-accordion' | 'br-button'): { before: string; after: string } {
     const pattern = new RegExp(`<${controlTag}[\\s\\S]*?<\\/${controlTag}>`, 'i');
     const match = html.match(pattern);
 
@@ -2238,6 +2351,40 @@ ${helperBlock}
     return this.optionalScssComment('Control');
   }
 
+  private buildAccordionTsCode(config: BrAccordionConfig): string {
+    return `import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
+import { BrAccordionComponent, BrAccordionConfig, BrAccordionToggleEvent } from '@sriharshavarada/br-ui-wrapper';
+
+@Component({
+  standalone: true,
+  imports: [CommonModule, BrAccordionComponent],
+  templateUrl: './accordion-demo.component.html',
+})
+export class YourFeatureComponent {
+  accordionConfig: BrAccordionConfig = ${JSON.stringify(config, null, 2)};
+
+  onAccordionChange(expandedIds: string[]): void {
+    console.log('Accordion expanded ids:', expandedIds);
+  }
+
+  onAccordionToggle(event: BrAccordionToggleEvent): void {
+    console.log('Accordion toggle:', event);
+  }
+}`;
+  }
+
+  private defaultAccordionHtmlCode(): string {
+    return `<section class="accordion-demo-shell">
+  <h3>Accordion Consumer Demo</h3>
+  <p>This is the same consumer HTML you can use in your feature.</p>
+  <br-accordion [config]="accordionConfig" (accordionChange)="onAccordionChange($event)" (itemToggle)="onAccordionToggle($event)"></br-accordion>
+</section>`;
+  }
+
+  private defaultAccordionScssCode(): string {
+    return this.optionalScssComment('Accordion');
+  }
   private buildButtonTsCode(config: BrButtonConfig): string {
     return `import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
@@ -2289,6 +2436,63 @@ export class YourFeatureComponent {
     return this.buildButtonPresetConfig('primary');
   }
 
+  private defaultAccordionConfig(): BrAccordionConfig {
+    return this.buildAccordionPresetConfig('default');
+  }
+
+  private buildAccordionPresetConfig(preset: AccordionPreset): BrAccordionConfig {
+    switch (preset) {
+      case 'multi':
+        return {
+          id: 'multiAccordion',
+          multiple: true,
+          items: [
+            { id: 'overview', header: 'Overview', content: '<p>Multiple sections can stay expanded together.</p>', expanded: true },
+            { id: 'details', header: 'Details', content: '<p>Use this pattern for grouped details and supplemental context.</p>', expanded: true },
+            { id: 'history', header: 'History', content: '<p>Each panel emits the same wrapper events across modes.</p>' },
+          ],
+        };
+      case 'flush':
+        return {
+          id: 'flushAccordion',
+          flush: true,
+          items: [
+            { id: 'summary', header: 'Summary', content: '<p>Flush mode removes the outer card spacing and radius.</p>', expanded: true },
+            { id: 'activity', header: 'Recent Activity', content: '<p>Useful inside dense layouts like side panels or modal bodies.</p>' },
+            { id: 'audit', header: 'Audit Trail', content: '<p>Keep one section open at a time in single-expand mode.</p>' },
+          ],
+        };
+      case 'faq':
+        return {
+          id: 'faqAccordion',
+          multiple: true,
+          items: [
+            { id: 'faq-1', header: 'How does runtime mode work?', content: '<p>The same wrapper switches between custom, Material, and Prime-styled implementations using RuntimeUiConfigService.</p>', expanded: true },
+            { id: 'faq-2', header: 'What does the wrapper emit?', content: '<p>The wrapper emits expanded ids, item toggle details, and a standard controlEvent payload.</p>' },
+            { id: 'faq-3', header: 'Can I drive it from JSON?', content: '<p>Yes. The playground config editor uses the same BrAccordionConfig object you can use in a consumer feature.</p>' },
+          ],
+        };
+      case 'disabled':
+        return {
+          id: 'disabledAccordion',
+          items: [
+            { id: 'open', header: 'Available Section', content: '<p>This section is interactive.</p>', expanded: true },
+            { id: 'locked', header: 'Disabled Section', content: '<p>This panel is disabled and cannot be toggled.</p>', disabled: true },
+            { id: 'notes', header: 'Notes', content: '<p>Disabled panels still render consistently across modes.</p>' },
+          ],
+        };
+      case 'default':
+      default:
+        return {
+          id: 'defaultAccordion',
+          items: [
+            { id: 'candidate', header: 'Candidate Summary', icon: 'person', content: '<p>Use accordion sections to progressively disclose profile details.</p>', expanded: true },
+            { id: 'interviews', header: 'Interview Stages', icon: 'schedule', content: '<p>Track stage notes, owners, and next-step actions inside each section.</p>' },
+            { id: 'documents', header: 'Documents', icon: 'folder', content: '<p>Attach offer letters, resumes, and supporting documents here.</p>' },
+          ],
+        };
+    }
+  }
   private buildButtonPresetConfig(preset: ButtonPreset): BrButtonConfig {
     switch (preset) {
       case 'secondary':
@@ -2377,6 +2581,7 @@ export class YourFeatureComponent {
   private getCodeState(tab: PlaygroundTab): DemoCodeState {
     if (tab === 'grid') return this.gridCode;
     if (tab === 'date') return this.dateCode;
+    if (tab === 'accordion') return this.accordionCode;
     if (tab === 'form') return this.formCode;
     if (tab === 'button') return this.buttonCode;
     return this.modalCode;
@@ -2433,6 +2638,15 @@ export class YourFeatureComponent {
     return new Function('event', 'console', body) as (event: BrFormActionEvent, runtimeConsole: Console) => void;
   }
 
+  private parseAccordionChangeHandler(tsCode: string): (expandedIds: string[], runtimeConsole: Console) => void {
+    const body = this.extractMethodBody(tsCode, 'onAccordionChange');
+    return new Function('expandedIds', 'console', body) as (expandedIds: string[], runtimeConsole: Console) => void;
+  }
+
+  private parseAccordionToggleHandler(tsCode: string): (event: BrAccordionToggleEvent, runtimeConsole: Console) => void {
+    const body = this.extractMethodBody(tsCode, 'onAccordionToggle');
+    return new Function('event', 'console', body) as (event: BrAccordionToggleEvent, runtimeConsole: Console) => void;
+  }
   private parseButtonClickHandler(tsCode: string): (event: MouseEvent, runtimeConsole: Console) => void {
     const body = this.extractMethodBody(tsCode, 'onButtonClick');
     return new Function('event', 'console', body) as (event: MouseEvent, runtimeConsole: Console) => void;
@@ -2443,7 +2657,7 @@ export class YourFeatureComponent {
     return new Function('event', 'console', body) as (event: any, runtimeConsole: Console) => void;
   }
 
-  private extractMethodBody(tsCode: string, methodName: 'onGridAction' | 'onDateChange' | 'onModalAction' | 'onFormAction' | 'onControlsAction' | 'onButtonClick' | 'onButtonControlEvent'): string {
+  private extractMethodBody(tsCode: string, methodName: 'onGridAction' | 'onDateChange' | 'onModalAction' | 'onAccordionChange' | 'onAccordionToggle' | 'onFormAction' | 'onControlsAction' | 'onButtonClick' | 'onButtonControlEvent'): string {
     const regex = new RegExp(`${methodName}\\s*\\([^)]*\\)\\s*:\\s*void\\s*\\{([\\s\\S]*?)\\n\\s*\\}`, 'm');
     const match = tsCode.match(regex);
     if (!match || !match[1]) {
@@ -2473,6 +2687,7 @@ export class YourFeatureComponent {
       grid: /import\s*\{[^}]*BrGridConfig[^}]*\}\s*from\s*['"]@sriharshavarada\/br-ui-wrapper['"]/,
       date: /import\s*\{[^}]*BrDateConfig[^}]*\}\s*from\s*['"]@sriharshavarada\/br-ui-wrapper['"]/,
       modal: /import\s*\{[^}]*BrModalConfig[^}]*\}\s*from\s*['"]@sriharshavarada\/br-ui-wrapper['"]/,
+      accordion: /import\s*\{[^}]*BrAccordionConfig[^}]*\}\s*from\s*['"]@sriharshavarada\/br-ui-wrapper['"]/,
       form: /import\s*\{[^}]*Br(ControlsConfig|FormConfig)[^}]*\}\s*from\s*['"]@sriharshavarada\/br-ui-wrapper['"]/,
       button: /import\s*\{[^}]*BrButtonConfig[^}]*\}\s*from\s*['"]@sriharshavarada\/br-ui-wrapper['"]/,
     };
@@ -2482,7 +2697,7 @@ export class YourFeatureComponent {
     }
   }
 
-  private createRuntimeConsole(scope: 'grid' | 'date' | 'modal' | 'form' | 'button'): Console {
+  private createRuntimeConsole(scope: 'grid' | 'date' | 'modal' | 'accordion' | 'form' | 'button'): Console {
     const logLike = (level: 'log' | 'warn' | 'error') => (...args: any[]) => {
       const message = args.map((x) => this.stringifyArg(x)).join(' ');
       this.pushLog(`[${scope}] console.${level}: ${message}`);
@@ -3968,3 +4183,14 @@ export class YourFeatureComponent {
     return JSON.parse(JSON.stringify(value)) as T;
   }
 }
+
+
+
+
+
+
+
+
+
+
+

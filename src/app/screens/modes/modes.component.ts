@@ -14,6 +14,7 @@ type ModePanelKey =
   | 'grid'
   | 'date'
   | 'modal'
+  | 'accordion'
   | 'text'
   | 'singleSelect'
   | 'multiSelect'
@@ -43,6 +44,7 @@ export class ModesComponent {
   readonly coreModeItems: ModePanelItem[] = [
     { key: 'grid', label: 'Grid', hint: 'br-grid wrapper' },
     { key: 'modal', label: 'Modal Pop-up', hint: 'br-modal wrapper' },
+    { key: 'accordion', label: 'Accordion', hint: 'br-accordion wrapper' },
   ];
 
   readonly controlModeItems: ModePanelItem[] = [
@@ -71,6 +73,10 @@ export class ModesComponent {
 
   setModalMode(mode: ModalUiMode): void {
     this.runtimeUiConfig.setMode('modal', mode);
+  }
+
+  setAccordionMode(mode: ControlUiMode): void {
+    this.runtimeUiConfig.setMode('accordion', mode);
   }
 
   setControlMode(
@@ -103,6 +109,7 @@ export class ModesComponent {
     if (key === 'grid') return this.gridModes;
     if (key === 'date') return this.dateModes;
     if (key === 'modal') return this.modalModes;
+    if (key === 'accordion') return this.controlModes;
     return this.controlModes;
   }
 
@@ -123,9 +130,14 @@ export class ModesComponent {
       this.setModalMode(mode as ModalUiMode);
       return;
     }
+    if (key === 'accordion') {
+      this.setAccordionMode(mode as ControlUiMode);
+      return;
+    }
     this.setControlMode(
       key as 'text' | 'singleSelect' | 'multiSelect' | 'checkbox' | 'radio' | 'autocomplete',
       mode as ControlUiMode,
     );
   }
 }
+

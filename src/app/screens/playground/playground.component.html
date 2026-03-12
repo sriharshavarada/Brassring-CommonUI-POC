@@ -21,6 +21,9 @@
     <button type="button" class="tab-btn" [class.active]="activeTab === 'form'" (click)="activeTab = 'form'">
       Controls Playground
     </button>
+    <button type="button" class="tab-btn" [class.active]="activeTab === 'accordion'" (click)="activeTab = 'accordion'">
+      Accordion Playground
+    </button>
     <button type="button" class="tab-btn" [class.active]="activeTab === 'button'" (click)="activeTab = 'button'">
       Buttons Playground
     </button>
@@ -122,6 +125,86 @@
     </article>
   </section>
 
+  <section class="workspace" *ngIf="activeTab === 'accordion'">
+    <article class="editor-card full">
+      <div class="card-head">
+        <div class="card-head-inline">
+          <h2>Accordion Playground</h2>
+          <div class="inline-mode-control">
+            <span class="inline-mode-label">Accordion Mode</span>
+            <div class="segmented compact inline-mode-segmented">
+              <button type="button" class="seg-btn" *ngFor="let mode of controlModes"
+                [class.active]="modes.accordion === mode" (click)="setAccordionMode(mode)">
+                {{ mode }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="preset-row">
+        <span class="preset-label">Accordion Presets:</span>
+        <button type="button" class="preset-btn" *ngFor="let preset of accordionPresets"
+          [class.active]="activeAccordionPreset === preset" (click)="selectAccordionPreset(preset)">
+          {{ accordionPresetLabels[preset] }}
+        </button>
+      </div>
+
+      <section class="inline-collapse">
+        <button type="button" class="inline-collapse-toggle" (click)="toggleConfigPanel('accordion')">
+          <span class="inline-collapse-title">Accordion Config Editor</span>
+          <span class="inline-collapse-meta">{{ accordionConfigCollapsed ? 'Collapsed' : 'Expanded' }}</span>
+          <span class="inline-collapse-caret" [class.open]="!accordionConfigCollapsed">▾</span>
+        </button>
+        <div class="inline-collapse-body" *ngIf="!accordionConfigCollapsed">
+          <app-json-workbench title="Accordion Config" [value]="accordionConfig" (valueChange)="onAccordionConfigChange($event)">
+          </app-json-workbench>
+        </div>
+      </section>
+
+      <section class="inline-collapse">
+        <button type="button" class="inline-collapse-toggle" (click)="toggleCodePanel('accordion')">
+          <span class="inline-collapse-title">Accordion Code Studio</span>
+          <span class="inline-collapse-meta">{{ accordionCode.collapsed ? 'Collapsed' : 'Expanded' }}</span>
+          <span class="inline-collapse-caret" [class.open]="!accordionCode.collapsed">▾</span>
+        </button>
+        <section class="code-studio inline-collapse-body" *ngIf="!accordionCode.collapsed">
+          <div class="code-head">
+            <h3>Consumer Code</h3>
+            <div class="code-actions">
+              <button type="button" class="btn" (click)="applyCode('accordion')">Apply Code</button>
+              <button type="button" class="btn ghost" (click)="resetCode('accordion')">Reset</button>
+              <button type="button" class="btn ghost" (click)="toggleCodePanel('accordion')">Collapse</button>
+            </div>
+          </div>
+          <div class="file-tabs">
+            <button type="button" class="file-tab" *ngFor="let file of codeFiles"
+              [class.active]="accordionCode.activeFile === file" (click)="setCodeFile('accordion', file)">
+              {{ file.toUpperCase() }}
+            </button>
+          </div>
+          <app-code-editor [language]="codeLanguage(accordionCode.activeFile)"
+            [value]="accordionCode.activeFile === 'ts' ? accordionCode.ts : (accordionCode.activeFile === 'html' ? accordionCode.html : accordionCode.scss)"
+            (valueChange)="onCodeEditorChange('accordion', $event)">
+          </app-code-editor>
+          <p class="code-error" *ngIf="codeError.accordion">{{ codeError.accordion }}</p>
+        </section>
+      </section>
+
+      <div class="preview full-preview accordion-live-preview">
+        <style [textContent]="accordionCode.appliedScss"></style>
+        <ng-container *ngIf="!codeError.accordion; else accordionPreviewError">
+          <div [innerHTML]="accordionCode.htmlBefore"></div>
+          <br-accordion [config]="accordionConfig" (accordionChange)="onAccordionChange($event)"
+            (itemToggle)="onAccordionToggle($event)"></br-accordion>
+          <div [innerHTML]="accordionCode.htmlAfter"></div>
+        </ng-container>
+        <ng-template #accordionPreviewError>
+          <div class="preview-error">{{ codeError.accordion }}</div>
+        </ng-template>
+      </div>
+    </article>
+  </section>
   <section class="workspace" *ngIf="activeTab === 'button'">
     <article class="editor-card full">
       <div class="card-head">
@@ -571,3 +654,4 @@
     </section>
   </div>
 </div>
+
