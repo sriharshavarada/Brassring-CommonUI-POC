@@ -25,6 +25,109 @@ These are the key commits in order (older -> newer):
 - `59a221e` `docs: update handoff with date control and tree editor changes`
 - `81c77af` `2-Way-Binding Attempt 1`
 
+## Post-Commit Delta After Latest Local HEADs
+This section captures local work that exists after the latest checked-in commits currently visible in each repo.
+
+Latest local commit before these changes:
+- app repo:
+  - `0549f05` `Accodian changes`
+- library repo:
+  - `5f0fe36` `Accordion Changes`
+
+### Current package mode
+- The app is intentionally left in local `yalc` mode only.
+- App dependency currently points to:
+  - `file:.yalc/@sriharshavarada/br-ui-wrapper`
+- This is reflected in:
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/package.json`
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/package-lock.json`
+- Do not treat this state as published-package verification; this is local library-consumer validation mode.
+
+### App repo changes after `0549f05`
+- `add-user` screen now contains a projected-content accordion example using:
+  - `br-accordion`
+  - `br-accordion-item`
+  - nested wrapper controls inside accordion bodies
+- Files:
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/add-user/add-user.component.ts`
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/add-user/add-user.component.html`
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/add-user/add-user.component.scss`
+
+- Accordion playground was expanded substantially:
+  - new `Direct Input` preset was added
+  - direct-input variant now demonstrates projected `br-accordion-item` usage instead of `[items]`-driven accordion config
+  - direct-input variant keeps a small note instead of pretending there is a real `BrAccordionConfig`
+  - code studio for direct-input shows one combined projected-markup example
+  - live direct-input cards now include:
+    - basic projected items
+    - multi-expand
+    - flush
+    - disabled item
+    - projected-content example with nested wrapper controls
+  - direct-input accordion lists were stabilized as readonly properties after a bug where getter-created arrays caused projected items to rebuild and prevented panels from staying open
+- Files:
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/playground/playground.component.ts`
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/playground/playground.component.html`
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/playground/playground.component.scss`
+
+### Library repo changes after `5f0fe36`
+- `br-accordion` now supports projected child items through:
+  - `ContentChildren(BrAccordionItemComponent)`
+  - runtime adaptation of projected items into the wrapper contract
+  - sync/update logic for projected item expansion state
+- Public projected child component is now exposed:
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/components/br-accordion/br-accordion-item.component.ts`
+  - exported from `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/public-api.ts`
+
+- Accordion item model was expanded to support projected content templates:
+  - `contentTemplate?: TemplateRef<unknown> | null`
+- File:
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/models/controls-config.model.ts`
+
+- Modal and form models were extended so accordion can be used as a field type:
+  - form field type now includes `accordion`
+  - modal field type now includes `accordion`
+  - accordion item arrays plus `multiple` / `flush` are accepted in those contracts
+- Files:
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/models/form-config.model.ts`
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/models/modal-config.model.ts`
+
+- Accordion rendering was wired into modal implementations:
+  - custom modal
+  - material modal
+  - primeng modal
+- Files:
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/modal/custom/custom-modal.component.ts`
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/modal/custom/custom-modal.component.html`
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/modal/material/material-modal.component.ts`
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/modal/material/material-modal.component.html`
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/modal/primeng/prime-modal.component.ts`
+
+- Accordion branding pass was completed across all implementations:
+  - custom, material, and Prime accordions now use branding tokens for typography, surface colors, borders, shadows, focus treatment, and disabled styling
+- Files:
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/form/controls/accordion/custom/custom-accordion-control.component.scss`
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/form/controls/accordion/material/material-accordion-control.component.scss`
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/form/controls/accordion/primeng/prime-accordion-control.component.scss`
+
+- Accordion accessibility was improved, but not fully exhausted:
+  - custom and Prime keep controlled regions in the DOM when collapsed via `[hidden]`
+  - decorative icon/caret content is now `aria-hidden`
+  - region/header relationships were improved with stable ids and `aria-labelledby`
+  - Material icon text is also hidden from assistive tech
+- Files:
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/form/controls/accordion/custom/custom-accordion-control.component.html`
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/form/controls/accordion/material/material-accordion-control.component.html`
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/form/controls/accordion/primeng/prime-accordion-control.component.html`
+
+### Validation already performed for this local state
+- library build passed locally
+- library was pushed through:
+  - `npm run dev:yalc:push`
+- app was restarted with:
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/scripts/restart-app-clean.sh`
+- app is currently expected to be verified in local `yalc` mode, not published-package mode
+
 ### What those missed 2 commits likely covered
 If someone missed recent check-ins:
 - `9c2c63c` / `3d1c98e` are modal-related iterations (popup behavior/configuration and custom modal wiring refinement).

@@ -152,46 +152,67 @@
 
       <section class="inline-collapse">
         <button type="button" class="inline-collapse-toggle" (click)="toggleConfigPanel('accordion')">
-          <span class="inline-collapse-title">Accordion Config Editor</span>
+          <span class="inline-collapse-title">{{ isAccordionDirectInputPreset ? 'Direct Input Structure' : 'Accordion Config Editor' }}</span>
           <span class="inline-collapse-meta">{{ accordionConfigCollapsed ? 'Collapsed' : 'Expanded' }}</span>
           <span class="inline-collapse-caret" [class.open]="!accordionConfigCollapsed">▾</span>
         </button>
         <div class="inline-collapse-body" *ngIf="!accordionConfigCollapsed">
-          <app-json-workbench title="Accordion Config" [value]="accordionConfig" (valueChange)="onAccordionConfigChange($event)">
-          </app-json-workbench>
+          <ng-container *ngIf="!isAccordionDirectInputPreset; else directInputConfigStudio">
+            <app-json-workbench title="Accordion Config" [value]="accordionConfig" (valueChange)="onAccordionConfigChange($event)">
+            </app-json-workbench>
+          </ng-container>
+          <ng-template #directInputConfigStudio>
+            <div class="accordion-studio-stack">
+              <p class="accordion-studio-copy">This variant is template-driven and has no <code>BrAccordionConfig</code>.</p>
+            </div>
+          </ng-template>
         </div>
       </section>
 
       <section class="inline-collapse">
         <button type="button" class="inline-collapse-toggle" (click)="toggleCodePanel('accordion')">
-          <span class="inline-collapse-title">Accordion Code Studio</span>
+          <span class="inline-collapse-title">{{ isAccordionDirectInputPreset ? 'Direct Input Code Studio' : 'Accordion Code Studio' }}</span>
           <span class="inline-collapse-meta">{{ accordionCode.collapsed ? 'Collapsed' : 'Expanded' }}</span>
           <span class="inline-collapse-caret" [class.open]="!accordionCode.collapsed">▾</span>
         </button>
         <section class="code-studio inline-collapse-body" *ngIf="!accordionCode.collapsed">
-          <div class="code-head">
-            <h3>Consumer Code</h3>
-            <div class="code-actions">
-              <button type="button" class="btn" (click)="applyCode('accordion')">Apply Code</button>
-              <button type="button" class="btn ghost" (click)="resetCode('accordion')">Reset</button>
-              <button type="button" class="btn ghost" (click)="toggleCodePanel('accordion')">Collapse</button>
+          <ng-container *ngIf="!isAccordionDirectInputPreset; else directInputCodeStudio">
+            <div class="code-head">
+              <h3>Consumer Code</h3>
+              <div class="code-actions">
+                <button type="button" class="btn" (click)="applyCode('accordion')">Apply Code</button>
+                <button type="button" class="btn ghost" (click)="resetCode('accordion')">Reset</button>
+                <button type="button" class="btn ghost" (click)="toggleCodePanel('accordion')">Collapse</button>
+              </div>
             </div>
-          </div>
-          <div class="file-tabs">
-            <button type="button" class="file-tab" *ngFor="let file of codeFiles"
-              [class.active]="accordionCode.activeFile === file" (click)="setCodeFile('accordion', file)">
-              {{ file.toUpperCase() }}
-            </button>
-          </div>
-          <app-code-editor [language]="codeLanguage(accordionCode.activeFile)"
-            [value]="accordionCode.activeFile === 'ts' ? accordionCode.ts : (accordionCode.activeFile === 'html' ? accordionCode.html : accordionCode.scss)"
-            (valueChange)="onCodeEditorChange('accordion', $event)">
-          </app-code-editor>
-          <p class="code-error" *ngIf="codeError.accordion">{{ codeError.accordion }}</p>
+            <div class="file-tabs">
+              <button type="button" class="file-tab" *ngFor="let file of codeFiles"
+                [class.active]="accordionCode.activeFile === file" (click)="setCodeFile('accordion', file)">
+                {{ file.toUpperCase() }}
+              </button>
+            </div>
+            <app-code-editor [language]="codeLanguage(accordionCode.activeFile)"
+              [value]="accordionCode.activeFile === 'ts' ? accordionCode.ts : (accordionCode.activeFile === 'html' ? accordionCode.html : accordionCode.scss)"
+              (valueChange)="onCodeEditorChange('accordion', $event)">
+            </app-code-editor>
+            <p class="code-error" *ngIf="codeError.accordion">{{ codeError.accordion }}</p>
+          </ng-container>
+          <ng-template #directInputCodeStudio>
+            <div class="accordion-studio-stack">
+              <div class="code-head">
+                <h3>Playground Markup</h3>
+                <div class="code-actions">
+                  <button type="button" class="btn ghost" (click)="toggleCodePanel('accordion')">Collapse</button>
+                </div>
+              </div>
+              <p class="accordion-studio-copy">Single view of the live direct-input accordion gallery shown below.</p>
+              <pre class="snippet-block"><code>{{ directInputPlaygroundCode }}</code></pre>
+            </div>
+          </ng-template>
         </section>
       </section>
 
-      <div class="preview full-preview accordion-live-preview">
+      <div class="preview full-preview accordion-live-preview" *ngIf="!isAccordionDirectInputPreset">
         <style [textContent]="accordionCode.appliedScss"></style>
         <ng-container *ngIf="!codeError.accordion; else accordionPreviewError">
           <div [innerHTML]="accordionCode.htmlBefore"></div>
@@ -203,6 +224,94 @@
           <div class="preview-error">{{ codeError.accordion }}</div>
         </ng-template>
       </div>
+
+      <section class="preview accordion-direct-showcase" *ngIf="isAccordionDirectInputPreset">
+        <div class="accordion-direct-showcase__header">
+          <h3>Direct Input Accordions</h3>
+          <p>Live wrapper-only variants rendered the same way they are represented in the config and code sections above.</p>
+        </div>
+
+        <div class="accordion-direct-showcase__grid">
+          <article class="accordion-direct-card">
+            <h4>Basic Projected Items</h4>
+            <p class="accordion-direct-card__copy">Single-expand accordion authored directly with projected items.</p>
+            <br-accordion [id]="'directBasicAccordion'" (accordionChange)="onAccordionChange($event)"
+              (itemToggle)="onAccordionToggle($event)">
+              <br-accordion-item *ngFor="let item of directInputBasicItems" [id]="item.id" [header]="item.header"
+                [expanded]="item.expanded ?? false" [disabled]="item.disabled ?? false" [icon]="item.icon" [meta]="item.meta">
+                <div class="accordion-projected-body" [innerHTML]="projectedAccordionContent(item)"></div>
+              </br-accordion-item>
+            </br-accordion>
+          </article>
+
+          <article class="accordion-direct-card">
+            <h4>Multi Expand</h4>
+            <p class="accordion-direct-card__copy">Projected items with `[multiple]` enabled on the wrapper.</p>
+            <br-accordion [id]="'directMultiAccordion'" [multiple]="true" (accordionChange)="onAccordionChange($event)"
+              (itemToggle)="onAccordionToggle($event)">
+              <br-accordion-item *ngFor="let item of directInputMultiItems" [id]="item.id" [header]="item.header"
+                [expanded]="item.expanded ?? false" [disabled]="item.disabled ?? false" [icon]="item.icon" [meta]="item.meta">
+                <div class="accordion-projected-body" [innerHTML]="projectedAccordionContent(item)"></div>
+              </br-accordion-item>
+            </br-accordion>
+          </article>
+
+          <article class="accordion-direct-card">
+            <h4>Flush Mode</h4>
+            <p class="accordion-direct-card__copy">Projected items with `[flush]` for denser layouts.</p>
+            <br-accordion [id]="'directFlushAccordion'" [flush]="true" (accordionChange)="onAccordionChange($event)"
+              (itemToggle)="onAccordionToggle($event)">
+              <br-accordion-item *ngFor="let item of directInputFlushItems" [id]="item.id" [header]="item.header"
+                [expanded]="item.expanded ?? false" [disabled]="item.disabled ?? false" [icon]="item.icon" [meta]="item.meta">
+                <div class="accordion-projected-body" [innerHTML]="projectedAccordionContent(item)"></div>
+              </br-accordion-item>
+            </br-accordion>
+          </article>
+
+          <article class="accordion-direct-card">
+            <h4>Disabled Items</h4>
+            <p class="accordion-direct-card__copy">Projected items with one disabled panel.</p>
+            <br-accordion [id]="'directDisabledAccordion'" (accordionChange)="onAccordionChange($event)"
+              (itemToggle)="onAccordionToggle($event)">
+              <br-accordion-item *ngFor="let item of directInputDisabledItems" [id]="item.id" [header]="item.header"
+                [expanded]="item.expanded ?? false" [disabled]="item.disabled ?? false" [icon]="item.icon" [meta]="item.meta">
+                <div class="accordion-projected-body" [innerHTML]="projectedAccordionContent(item)"></div>
+              </br-accordion-item>
+            </br-accordion>
+          </article>
+
+          <article class="accordion-direct-card">
+            <h4>Projected Items</h4>
+            <p class="accordion-direct-card__copy">Projected <code>br-accordion-item</code> with mixed markup and live wrapper controls.</p>
+            <br-accordion [id]="'playground-projected-input'" [multiple]="true" [flush]="false"
+              (accordionChange)="onAccordionChange($event)" (itemToggle)="onAccordionToggle($event)">
+              <br-accordion-item [id]="directInputProjectedItems[0].id" [header]="directInputProjectedItems[0].header"
+                [expanded]="directInputProjectedItems[0].expanded ?? false" [disabled]="directInputProjectedItems[0].disabled ?? false"
+                [icon]="directInputProjectedItems[0].icon" [meta]="directInputProjectedItems[0].meta">
+                <div class="accordion-projected-body" [innerHTML]="projectedAccordionContent(directInputProjectedItems[0])"></div>
+              </br-accordion-item>
+              <br-accordion-item [id]="directInputProjectedItems[1].id" [header]="directInputProjectedItems[1].header"
+                [expanded]="directInputProjectedItems[1].expanded ?? false" [disabled]="directInputProjectedItems[1].disabled ?? false"
+                [icon]="directInputProjectedItems[1].icon" [meta]="directInputProjectedItems[1].meta">
+                <div class="accordion-inline-controls">
+                  <br-text [config]="{ id: 'accordionText', label: 'Hiring Manager', value: 'Alicia Stone', placeholder: 'Enter manager name' }">
+                  </br-text>
+                  <br-single-select
+                    [config]="{ id: 'accordionStage', label: 'Interview Stage', value: 'onsite', options: [{ label: 'Phone Screen', value: 'phone' }, { label: 'Onsite', value: 'onsite' }, { label: 'Offer', value: 'offer' }] }">
+                  </br-single-select>
+                  <br-checkbox [config]="{ id: 'accordionChecklist', label: 'Background check required', checked: true, value: true }">
+                  </br-checkbox>
+                </div>
+              </br-accordion-item>
+              <br-accordion-item [id]="directInputProjectedItems[2].id" [header]="directInputProjectedItems[2].header"
+                [expanded]="directInputProjectedItems[2].expanded ?? false" [disabled]="directInputProjectedItems[2].disabled ?? false"
+                [icon]="directInputProjectedItems[2].icon" [meta]="directInputProjectedItems[2].meta">
+                <div class="accordion-projected-body" [innerHTML]="projectedAccordionContent(directInputProjectedItems[2])"></div>
+              </br-accordion-item>
+            </br-accordion>
+          </article>
+        </div>
+      </section>
     </article>
   </section>
   <section class="workspace" *ngIf="activeTab === 'button'">
@@ -654,4 +763,3 @@
     </section>
   </div>
 </div>
-

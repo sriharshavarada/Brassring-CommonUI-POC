@@ -38,6 +38,47 @@
     </div>
   </section>
 
+  <section class="form-card">
+    <h2>Accordion Example</h2>
+    <p class="section-copy">
+      This section uses projected-content accordion items. The accordion itself is not config-driven here; the content inside each
+      item is normal consumer markup.
+    </p>
+
+    <br-accordion [multiple]="true" [flush]="false">
+      <br-accordion-item header="Employment Details" [expanded]="true">
+        <div class="accordion-grid">
+          <div class="field">
+            <br-text [config]="employeeIdConfig" (valueChange)="updateEmployeeId($event)"
+              (controlEvent)="onControlEvent('TEXT:employeeId', $event)"></br-text>
+          </div>
+          <div class="field">
+            <br-text [config]="managerConfig" (valueChange)="updateManager($event)"
+              (controlEvent)="onControlEvent('TEXT:manager', $event)"></br-text>
+          </div>
+        </div>
+      </br-accordion-item>
+
+      <br-accordion-item header="Access And Workspace">
+        <div class="accordion-grid">
+          <div class="field">
+            <br-text [config]="badgeNumberConfig" (valueChange)="updateBadgeNumber($event)"
+              (controlEvent)="onControlEvent('TEXT:badgeNumber', $event)"></br-text>
+          </div>
+          <div class="field">
+            <br-text [config]="deskLocationConfig" (valueChange)="updateDeskLocation($event)"
+              (controlEvent)="onControlEvent('TEXT:deskLocation', $event)"></br-text>
+          </div>
+          <div class="field full">
+            <div class="accordion-note">
+              You can place plain HTML or any other library control inside <code>br-accordion-item</code>.
+            </div>
+          </div>
+        </div>
+      </br-accordion-item>
+    </br-accordion>
+  </section>
+
   <p class="result" *ngIf="submitMessage">{{ submitMessage }}</p>
 
   <section class="event-log" *ngIf="controlEvents.length">

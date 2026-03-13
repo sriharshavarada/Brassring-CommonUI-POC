@@ -20,6 +20,8 @@ import {
   BrModalConfig,
   BrAccordionComponent,
   BrAccordionConfig,
+  BrAccordionItemConfig,
+  BrAccordionItemComponent,
   BrAccordionToggleEvent,
   BrAutocompleteComponent,
   BrAutocompleteConfig,
@@ -63,7 +65,7 @@ type DatePreset = 'default' | 'compact' | 'disabled';
 type ModalPreset = 'custom' | 'info' | 'confirm' | 'delete' | 'form';
 type FormPreset = 'all-controls' | 'simple';
 type ButtonPreset = 'primary' | 'secondary' | 'outline' | 'danger' | 'text' | 'icon' | 'loading' | 'full-width' | 'with-icons';
-type AccordionPreset = 'default' | 'multi' | 'flush' | 'faq' | 'disabled';
+type AccordionPreset = 'default' | 'multi' | 'flush' | 'faq' | 'disabled' | 'direct-input';
 type ControlPlayground = 'all' | 'date' | 'text' | 'text-area' | 'single-select' | 'multi-select' | 'checkbox' | 'radio' | 'autocomplete';
 type ControlConfig =
   | BrTextConfig
@@ -245,6 +247,7 @@ const LIBRARY_BRANDING_SAMPLE: BrBrandingConfig = {
     BrTextComponent,
     BrTextAreaComponent,
     BrAccordionComponent,
+    BrAccordionItemComponent,
     BrButtonComponent,
     BrSingleSelectComponent,
     BrMultiSelectComponent,
@@ -308,6 +311,7 @@ export class PlaygroundComponent {
     flush: 'Flush Accordion',
     faq: 'FAQ Accordion',
     disabled: 'Disabled Item',
+    'direct-input': 'Direct Input',
   };
   readonly controlPlaygroundLabels: Record<ControlPlayground, string> = {
     all: 'All Controls',
@@ -335,6 +339,66 @@ export class PlaygroundComponent {
   remoteDemoReturnEmpty = false;
   activeControlPlayground: ControlPlayground = 'all';
   activeControlVariant = 'default';
+
+  readonly directInputBasicItems: BrAccordionItemConfig[] = [
+    {
+      id: 'candidate-summary',
+      header: 'Candidate Summary',
+      icon: 'person',
+      content: '<p>Direct input using projected <code>br-accordion-item</code> blocks.</p>',
+      expanded: true,
+    },
+    {
+      id: 'timeline',
+      header: 'Interview Timeline',
+      icon: 'schedule',
+      content: '<p>Use this when panel markup is static and authored directly in the template.</p>',
+    },
+    {
+      id: 'attachments',
+      header: 'Attachments',
+      icon: 'folder',
+      content: '<p>Files, notes, or other lightweight sections fit well here.</p>',
+    },
+  ];
+
+  readonly directInputMultiItems: BrAccordionItemConfig[] = [
+    { id: 'employment', header: 'Employment Details', content: '<p>Multiple panels stay open together.</p>', expanded: true },
+    { id: 'workspace', header: 'Workspace Access', content: '<p>Useful when the user compares related sections side by side.</p>', expanded: true },
+    { id: 'audit', header: 'Audit Notes', content: '<p>Keep supplemental context visible without collapsing the rest.</p>' },
+  ];
+
+  readonly directInputFlushItems: BrAccordionItemConfig[] = [
+    { id: 'overview', header: 'Overview', content: '<p>Flush style removes the outer card chrome.</p>', expanded: true },
+    { id: 'activity', header: 'Recent Activity', content: '<p>Good fit for dense side panels and modal bodies.</p>' },
+    { id: 'history', header: 'History', content: '<p>Still uses the same direct wrapper inputs.</p>' },
+  ];
+
+  readonly directInputDisabledItems: BrAccordionItemConfig[] = [
+    { id: 'open-section', header: 'Available Section', content: '<p>This one is interactive.</p>', expanded: true },
+    { id: 'locked-section', header: 'Disabled Section', content: '<p>This panel is disabled through the item input.</p>', disabled: true },
+    { id: 'notes-section', header: 'Notes', content: '<p>Direct input still supports disabled items and metadata.</p>' },
+  ];
+
+  readonly directInputProjectedItems: BrAccordionItemConfig[] = [
+    {
+      id: 'projected-one',
+      header: 'Projected Content Block',
+      content:
+        '<div><p>Panel body comes from projected markup instead of the config object.</p><p><strong>Use this path for richer layouts.</strong></p></div>',
+      expanded: true,
+    },
+    {
+      id: 'projected-two',
+      header: 'Nested Wrapper Controls',
+      content: '<div><p>You can place form controls, notes, badges, or any other markup here.</p></div>',
+    },
+    {
+      id: 'projected-three',
+      header: 'Freeform Composition',
+      content: '<div><p>This is the most flexible direct-input style when every section differs.</p></div>',
+    },
+  ];
 
   gridConfigCollapsed = true;
   dateConfigCollapsed = false;
@@ -430,7 +494,148 @@ export class PlaygroundComponent {
   }
 
   get accordionPresets(): AccordionPreset[] {
-    return ['default', 'multi', 'flush', 'faq', 'disabled'];
+    return ['default', 'multi', 'flush', 'faq', 'disabled', 'direct-input'];
+  }
+
+  get accordionDirectItems(): BrAccordionItemConfig[] {
+    return this.accordionConfig.items || [];
+  }
+
+  get accordionProjectedItems(): BrAccordionItemConfig[] {
+    return this.accordionConfig.items || [];
+  }
+
+  get isAccordionDirectInputPreset(): boolean {
+    return this.activeAccordionPreset === 'direct-input';
+  }
+
+  get directInputAccordionConfigs(): Array<{ title: string; config: BrAccordionConfig }> {
+    return [];
+  }
+
+  get directInputConfigStudioJson(): string {
+    return `{
+  "kind": "projected-br-accordion-item-only",
+  "note": "Direct input preset does not use BrAccordionConfig for rendering.",
+  "variants": {
+    "basic": ${JSON.stringify(this.directInputBasicItems, null, 4)},
+    "multi": ${JSON.stringify(this.directInputMultiItems, null, 4)},
+    "flush": ${JSON.stringify(this.directInputFlushItems, null, 4)},
+    "disabled": ${JSON.stringify(this.directInputDisabledItems, null, 4)},
+    "projected": ${JSON.stringify(this.directInputProjectedItems, null, 4)}
+  }
+}`;
+  }
+
+  get directInputPlaygroundCode(): string {
+    return `<!-- Direct input accordion gallery used in the playground -->
+<section class="accordion-direct-showcase">
+  <br-accordion
+    [id]="'directBasicAccordion'"
+    (accordionChange)="onAccordionChange($event)"
+    (itemToggle)="onAccordionToggle($event)">
+    <br-accordion-item header="Candidate Summary" [expanded]="true" icon="person">
+      <p>Direct input using projected <code>br-accordion-item</code> blocks.</p>
+    </br-accordion-item>
+    <br-accordion-item header="Interview Timeline" icon="schedule">
+      <p>Use this when panel markup is static and authored directly in the template.</p>
+    </br-accordion-item>
+    <br-accordion-item header="Attachments" icon="folder">
+      <p>Files, notes, or other lightweight sections fit well here.</p>
+    </br-accordion-item>
+  </br-accordion>
+
+  <br-accordion
+    [id]="'directMultiAccordion'"
+    [multiple]="true"
+    (accordionChange)="onAccordionChange($event)"
+    (itemToggle)="onAccordionToggle($event)">
+    <br-accordion-item header="Employment Details" [expanded]="true">
+      <p>Multiple panels stay open together.</p>
+    </br-accordion-item>
+    <br-accordion-item header="Workspace Access" [expanded]="true">
+      <p>Useful when the user compares related sections side by side.</p>
+    </br-accordion-item>
+    <br-accordion-item header="Audit Notes">
+      <p>Keep supplemental context visible without collapsing the rest.</p>
+    </br-accordion-item>
+  </br-accordion>
+
+  <br-accordion
+    [id]="'directFlushAccordion'"
+    [flush]="true"
+    (accordionChange)="onAccordionChange($event)"
+    (itemToggle)="onAccordionToggle($event)">
+    <br-accordion-item header="Overview" [expanded]="true">
+      <p>Flush style removes the outer card chrome.</p>
+    </br-accordion-item>
+    <br-accordion-item header="Recent Activity">
+      <p>Good fit for dense side panels and modal bodies.</p>
+    </br-accordion-item>
+    <br-accordion-item header="History">
+      <p>Still uses the same direct wrapper inputs.</p>
+    </br-accordion-item>
+  </br-accordion>
+
+  <br-accordion
+    [id]="'directDisabledAccordion'"
+    (accordionChange)="onAccordionChange($event)"
+    (itemToggle)="onAccordionToggle($event)">
+    <br-accordion-item header="Available Section" [expanded]="true">
+      <p>This one is interactive.</p>
+    </br-accordion-item>
+    <br-accordion-item header="Disabled Section" [disabled]="true">
+      <p>This panel is disabled through the item input.</p>
+    </br-accordion-item>
+    <br-accordion-item header="Notes">
+      <p>Direct input still supports disabled items and metadata.</p>
+    </br-accordion-item>
+  </br-accordion>
+
+  <br-accordion
+    [id]="'directProjectedAccordion'"
+    [multiple]="true"
+    (accordionChange)="onAccordionChange($event)"
+    (itemToggle)="onAccordionToggle($event)">
+    <br-accordion-item header="Projected Content Block" [expanded]="true">
+      <div>
+        <p>Panel body comes from projected markup instead of a config object.</p>
+        <p><strong>Use this path for richer layouts.</strong></p>
+      </div>
+    </br-accordion-item>
+    <br-accordion-item header="Nested Wrapper Controls">
+      <div class="accordion-inline-controls">
+        <br-text [config]="{
+          id: 'accordionText',
+          label: 'Hiring Manager',
+          value: 'Alicia Stone',
+          placeholder: 'Enter manager name'
+        }"></br-text>
+        <br-single-select [config]="{
+          id: 'accordionStage',
+          label: 'Interview Stage',
+          value: 'onsite',
+          options: [
+            { label: 'Phone Screen', value: 'phone' },
+            { label: 'Onsite', value: 'onsite' },
+            { label: 'Offer', value: 'offer' }
+          ]
+        }"></br-single-select>
+        <br-checkbox [config]="{
+          id: 'accordionChecklist',
+          label: 'Background check required',
+          checked: true,
+          value: true
+        }"></br-checkbox>
+      </div>
+    </br-accordion-item>
+    <br-accordion-item header="Freeform Composition">
+      <div>
+        <p>This is the most flexible direct-input style when every section differs.</p>
+      </div>
+    </br-accordion-item>
+  </br-accordion>
+</section>`;
   }
 
   get controlPlaygrounds(): ControlPlayground[] {
@@ -1475,6 +1680,14 @@ export class PlaygroundComponent {
     }
   }
 
+  projectedAccordionContent(item: BrAccordionItemConfig): string {
+    if (item.content && item.content.trim()) {
+      return item.content;
+    }
+
+    return `<p>${item.header} content rendered through projected <code>br-accordion-item</code>.</p>`;
+  }
+
   onButtonClick(event: MouseEvent): void {
     const runtimeConsole = this.createRuntimeConsole('button');
     if (this.runtimeHandlers.buttonClick) {
@@ -2481,6 +2694,8 @@ export class YourFeatureComponent {
             { id: 'notes', header: 'Notes', content: '<p>Disabled panels still render consistently across modes.</p>' },
           ],
         };
+      case 'direct-input':
+        return this.clone(this.defaultAccordionConfig());
       case 'default':
       default:
         return {
@@ -4183,13 +4398,6 @@ export class YourFeatureComponent {
     return JSON.parse(JSON.stringify(value)) as T;
   }
 }
-
-
-
-
-
-
-
 
 
 

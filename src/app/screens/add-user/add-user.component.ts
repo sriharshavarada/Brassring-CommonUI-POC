@@ -2,6 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
+  BrAccordionComponent,
+  BrAccordionItemComponent,
   BrAutocompleteComponent,
   BrAutocompleteConfig,
   BrButtonComponent,
@@ -26,6 +28,8 @@ import {
   standalone: true,
   imports: [
     CommonModule,
+    BrAccordionComponent,
+    BrAccordionItemComponent,
     BrTextComponent,
     BrSingleSelectComponent,
     BrMultiSelectComponent,
@@ -114,6 +118,26 @@ export class AddUserComponent {
   };
 
   activeConfig: BrCheckboxConfig = { label: 'Active User', checked: true };
+  employeeIdConfig: BrTextConfig = {
+    label: 'Employee ID',
+    value: '',
+    placeholder: 'Enter employee ID',
+  };
+  managerConfig: BrTextConfig = {
+    label: 'Manager',
+    value: '',
+    placeholder: 'Enter manager name',
+  };
+  badgeNumberConfig: BrTextConfig = {
+    label: 'Badge Number',
+    value: '',
+    placeholder: 'Enter badge number',
+  };
+  deskLocationConfig: BrTextConfig = {
+    label: 'Desk Location',
+    value: '',
+    placeholder: 'Building / floor / desk',
+  };
 
   submitMessage = '';
   controlEvents: string[] = [];
@@ -128,6 +152,10 @@ export class AddUserComponent {
   updateStartDate(value: string): void { this.startDateConfig = { ...this.startDateConfig, value }; }
   updateLocation(value: string): void { this.locationConfig = { ...this.locationConfig, value }; }
   updateActive(checked: boolean): void { this.activeConfig = { ...this.activeConfig, checked }; }
+  updateEmployeeId(value: string): void { this.employeeIdConfig = { ...this.employeeIdConfig, value }; }
+  updateManager(value: string): void { this.managerConfig = { ...this.managerConfig, value }; }
+  updateBadgeNumber(value: string): void { this.badgeNumberConfig = { ...this.badgeNumberConfig, value }; }
+  updateDeskLocation(value: string): void { this.deskLocationConfig = { ...this.deskLocationConfig, value }; }
 
   onTextControlEvent(event: BrControlEvent<unknown>): void {
     this.pushControlEvent('TEXT:name', event);
@@ -163,6 +191,10 @@ export class AddUserComponent {
       startDate: this.startDateConfig.value,
       location: this.locationConfig.value,
       active: this.activeConfig.checked,
+      employeeId: this.employeeIdConfig.value,
+      manager: this.managerConfig.value,
+      badgeNumber: this.badgeNumberConfig.value,
+      deskLocation: this.deskLocationConfig.value,
       registryRead: {
         nameById: this.controlRegistry.valueById('add-user-name'),
         startDateById: this.controlRegistry.valueById('add-user-start-date'),
