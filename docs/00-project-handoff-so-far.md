@@ -30,9 +30,9 @@ This section captures local work that exists after the latest checked-in commits
 
 Latest local commit before these changes:
 - app repo:
-  - `0549f05` `Accodian changes`
+  - `054fd39` `docs: capture yalc accordion handoff and app demos`
 - library repo:
-  - `5f0fe36` `Accordion Changes`
+  - `0447bed` `feat: add projected accordion items and branded accessibility updates`
 
 ### Current package mode
 - The app is intentionally left in local `yalc` mode only.
@@ -43,7 +43,7 @@ Latest local commit before these changes:
   - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/package-lock.json`
 - Do not treat this state as published-package verification; this is local library-consumer validation mode.
 
-### App repo changes after `0549f05`
+### App repo changes after `054fd39`
 - `add-user` screen now contains a projected-content accordion example using:
   - `br-accordion`
   - `br-accordion-item`
@@ -70,7 +70,38 @@ Latest local commit before these changes:
   - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/playground/playground.component.html`
   - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/playground/playground.component.scss`
 
-### Library repo changes after `5f0fe36`
+### App repo accessibility/demo changes after `054fd39`
+- Playground consumer config/code generation now preserves field-level accessibility inputs for wrapper controls:
+  - `ariaLabel`
+  - `ariaLabelledBy`
+  - `ariaDescribedBy`
+- This was wired through the generated consumer helper code for:
+  - text
+  - text-area
+  - single-select
+  - multi-select
+  - checkbox
+  - radio
+  - autocomplete
+  - date
+
+- Playground presets now visibly expose accessibility config instead of hiding it behind internal defaults:
+  - grid presets include `accessibility` blocks for grid labels, dialog labels, selection labels, search labels, pagination labels, and row/primary action menu labels
+  - form presets include form-level `accessibility` plus field-level `ariaLabel`
+  - single-control, events-demo, and registry-demo variants now automatically inject missing field-level `ariaLabel` values from the field label and keep a form-level `accessibility.ariaLabel`
+  - button presets now include `ariaLabel` across all variants, not just icon-only buttons
+  - modal presets include dialog labels/descriptions/close button labels
+  - accordion presets include top-level `ariaLabel` plus item-level `ariaLabel`
+
+- A WCAG tracking document was added to separate current implementation status from actual compliance signoff:
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/docs/09-wcag-2.1-aa-coverage-matrix.md`
+  - This matrix covers all 47 WCAG 2.1 A/AA criteria with ownership/status notes
+
+- Dev-server restart workflow was hardened to reduce stale Angular/lazy-chunk issues during local `yalc` verification:
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/scripts/restart-app-clean.sh`
+  - Script now accepts host/port arguments and clears `.angular/cache`, `out-tsc`, and `dist/br-ui-framework` before restart
+
+### Library repo changes after `0447bed`
 - `br-accordion` now supports projected child items through:
   - `ContentChildren(BrAccordionItemComponent)`
   - runtime adaptation of projected items into the wrapper contract
@@ -120,8 +151,50 @@ Latest local commit before these changes:
   - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/form/controls/accordion/material/material-accordion-control.component.html`
   - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/form/controls/accordion/primeng/prime-accordion-control.component.html`
 
+### Library repo accessibility changes after `0447bed`
+- A shared accessibility contract was added across public models and adapters so consumer config can carry accessibility data consistently through all implementations:
+  - control-level aria support was added for text, text-area, single-select, multi-select, checkbox, radio, autocomplete, date, and button adapters/models
+  - modal contracts now carry dialog labels/descriptions/close button labels
+  - grid contracts now carry labels for grid, pagination, search, select-all, row selection, row menus, primary action menus, sort/filter/columns dialogs, and icon-only cell actions
+
+- Control implementations were updated to consume the new accessibility contract across custom/material/Prime renderers where available:
+  - text
+  - text-area
+  - single-select
+  - multi-select
+  - checkbox
+  - radio
+  - autocomplete
+  - date
+  - button
+  - accordion
+
+- Grid accessibility hardening was applied across shell and engine layers:
+  - row action triggers and primary action menus now expose accessible names and menu semantics
+  - sort/filter/columns overlays now use accessible dialog labels
+  - grid toolbar/icon-only actions now expose accessible names
+  - row-selection and select-all controls now expose labels
+  - pagination now exposes a named navigation landmark
+  - visible focus styling was added to grid overlays and popup controls
+  - all grid engines were updated to consume the same labels:
+    - custom
+    - material
+    - canvas
+    - primeng
+
+- Modal accessibility hardening was added across custom/material/Prime modal implementations:
+  - dialog container focus target
+  - focus handoff into the modal on open
+  - tab trapping inside supported modal variants
+  - focus return on close
+
+- Regression tests were added for the new accessibility behavior:
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/grid/shell/grid-shell.component.spec.ts`
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/modal/custom/custom-modal.component.spec.ts`
+
 ### Validation already performed for this local state
 - library build passed locally
+- library tests passed locally for the new grid/modal accessibility coverage
 - library was pushed through:
   - `npm run dev:yalc:push`
 - app was restarted with:

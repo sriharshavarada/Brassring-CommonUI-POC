@@ -1262,6 +1262,9 @@ export class PlaygroundComponent {
       placeholder: field.placeholder,
       disabled: field.disabled,
       required: field.required,
+      ariaLabel: field.ariaLabel,
+      ariaLabelledBy: field.ariaLabelledBy,
+      ariaDescribedBy: field.ariaDescribedBy,
     };
   }
 
@@ -1279,6 +1282,9 @@ export class PlaygroundComponent {
       maxLength: field.maxLength,
       disabled: field.disabled,
       required: field.required,
+      ariaLabel: field.ariaLabel,
+      ariaLabelledBy: field.ariaLabelledBy,
+      ariaDescribedBy: field.ariaDescribedBy,
     };
   }
 
@@ -1294,6 +1300,9 @@ export class PlaygroundComponent {
       options: field.options || [],
       disabled: field.disabled,
       required: field.required,
+      ariaLabel: field.ariaLabel,
+      ariaLabelledBy: field.ariaLabelledBy,
+      ariaDescribedBy: field.ariaDescribedBy,
     };
   }
 
@@ -1309,6 +1318,9 @@ export class PlaygroundComponent {
       options: field.options || [],
       disabled: field.disabled,
       required: field.required,
+      ariaLabel: field.ariaLabel,
+      ariaLabelledBy: field.ariaLabelledBy,
+      ariaDescribedBy: field.ariaDescribedBy,
     };
   }
 
@@ -1324,6 +1336,9 @@ export class PlaygroundComponent {
       checked: !!this.controlValue(field),
       disabled: field.disabled,
       required: field.required,
+      ariaLabel: field.ariaLabel,
+      ariaLabelledBy: field.ariaLabelledBy,
+      ariaDescribedBy: field.ariaDescribedBy,
     };
   }
 
@@ -1339,6 +1354,9 @@ export class PlaygroundComponent {
       options: field.options || [],
       disabled: field.disabled,
       required: field.required,
+      ariaLabel: field.ariaLabel,
+      ariaLabelledBy: field.ariaLabelledBy,
+      ariaDescribedBy: field.ariaDescribedBy,
     };
   }
 
@@ -1355,6 +1373,9 @@ export class PlaygroundComponent {
       placeholder: field.placeholder,
       disabled: field.disabled,
       required: field.required,
+      ariaLabel: field.ariaLabel,
+      ariaLabelledBy: field.ariaLabelledBy,
+      ariaDescribedBy: field.ariaDescribedBy,
     };
   }
 
@@ -1376,6 +1397,9 @@ export class PlaygroundComponent {
       disabled: field.disabled,
       placeholder: field.placeholder || 'Select date',
       required: field.required,
+      ariaLabel: field.ariaLabel,
+      ariaLabelledBy: field.ariaLabelledBy,
+      ariaDescribedBy: field.ariaDescribedBy,
     };
   }
 
@@ -2117,6 +2141,9 @@ export class YourFeatureComponent {
       placeholder: field.placeholder,
       disabled: field.disabled,
       required: field.required,
+      ariaLabel: field.ariaLabel,
+      ariaLabelledBy: field.ariaLabelledBy,
+      ariaDescribedBy: field.ariaDescribedBy,
     };
   }`);
     }
@@ -2136,6 +2163,9 @@ export class YourFeatureComponent {
       maxLength: field.maxLength,
       disabled: field.disabled,
       required: field.required,
+      ariaLabel: field.ariaLabel,
+      ariaLabelledBy: field.ariaLabelledBy,
+      ariaDescribedBy: field.ariaDescribedBy,
     };
   }`);
     }
@@ -2153,6 +2183,9 @@ export class YourFeatureComponent {
       options: field.options || [],
       disabled: field.disabled,
       required: field.required,
+      ariaLabel: field.ariaLabel,
+      ariaLabelledBy: field.ariaLabelledBy,
+      ariaDescribedBy: field.ariaDescribedBy,
     };
   }`);
     }
@@ -2170,6 +2203,9 @@ export class YourFeatureComponent {
       options: field.options || [],
       disabled: field.disabled,
       required: field.required,
+      ariaLabel: field.ariaLabel,
+      ariaLabelledBy: field.ariaLabelledBy,
+      ariaDescribedBy: field.ariaDescribedBy,
     };
   }`);
     }
@@ -2187,6 +2223,9 @@ export class YourFeatureComponent {
       checked: !!this.controlValue(field),
       disabled: field.disabled,
       required: field.required,
+      ariaLabel: field.ariaLabel,
+      ariaLabelledBy: field.ariaLabelledBy,
+      ariaDescribedBy: field.ariaDescribedBy,
     };
   }`);
     }
@@ -2204,6 +2243,9 @@ export class YourFeatureComponent {
       options: field.options || [],
       disabled: field.disabled,
       required: field.required,
+      ariaLabel: field.ariaLabel,
+      ariaLabelledBy: field.ariaLabelledBy,
+      ariaDescribedBy: field.ariaDescribedBy,
     };
   }`);
     }
@@ -2222,6 +2264,9 @@ export class YourFeatureComponent {
       placeholder: field.placeholder,
       disabled: field.disabled,
       required: field.required,
+      ariaLabel: field.ariaLabel,
+      ariaLabelledBy: field.ariaLabelledBy,
+      ariaDescribedBy: field.ariaDescribedBy,
     };
   }`);
     }
@@ -2239,6 +2284,9 @@ export class YourFeatureComponent {
       disabled: field.disabled,
       placeholder: field.placeholder || 'Select date',
       required: field.required,
+      ariaLabel: field.ariaLabel,
+      ariaLabelledBy: field.ariaLabelledBy,
+      ariaDescribedBy: field.ariaDescribedBy,
     };
   }`);
     }
@@ -2659,39 +2707,43 @@ export class YourFeatureComponent {
         return {
           id: 'multiAccordion',
           multiple: true,
+          ariaLabel: 'Multiple expand accordion',
           items: [
-            { id: 'overview', header: 'Overview', content: '<p>Multiple sections can stay expanded together.</p>', expanded: true },
-            { id: 'details', header: 'Details', content: '<p>Use this pattern for grouped details and supplemental context.</p>', expanded: true },
-            { id: 'history', header: 'History', content: '<p>Each panel emits the same wrapper events across modes.</p>' },
+            { id: 'overview', header: 'Overview', content: '<p>Multiple sections can stay expanded together.</p>', expanded: true, ariaLabel: 'Overview section' },
+            { id: 'details', header: 'Details', content: '<p>Use this pattern for grouped details and supplemental context.</p>', expanded: true, ariaLabel: 'Details section' },
+            { id: 'history', header: 'History', content: '<p>Each panel emits the same wrapper events across modes.</p>', ariaLabel: 'History section' },
           ],
         };
       case 'flush':
         return {
           id: 'flushAccordion',
           flush: true,
+          ariaLabel: 'Flush accordion',
           items: [
-            { id: 'summary', header: 'Summary', content: '<p>Flush mode removes the outer card spacing and radius.</p>', expanded: true },
-            { id: 'activity', header: 'Recent Activity', content: '<p>Useful inside dense layouts like side panels or modal bodies.</p>' },
-            { id: 'audit', header: 'Audit Trail', content: '<p>Keep one section open at a time in single-expand mode.</p>' },
+            { id: 'summary', header: 'Summary', content: '<p>Flush mode removes the outer card spacing and radius.</p>', expanded: true, ariaLabel: 'Summary section' },
+            { id: 'activity', header: 'Recent Activity', content: '<p>Useful inside dense layouts like side panels or modal bodies.</p>', ariaLabel: 'Recent activity section' },
+            { id: 'audit', header: 'Audit Trail', content: '<p>Keep one section open at a time in single-expand mode.</p>', ariaLabel: 'Audit trail section' },
           ],
         };
       case 'faq':
         return {
           id: 'faqAccordion',
           multiple: true,
+          ariaLabel: 'Frequently asked questions accordion',
           items: [
-            { id: 'faq-1', header: 'How does runtime mode work?', content: '<p>The same wrapper switches between custom, Material, and Prime-styled implementations using RuntimeUiConfigService.</p>', expanded: true },
-            { id: 'faq-2', header: 'What does the wrapper emit?', content: '<p>The wrapper emits expanded ids, item toggle details, and a standard controlEvent payload.</p>' },
-            { id: 'faq-3', header: 'Can I drive it from JSON?', content: '<p>Yes. The playground config editor uses the same BrAccordionConfig object you can use in a consumer feature.</p>' },
+            { id: 'faq-1', header: 'How does runtime mode work?', content: '<p>The same wrapper switches between custom, Material, and Prime-styled implementations using RuntimeUiConfigService.</p>', expanded: true, ariaLabel: 'FAQ item runtime mode' },
+            { id: 'faq-2', header: 'What does the wrapper emit?', content: '<p>The wrapper emits expanded ids, item toggle details, and a standard controlEvent payload.</p>', ariaLabel: 'FAQ item wrapper events' },
+            { id: 'faq-3', header: 'Can I drive it from JSON?', content: '<p>Yes. The playground config editor uses the same BrAccordionConfig object you can use in a consumer feature.</p>', ariaLabel: 'FAQ item JSON config support' },
           ],
         };
       case 'disabled':
         return {
           id: 'disabledAccordion',
+          ariaLabel: 'Disabled item accordion',
           items: [
-            { id: 'open', header: 'Available Section', content: '<p>This section is interactive.</p>', expanded: true },
-            { id: 'locked', header: 'Disabled Section', content: '<p>This panel is disabled and cannot be toggled.</p>', disabled: true },
-            { id: 'notes', header: 'Notes', content: '<p>Disabled panels still render consistently across modes.</p>' },
+            { id: 'open', header: 'Available Section', content: '<p>This section is interactive.</p>', expanded: true, ariaLabel: 'Available section' },
+            { id: 'locked', header: 'Disabled Section', content: '<p>This panel is disabled and cannot be toggled.</p>', disabled: true, ariaLabel: 'Disabled section' },
+            { id: 'notes', header: 'Notes', content: '<p>Disabled panels still render consistently across modes.</p>', ariaLabel: 'Notes section' },
           ],
         };
       case 'direct-input':
@@ -2700,10 +2752,11 @@ export class YourFeatureComponent {
       default:
         return {
           id: 'defaultAccordion',
+          ariaLabel: 'Candidate profile accordion',
           items: [
-            { id: 'candidate', header: 'Candidate Summary', icon: 'person', content: '<p>Use accordion sections to progressively disclose profile details.</p>', expanded: true },
-            { id: 'interviews', header: 'Interview Stages', icon: 'schedule', content: '<p>Track stage notes, owners, and next-step actions inside each section.</p>' },
-            { id: 'documents', header: 'Documents', icon: 'folder', content: '<p>Attach offer letters, resumes, and supporting documents here.</p>' },
+            { id: 'candidate', header: 'Candidate Summary', icon: 'person', content: '<p>Use accordion sections to progressively disclose profile details.</p>', expanded: true, ariaLabel: 'Candidate summary section' },
+            { id: 'interviews', header: 'Interview Stages', icon: 'schedule', content: '<p>Track stage notes, owners, and next-step actions inside each section.</p>', ariaLabel: 'Interview stages section' },
+            { id: 'documents', header: 'Documents', icon: 'folder', content: '<p>Attach offer letters, resumes, and supporting documents here.</p>', ariaLabel: 'Documents section' },
           ],
         };
     }
@@ -2714,6 +2767,7 @@ export class YourFeatureComponent {
         return {
           id: 'secondaryButton',
           label: 'Cancel',
+          ariaLabel: 'Cancel',
           variant: 'secondary',
           size: 'md',
           type: 'button',
@@ -2722,6 +2776,7 @@ export class YourFeatureComponent {
         return {
           id: 'outlineButton',
           label: 'Preview',
+          ariaLabel: 'Preview',
           variant: 'outline',
           size: 'md',
           type: 'button',
@@ -2730,6 +2785,7 @@ export class YourFeatureComponent {
         return {
           id: 'dangerButton',
           label: 'Delete User',
+          ariaLabel: 'Delete user',
           variant: 'danger',
           size: 'md',
           type: 'button',
@@ -2738,6 +2794,7 @@ export class YourFeatureComponent {
         return {
           id: 'textButton',
           label: 'Learn More',
+          ariaLabel: 'Learn more',
           variant: 'text',
           size: 'md',
           type: 'button',
@@ -2756,6 +2813,7 @@ export class YourFeatureComponent {
         return {
           id: 'loadingButton',
           label: 'Submitting',
+          ariaLabel: 'Submitting',
           variant: 'primary',
           size: 'md',
           type: 'button',
@@ -2766,6 +2824,7 @@ export class YourFeatureComponent {
         return {
           id: 'fullWidthButton',
           label: 'Continue',
+          ariaLabel: 'Continue',
           variant: 'primary',
           size: 'lg',
           type: 'button',
@@ -2775,6 +2834,7 @@ export class YourFeatureComponent {
         return {
           id: 'withIconsButton',
           label: 'Download Report',
+          ariaLabel: 'Download report',
           variant: 'secondary',
           size: 'md',
           type: 'button',
@@ -2786,6 +2846,7 @@ export class YourFeatureComponent {
         return {
           id: 'primaryButton',
           label: 'Save Changes',
+          ariaLabel: 'Save changes',
           variant: 'primary',
           size: 'md',
           type: 'button',
@@ -2977,6 +3038,10 @@ export class YourFeatureComponent {
       pagination: true,
       pageSize: 5,
       sorting: true,
+      accessibility: {
+        gridLabel: 'Simple user grid',
+        paginationLabel: 'Simple grid pagination',
+      },
       uiConfig: {
         maxHeight: '500px',
       },
@@ -3036,6 +3101,13 @@ export class YourFeatureComponent {
       pagination: true,
       pageSize: 5,
       sorting: true,
+      accessibility: {
+        gridLabel: 'Remote user grid',
+        searchInputLabel: 'Search remote users',
+        primaryActionMenuTriggerLabel: 'Open remote user actions',
+        rowSelectionLabel: 'Select remote user row',
+        selectAllLabel: 'Select all remote user rows',
+      },
       uiConfig: {
         maxHeight: '500px',
       },
@@ -3103,6 +3175,10 @@ export class YourFeatureComponent {
       pagination: true,
       pageSize: 5,
       sorting: true,
+      accessibility: {
+        gridLabel: 'Moderate user grid',
+        searchInputLabel: 'Search moderate user grid',
+      },
       uiConfig: {
         maxHeight: '500px',
       },
@@ -3242,6 +3318,12 @@ export class YourFeatureComponent {
       pagination: true,
       pageSize: 5,
       sorting: true,
+      accessibility: {
+        gridLabel: 'Rich candidate grid',
+        rowActionMenuTriggerLabel: 'Open candidate row actions',
+        contextMenuLabel: 'Candidate row actions',
+        rowSelectionLabel: 'Select candidate row',
+      },
       uiConfig: {
         maxHeight: '500px',
       },
@@ -3317,6 +3399,20 @@ export class YourFeatureComponent {
       pagination: true,
       pageSize: 5,
       sorting: true,
+      accessibility: {
+        gridLabel: 'Complex user grid',
+        primaryActionMenuLabel: 'Create user actions',
+        primaryActionMenuTriggerLabel: 'Open create user actions',
+        rowActionMenuLabel: 'Row actions',
+        rowActionMenuTriggerLabel: 'Open row actions',
+        searchInputLabel: 'Search users',
+        sortDialogLabel: 'Sort users',
+        filterDialogLabel: 'Filter users',
+        columnsDialogLabel: 'Personalize user columns',
+        paginationLabel: 'User grid pagination',
+        selectAllLabel: 'Select all users',
+        rowSelectionLabel: 'Select user row',
+      },
       uiConfig: {
         maxHeight: '500px',
       },
@@ -3400,6 +3496,7 @@ export class YourFeatureComponent {
       disabled: false,
       placeholder: 'Pick a date',
       required: false,
+      ariaLabel: 'Start date input',
       uiConfig: {
         density: 'comfortable',
         size: 'md',
@@ -3421,6 +3518,7 @@ export class YourFeatureComponent {
       disabled: false,
       placeholder: 'Compact mode',
       required: true,
+      ariaLabel: 'Compact date input',
       uiConfig: {
         density: 'compact',
         size: 'sm',
@@ -3441,6 +3539,7 @@ export class YourFeatureComponent {
       disabled: true,
       placeholder: 'Disabled',
       required: false,
+      ariaLabel: 'Disabled date input',
       uiConfig: {
         density: 'comfortable',
         size: 'md',
@@ -3454,7 +3553,7 @@ export class YourFeatureComponent {
       title: 'All Form Controls',
       description: 'Custom/Material abstraction for textbox, selects, checkbox, radio, date and autocomplete.',
       fields: [
-        { id: 'fullName', type: 'text', label: 'Full Name', placeholder: 'Enter name', required: true },
+        { id: 'fullName', type: 'text', label: 'Full Name', placeholder: 'Enter name', required: true, ariaLabel: 'Full name' },
         {
           id: 'department',
           type: 'single-select',
@@ -3464,6 +3563,7 @@ export class YourFeatureComponent {
             { label: 'Finance', value: 'fin' },
             { label: 'HR', value: 'hr' },
           ],
+          ariaLabel: 'Department',
         },
         {
           id: 'skills',
@@ -3475,8 +3575,9 @@ export class YourFeatureComponent {
             { label: 'SQL', value: 'sql' },
             { label: 'AWS', value: 'aws' },
           ],
+          ariaLabel: 'Skills',
         },
-        { id: 'isActive', type: 'checkbox', label: 'Active User', placeholder: 'Is Active' },
+        { id: 'isActive', type: 'checkbox', label: 'Active User', placeholder: 'Is Active', ariaLabel: 'Active user checkbox' },
         {
           id: 'employmentType',
           type: 'radio',
@@ -3485,6 +3586,7 @@ export class YourFeatureComponent {
             { label: 'Full Time', value: 'ft' },
             { label: 'Contract', value: 'ct' },
           ],
+          ariaLabel: 'Employment type',
         },
         {
           id: 'startDate',
@@ -3494,6 +3596,7 @@ export class YourFeatureComponent {
           locale: 'en-US',
           dateFormat: 'MM/dd/yyyy',
           DateConfiguration: this.clone(PLAYGROUND_DATE_CONFIGURATION),
+          ariaLabel: 'Start date',
         },
         {
           id: 'location',
@@ -3506,6 +3609,7 @@ export class YourFeatureComponent {
             { label: 'New York', value: 'New York' },
             { label: 'Chicago', value: 'Chicago' },
           ],
+          ariaLabel: 'Location',
         },
       ],
       value: {
@@ -3520,6 +3624,9 @@ export class YourFeatureComponent {
       showActions: true,
       submitLabel: 'Save Form',
       resetLabel: 'Reset Form',
+      accessibility: {
+        ariaLabel: 'All controls form',
+      },
     };
   }
 
@@ -3527,9 +3634,9 @@ export class YourFeatureComponent {
     return {
       title: 'Simple Form',
       fields: [
-        { id: 'name', type: 'text', label: 'Name', required: true },
-        { id: 'summary', type: 'text-area', label: 'Summary', placeholder: 'Add a short summary', rows: 4, maxLength: 280 },
-        { id: 'agree', type: 'checkbox', label: 'I Agree' },
+        { id: 'name', type: 'text', label: 'Name', required: true, ariaLabel: 'Name' },
+        { id: 'summary', type: 'text-area', label: 'Summary', placeholder: 'Add a short summary', rows: 4, maxLength: 280, ariaLabel: 'Summary' },
+        { id: 'agree', type: 'checkbox', label: 'I Agree', ariaLabel: 'Agreement checkbox' },
         {
           id: 'when',
           type: 'date',
@@ -3538,12 +3645,16 @@ export class YourFeatureComponent {
           locale: 'fr-FR',
           dateFormat: 'dd/MM/yyyy',
           DateConfiguration: this.clone(PLAYGROUND_DATE_CONFIGURATION),
+          ariaLabel: 'Date',
         },
       ],
       value: { name: '', summary: '', agree: false, when: '' },
       showActions: true,
       submitLabel: 'Submit',
       resetLabel: 'Reset',
+      accessibility: {
+        ariaLabel: 'Simple form',
+      },
     };
   }
 
@@ -3707,7 +3818,7 @@ export class YourFeatureComponent {
 
   private buildControlEventsDemoVariantConfig(control: Exclude<ControlPlayground, 'all'>): BrFormConfig {
     if (control === 'text') {
-      return {
+      return this.withFormAccessibility({
         title: 'Text Box Playground',
         description: 'Events Demo: type in first box and tab/click to second to trigger keyup/focus/blur/click events.',
         fields: [
@@ -3716,11 +3827,11 @@ export class YourFeatureComponent {
         ],
         value: { textControlA: '', textControlB: '' },
         showActions: false,
-      };
+      });
     }
 
     if (control === 'text-area') {
-      return {
+      return this.withFormAccessibility({
         title: 'Text Area Playground',
         description: 'Events Demo: type in the first text area, tab to the second, and click back to trigger input, keyup, focus, blur, and click.',
         fields: [
@@ -3729,11 +3840,11 @@ export class YourFeatureComponent {
         ],
         value: { textAreaControlA: '', textAreaControlB: '' },
         showActions: false,
-      };
+      });
     }
 
     if (control === 'date') {
-      return {
+      return this.withFormAccessibility({
         title: 'Date Playground',
         description: 'Events Demo: open date picker, pick a date, then move focus to second date control.',
         fields: [
@@ -3742,11 +3853,11 @@ export class YourFeatureComponent {
         ],
         value: { dateControlA: '', dateControlB: '' },
         showActions: false,
-      };
+      });
     }
 
     if (control === 'single-select') {
-      return {
+      return this.withFormAccessibility({
         title: 'Single Select Playground',
         description: 'Events Demo: click/select in first dropdown, then move to second to see change/focus/blur.',
         fields: [
@@ -3773,11 +3884,11 @@ export class YourFeatureComponent {
         ],
         value: { singleSelectControlA: '', singleSelectControlB: '' },
         showActions: false,
-      };
+      });
     }
 
     if (control === 'multi-select') {
-      return {
+      return this.withFormAccessibility({
         title: 'Multi Select Playground',
         description: 'Events Demo: click options/chips and then click outside to trigger interactions.',
         fields: [
@@ -3804,11 +3915,11 @@ export class YourFeatureComponent {
         ],
         value: { multiSelectControlA: [], multiSelectControlB: [] },
         showActions: false,
-      };
+      });
     }
 
     if (control === 'checkbox') {
-      return {
+      return this.withFormAccessibility({
         title: 'Checkbox Playground',
         description: 'Events Demo: click/toggle both checkboxes to see click/change/value events.',
         fields: [
@@ -3817,11 +3928,11 @@ export class YourFeatureComponent {
         ],
         value: { checkboxControlA: false, checkboxControlB: true },
         showActions: false,
-      };
+      });
     }
 
     if (control === 'radio') {
-      return {
+      return this.withFormAccessibility({
         title: 'Radio Playground',
         description: 'Events Demo: switch radio options and move focus between the two groups.',
         fields: [
@@ -3846,10 +3957,10 @@ export class YourFeatureComponent {
         ],
         value: { radioControlA: 'ft', radioControlB: 'ct' },
         showActions: false,
-      };
+      });
     }
 
-    return {
+    return this.withFormAccessibility({
       title: 'Autocomplete Playground',
       description: 'Events Demo: type in first input, arrow/enter to select, then move to second input.',
       fields: [
@@ -3878,7 +3989,7 @@ export class YourFeatureComponent {
       ],
       value: { autocompleteControlA: '', autocompleteControlB: '' },
       showActions: false,
-    };
+    });
   }
 
   private buildControlRegistryDemoVariantConfig(control: Exclude<ControlPlayground, 'all'>): BrFormConfig {
@@ -3888,7 +3999,7 @@ export class YourFeatureComponent {
     const metaB = { sample: 'B', scenario: 'registry-demo' };
 
     if (control === 'text') {
-      return {
+      return this.withFormAccessibility({
         title: 'Text Box Playground',
         description: 'Registry Demo: Read values using valueById, valuesByName, valuesByClass.',
         fields: [
@@ -3897,11 +4008,11 @@ export class YourFeatureComponent {
         ],
         value: { textRegistryA: 'Alpha', textRegistryB: 'Beta' },
         showActions: false,
-      };
+      });
     }
 
     if (control === 'text-area') {
-      return {
+      return this.withFormAccessibility({
         title: 'Text Area Playground',
         description: 'Registry Demo: Read text area values using valueById, valuesByName, valuesByClass.',
         fields: [
@@ -3910,11 +4021,11 @@ export class YourFeatureComponent {
         ],
         value: { textAreaRegistryA: 'Alpha note', textAreaRegistryB: 'Beta note' },
         showActions: false,
-      };
+      });
     }
 
     if (control === 'date') {
-      return {
+      return this.withFormAccessibility({
         title: 'Date Playground',
         description: 'Registry Demo: Read values using valueById, valuesByName, valuesByClass.',
         fields: [
@@ -3923,7 +4034,7 @@ export class YourFeatureComponent {
         ],
         value: { dateRegistryA: '2026-03-10', dateRegistryB: '2026-03-20' },
         showActions: false,
-      };
+      });
     }
 
     if (control === 'single-select') {
@@ -3932,7 +4043,7 @@ export class YourFeatureComponent {
         { label: 'Finance', value: 'fin' },
         { label: 'HR', value: 'hr' },
       ];
-      return {
+      return this.withFormAccessibility({
         title: 'Single Select Playground',
         description: 'Registry Demo: Read values using valueById, valuesByName, valuesByClass.',
         fields: [
@@ -3941,7 +4052,7 @@ export class YourFeatureComponent {
         ],
         value: { singleRegistryA: 'eng', singleRegistryB: 'fin' },
         showActions: false,
-      };
+      });
     }
 
     if (control === 'multi-select') {
@@ -3950,7 +4061,7 @@ export class YourFeatureComponent {
         { label: 'Java', value: 'java' },
         { label: 'SQL', value: 'sql' },
       ];
-      return {
+      return this.withFormAccessibility({
         title: 'Multi Select Playground',
         description: 'Registry Demo: Read values using valueById, valuesByName, valuesByClass.',
         fields: [
@@ -3959,11 +4070,11 @@ export class YourFeatureComponent {
         ],
         value: { multiRegistryA: ['angular'], multiRegistryB: ['java', 'sql'] },
         showActions: false,
-      };
+      });
     }
 
     if (control === 'checkbox') {
-      return {
+      return this.withFormAccessibility({
         title: 'Checkbox Playground',
         description: 'Registry Demo: Read values using valueById, valuesByName, valuesByClass.',
         fields: [
@@ -3972,7 +4083,7 @@ export class YourFeatureComponent {
         ],
         value: { checkboxRegistryA: true, checkboxRegistryB: false },
         showActions: false,
-      };
+      });
     }
 
     if (control === 'radio') {
@@ -3980,7 +4091,7 @@ export class YourFeatureComponent {
         { label: 'Full Time', value: 'ft' },
         { label: 'Contract', value: 'ct' },
       ];
-      return {
+      return this.withFormAccessibility({
         title: 'Radio Playground',
         description: 'Registry Demo: Read values using valueById, valuesByName, valuesByClass.',
         fields: [
@@ -3989,10 +4100,10 @@ export class YourFeatureComponent {
         ],
         value: { radioRegistryA: 'ft', radioRegistryB: 'ct' },
         showActions: false,
-      };
+      });
     }
 
-    return {
+    return this.withFormAccessibility({
       title: 'Autocomplete Playground',
       description: 'Registry Demo: Read values using valueById, valuesByName, valuesByClass.',
       fields: [
@@ -4027,12 +4138,12 @@ export class YourFeatureComponent {
       ],
       value: { autocompleteRegistryA: 'Austin', autocompleteRegistryB: 'Seattle' },
       showActions: false,
-    };
+    });
   }
 
   private singleControlConfig(field: BrFormField, value: any, title: string, description: string, disabled = false): BrFormConfig {
-    const fieldWithState: BrFormField = disabled ? { ...field, disabled: true } : field;
-    return {
+    const fieldWithState: BrFormField = this.withFieldAccessibility(disabled ? { ...field, disabled: true } : field);
+    return this.withFormAccessibility({
       title,
       description,
       fields: [fieldWithState],
@@ -4040,6 +4151,35 @@ export class YourFeatureComponent {
       showActions: true,
       submitLabel: 'Apply',
       resetLabel: 'Clear',
+      accessibility: {
+        ariaLabel: title,
+      },
+    }, title);
+  }
+
+  private withFieldAccessibility(field: BrFormField): BrFormField {
+    if (field.ariaLabel) {
+      return field;
+    }
+
+    const fallbackLabel = typeof field.label === 'string' && field.label.trim()
+      ? field.label.trim()
+      : field.id;
+
+    return {
+      ...field,
+      ariaLabel: fallbackLabel,
+    };
+  }
+
+  private withFormAccessibility(config: BrFormConfig, fallbackLabel?: string): BrFormConfig {
+    return {
+      ...config,
+      fields: (config.fields || []).map((field) => this.withFieldAccessibility(field)),
+      accessibility: {
+        ...(config.accessibility || {}),
+        ariaLabel: config.accessibility?.ariaLabel || fallbackLabel || config.title || 'Playground form',
+      },
     };
   }
 
@@ -4063,6 +4203,11 @@ export class YourFeatureComponent {
         { id: 'cancel', label: 'Cancel', type: 'secondary' },
         { id: 'save', label: 'Save', type: 'primary' },
       ],
+      accessibility: {
+        dialogLabel: 'Playground modal dialog',
+        dialogDescription: 'Edit JSON and open preview',
+        closeButtonLabel: 'Close playground modal',
+      },
       uiConfig: {
         size: 'md',
         isDismissible: true,
@@ -4079,6 +4224,11 @@ export class YourFeatureComponent {
         subtitle: 'Basic details about current application state.',
         content: '<p>This is a generic information modal.</p><p>Use it for non-blocking user notifications.</p>',
         actions: [{ id: 'ok', label: 'Understood', type: 'primary' }],
+        accessibility: {
+          dialogLabel: 'System information dialog',
+          dialogDescription: 'Basic details about current application state.',
+          closeButtonLabel: 'Close system information dialog',
+        },
         uiConfig: { size: 'md', showCloseButton: true },
       };
     }
@@ -4093,6 +4243,11 @@ export class YourFeatureComponent {
           { id: 'cancel', label: 'Cancel', type: 'secondary' },
           { id: 'confirm', label: 'Confirm', type: 'primary' },
         ],
+        accessibility: {
+          dialogLabel: 'Confirm action dialog',
+          dialogDescription: 'Please confirm to continue.',
+          closeButtonLabel: 'Close confirm action dialog',
+        },
         uiConfig: { size: 'sm', showCloseButton: true },
       };
     }
@@ -4107,6 +4262,11 @@ export class YourFeatureComponent {
           { id: 'cancel', label: 'Keep Record', type: 'ghost' },
           { id: 'delete', label: 'Delete Permanently', type: 'danger' },
         ],
+        accessibility: {
+          dialogLabel: 'Delete record dialog',
+          dialogDescription: 'This action cannot be undone.',
+          closeButtonLabel: 'Close delete record dialog',
+        },
         uiConfig: { size: 'md', isDismissible: false, showCloseButton: true },
       };
     }
@@ -4117,26 +4277,32 @@ export class YourFeatureComponent {
       subtitle: 'Update and save the profile fields below.',
       content: '<p>Fill all required fields before saving.</p>',
       fields: [
-        { id: 'firstName', type: 'text', label: 'First Name', required: true, colSpan: 1 },
-        { id: 'lastName', type: 'text', label: 'Last Name', required: true, colSpan: 1 },
-        { id: 'email', type: 'text', label: 'Email', colSpan: 2 },
+        { id: 'firstName', type: 'text', label: 'First Name', required: true, colSpan: 1, ariaLabel: 'First name' },
+        { id: 'lastName', type: 'text', label: 'Last Name', required: true, colSpan: 1, ariaLabel: 'Last name' },
+        { id: 'email', type: 'text', label: 'Email', colSpan: 2, ariaLabel: 'Email address' },
         {
           id: 'role',
           type: 'select',
           label: 'Role',
           colSpan: 1,
+          ariaLabel: 'Role',
           options: [
             { label: 'Admin', value: 'admin' },
             { label: 'Manager', value: 'manager' },
             { label: 'Viewer', value: 'viewer' },
           ],
         },
-        { id: 'subscribe', type: 'checkbox', label: 'Subscribe to updates', colSpan: 1 },
+        { id: 'subscribe', type: 'checkbox', label: 'Subscribe to updates', colSpan: 1, ariaLabel: 'Subscribe to updates' },
       ],
       actions: [
         { id: 'cancel', label: 'Cancel', type: 'secondary' },
         { id: 'save', label: 'Save Changes', type: 'primary' },
       ],
+      accessibility: {
+        dialogLabel: 'Edit user profile dialog',
+        dialogDescription: 'Update and save the profile fields below.',
+        closeButtonLabel: 'Close edit user profile dialog',
+      },
       uiConfig: { size: 'lg', showCloseButton: true },
     };
   }
@@ -4398,7 +4564,3 @@ export class YourFeatureComponent {
     return JSON.parse(JSON.stringify(value)) as T;
   }
 }
-
-
-
-
