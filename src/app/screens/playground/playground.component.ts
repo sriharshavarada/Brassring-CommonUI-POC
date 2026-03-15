@@ -532,15 +532,16 @@ export class PlaygroundComponent {
 <section class="accordion-direct-showcase">
   <br-accordion
     [id]="'directBasicAccordion'"
+    [ariaLabel]="'Candidate profile accordion'"
     (accordionChange)="onAccordionChange($event)"
     (itemToggle)="onAccordionToggle($event)">
-    <br-accordion-item header="Candidate Summary" [expanded]="true" icon="person">
+    <br-accordion-item header="Candidate Summary" [expanded]="true" icon="person" [ariaLabel]="'Candidate summary section'">
       <p>Direct input using projected <code>br-accordion-item</code> blocks.</p>
     </br-accordion-item>
-    <br-accordion-item header="Interview Timeline" icon="schedule">
+    <br-accordion-item header="Interview Timeline" icon="schedule" [ariaLabel]="'Interview timeline section'">
       <p>Use this when panel markup is static and authored directly in the template.</p>
     </br-accordion-item>
-    <br-accordion-item header="Attachments" icon="folder">
+    <br-accordion-item header="Attachments" icon="folder" [ariaLabel]="'Attachments section'">
       <p>Files, notes, or other lightweight sections fit well here.</p>
     </br-accordion-item>
   </br-accordion>
@@ -548,15 +549,16 @@ export class PlaygroundComponent {
   <br-accordion
     [id]="'directMultiAccordion'"
     [multiple]="true"
+    [ariaLabel]="'Employment details accordion'"
     (accordionChange)="onAccordionChange($event)"
     (itemToggle)="onAccordionToggle($event)">
-    <br-accordion-item header="Employment Details" [expanded]="true">
+    <br-accordion-item header="Employment Details" [expanded]="true" [ariaLabel]="'Employment details section'">
       <p>Multiple panels stay open together.</p>
     </br-accordion-item>
-    <br-accordion-item header="Workspace Access" [expanded]="true">
+    <br-accordion-item header="Workspace Access" [expanded]="true" [ariaLabel]="'Workspace access section'">
       <p>Useful when the user compares related sections side by side.</p>
     </br-accordion-item>
-    <br-accordion-item header="Audit Notes">
+    <br-accordion-item header="Audit Notes" [ariaLabel]="'Audit notes section'">
       <p>Keep supplemental context visible without collapsing the rest.</p>
     </br-accordion-item>
   </br-accordion>
@@ -564,30 +566,32 @@ export class PlaygroundComponent {
   <br-accordion
     [id]="'directFlushAccordion'"
     [flush]="true"
+    [ariaLabel]="'Flush overview accordion'"
     (accordionChange)="onAccordionChange($event)"
     (itemToggle)="onAccordionToggle($event)">
-    <br-accordion-item header="Overview" [expanded]="true">
+    <br-accordion-item header="Overview" [expanded]="true" [ariaLabel]="'Overview section'">
       <p>Flush style removes the outer card chrome.</p>
     </br-accordion-item>
-    <br-accordion-item header="Recent Activity">
+    <br-accordion-item header="Recent Activity" [ariaLabel]="'Recent activity section'">
       <p>Good fit for dense side panels and modal bodies.</p>
     </br-accordion-item>
-    <br-accordion-item header="History">
+    <br-accordion-item header="History" [ariaLabel]="'History section'">
       <p>Still uses the same direct wrapper inputs.</p>
     </br-accordion-item>
   </br-accordion>
 
   <br-accordion
     [id]="'directDisabledAccordion'"
+    [ariaLabel]="'Disabled item accordion'"
     (accordionChange)="onAccordionChange($event)"
     (itemToggle)="onAccordionToggle($event)">
-    <br-accordion-item header="Available Section" [expanded]="true">
+    <br-accordion-item header="Available Section" [expanded]="true" [ariaLabel]="'Available section'">
       <p>This one is interactive.</p>
     </br-accordion-item>
-    <br-accordion-item header="Disabled Section" [disabled]="true">
+    <br-accordion-item header="Disabled Section" [disabled]="true" [ariaLabel]="'Disabled section'">
       <p>This panel is disabled through the item input.</p>
     </br-accordion-item>
-    <br-accordion-item header="Notes">
+    <br-accordion-item header="Notes" [ariaLabel]="'Notes section'">
       <p>Direct input still supports disabled items and metadata.</p>
     </br-accordion-item>
   </br-accordion>
@@ -595,15 +599,16 @@ export class PlaygroundComponent {
   <br-accordion
     [id]="'directProjectedAccordion'"
     [multiple]="true"
+    [ariaLabel]="'Projected content accordion'"
     (accordionChange)="onAccordionChange($event)"
     (itemToggle)="onAccordionToggle($event)">
-    <br-accordion-item header="Projected Content Block" [expanded]="true">
+    <br-accordion-item header="Projected Content Block" [expanded]="true" [ariaLabel]="'Projected content block section'">
       <div>
         <p>Panel body comes from projected markup instead of a config object.</p>
         <p><strong>Use this path for richer layouts.</strong></p>
       </div>
     </br-accordion-item>
-    <br-accordion-item header="Nested Wrapper Controls">
+    <br-accordion-item header="Nested Wrapper Controls" [ariaLabel]="'Nested wrapper controls section'">
       <div class="accordion-inline-controls">
         <br-text [config]="{
           id: 'accordionText',
@@ -629,7 +634,7 @@ export class PlaygroundComponent {
         }"></br-checkbox>
       </div>
     </br-accordion-item>
-    <br-accordion-item header="Freeform Composition">
+    <br-accordion-item header="Freeform Composition" [ariaLabel]="'Freeform composition section'">
       <div>
         <p>This is the most flexible direct-input style when every section differs.</p>
       </div>
@@ -645,21 +650,21 @@ export class PlaygroundComponent {
   get controlVariants(): string[] {
     switch (this.activeControlPlayground) {
       case 'date':
-        return ['default-config', 'bounded-config', 'disabled-config', 'events-demo', 'registry-demo', 'ngmodel-simple'];
+        return ['default-config', 'bounded-config', 'disabled-config', 'events-demo', 'registry-demo', 'direct-input', 'ngmodel-simple'];
       case 'text':
         return ['default-config', 'required-config', 'disabled-config', 'events-demo', 'registry-demo', 'direct-input', 'ngmodel-simple'];
       case 'text-area':
-        return ['default-config', 'required-config', 'disabled-config', 'events-demo', 'registry-demo', 'ngmodel-simple'];
+        return ['default-config', 'required-config', 'disabled-config', 'events-demo', 'registry-demo', 'direct-input', 'ngmodel-simple'];
       case 'single-select':
-        return ['default-config', 'required-config', 'disabled-config', 'events-demo', 'registry-demo', 'ngmodel-simple'];
+        return ['default-config', 'required-config', 'disabled-config', 'events-demo', 'registry-demo', 'direct-input', 'ngmodel-simple'];
       case 'multi-select':
-        return ['default-config', 'preselected-config', 'disabled-config', 'events-demo', 'registry-demo', 'ngmodel-simple'];
+        return ['default-config', 'preselected-config', 'disabled-config', 'events-demo', 'registry-demo', 'direct-input', 'ngmodel-simple'];
       case 'checkbox':
-        return ['unchecked-config', 'checked-config', 'disabled-config', 'events-demo', 'registry-demo', 'ngmodel-simple'];
+        return ['unchecked-config', 'checked-config', 'disabled-config', 'events-demo', 'registry-demo', 'direct-input', 'ngmodel-simple'];
       case 'radio':
-        return ['default-config', 'preselected-config', 'disabled-config', 'events-demo', 'registry-demo', 'ngmodel-simple'];
+        return ['default-config', 'preselected-config', 'disabled-config', 'events-demo', 'registry-demo', 'direct-input', 'ngmodel-simple'];
       case 'autocomplete':
-        return ['default-config', 'prefilled-config', 'disabled-config', 'events-demo', 'registry-demo', 'ngmodel-simple'];
+        return ['default-config', 'prefilled-config', 'disabled-config', 'events-demo', 'registry-demo', 'direct-input', 'ngmodel-simple'];
       default:
         return ['default'];
     }
@@ -1448,7 +1453,7 @@ export class PlaygroundComponent {
   }
 
   isDirectInputVariant(): boolean {
-    return this.activeControlPlayground === 'text' && this.activeControlVariant === 'direct-input';
+    return this.activeControlPlayground !== 'all' && this.activeControlVariant === 'direct-input';
   }
 
   isNgModelOnlyField(field: BrFormField): boolean {
@@ -1546,8 +1551,8 @@ export class PlaygroundComponent {
 
   private applyFormCode(): void {
     try {
-      if (this.isDirectInputVariant() && this.activeControlPlayground === 'text') {
-        this.applyDirectInputTextFormCode();
+      if (this.isDirectInputVariant()) {
+        this.applyDirectInputFormCode();
         return;
       }
       this.validateTsShape('form', this.formCode.ts);
@@ -2085,23 +2090,8 @@ export class YourFeatureComponent {
   }
 
   private buildFormTsCode(config: BrFormConfig): string {
-    if (this.isDirectInputVariant() && this.activeControlPlayground === 'text' && config.fields?.length === 1) {
-      const field = config.fields[0];
-      const value = String((config.value || {})[field.id] ?? '');
-      return `import { BrTextComponent } from '@sriharshavarada/br-ui-wrapper';
-
-export class YourFeatureComponent {
-  employeeName = ${JSON.stringify(value)};
-
-  updateEmployeeName(value: string): void {
-    this.employeeName = value;
-    console.log('valueChange', value);
-  }
-
-  onControlEvent(event: any): void {
-    console.log('controlEvent', event);
-  }
-}`;
+    if (this.isDirectInputVariant() && config.fields?.length === 1) {
+      return this.buildDirectInputFormTsCode(config.fields[0], config);
     }
 
     const fieldTypes = new Set((config.fields || []).map((f: BrFormField) => f.type));
@@ -2457,31 +2447,54 @@ ${helperBlock}
   private controlHtmlSnippet(field: BrFormField): string {
     if (this.isNgModelOnlyField(field)) {
       if (field.type === 'text') {
-        return `<br-text [id]="'${field.id}'" [label]="'${field.label}'" [placeholder]="'${field.placeholder || ''}'" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ngModel]="controlValue(${this.fieldRef(field.id)})" (ngModelChange)="updateControlValue('${field.id}', $event)"></br-text>`;
+        return `<br-text [id]="'${field.id}'" [label]="'${field.label}'" [placeholder]="'${field.placeholder || ''}'" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [ngModel]="controlValue(${this.fieldRef(field.id)})" (ngModelChange)="updateControlValue('${field.id}', $event)"></br-text>`;
       }
       if (field.type === 'text-area') {
-        return `<br-text-area [id]="'${field.id}'" [label]="'${field.label}'" [placeholder]="'${field.placeholder || ''}'" [rows]="${field.rows ?? 4}" [maxLength]="${field.maxLength ?? 'null'}" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ngModel]="controlValue(${this.fieldRef(field.id)})" (ngModelChange)="updateControlValue('${field.id}', $event)"></br-text-area>`;
+        return `<br-text-area [id]="'${field.id}'" [label]="'${field.label}'" [placeholder]="'${field.placeholder || ''}'" [rows]="${field.rows ?? 4}" [maxLength]="${field.maxLength ?? 'null'}" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [ngModel]="controlValue(${this.fieldRef(field.id)})" (ngModelChange)="updateControlValue('${field.id}', $event)"></br-text-area>`;
       }
       if (field.type === 'single-select') {
-        return `<br-single-select [id]="'${field.id}'" [label]="'${field.label}'" [options]="${JSON.stringify(field.options || [])}" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ngModel]="controlValue(${this.fieldRef(field.id)})" (ngModelChange)="updateControlValue('${field.id}', $event)"></br-single-select>`;
+        return `<br-single-select [id]="'${field.id}'" [label]="'${field.label}'" [options]="${JSON.stringify(field.options || [])}" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [ngModel]="controlValue(${this.fieldRef(field.id)})" (ngModelChange)="updateControlValue('${field.id}', $event)"></br-single-select>`;
       }
       if (field.type === 'multi-select') {
-        return `<br-multi-select [id]="'${field.id}'" [label]="'${field.label}'" [options]="${JSON.stringify(field.options || [])}" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ngModel]="controlValue(${this.fieldRef(field.id)})" (ngModelChange)="updateControlValue('${field.id}', $event)"></br-multi-select>`;
+        return `<br-multi-select [id]="'${field.id}'" [label]="'${field.label}'" [options]="${JSON.stringify(field.options || [])}" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [ngModel]="controlValue(${this.fieldRef(field.id)})" (ngModelChange)="updateControlValue('${field.id}', $event)"></br-multi-select>`;
       }
       if (field.type === 'checkbox') {
-        return `<br-checkbox [id]="'${field.id}'" [label]="'${field.label}'" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ngModel]="controlValue(${this.fieldRef(field.id)})" (ngModelChange)="updateControlValue('${field.id}', $event)"></br-checkbox>`;
+        return `<br-checkbox [id]="'${field.id}'" [label]="'${field.label}'" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [ngModel]="controlValue(${this.fieldRef(field.id)})" (ngModelChange)="updateControlValue('${field.id}', $event)"></br-checkbox>`;
       }
       if (field.type === 'radio') {
-        return `<br-radio [id]="'${field.id}'" [label]="'${field.label}'" [options]="${JSON.stringify(field.options || [])}" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ngModel]="controlValue(${this.fieldRef(field.id)})" (ngModelChange)="updateControlValue('${field.id}', $event)"></br-radio>`;
+        return `<br-radio [id]="'${field.id}'" [label]="'${field.label}'" [options]="${JSON.stringify(field.options || [])}" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [ngModel]="controlValue(${this.fieldRef(field.id)})" (ngModelChange)="updateControlValue('${field.id}', $event)"></br-radio>`;
       }
       if (field.type === 'date') {
-        return `<br-date [id]="'${field.id}'" [label]="'${field.label}'" [placeholder]="'${field.placeholder || 'Select date'}'" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ngModel]="controlValue(${this.fieldRef(field.id)})" (ngModelChange)="updateControlValue('${field.id}', $event)"></br-date>`;
+        return `<br-date [id]="'${field.id}'" [label]="'${field.label}'" [placeholder]="'${field.placeholder || 'Select date'}'" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [ngModel]="controlValue(${this.fieldRef(field.id)})" (ngModelChange)="updateControlValue('${field.id}', $event)"></br-date>`;
       }
-      return `<br-autocomplete [id]="'${field.id}'" [label]="'${field.label}'" [placeholder]="'${field.placeholder || ''}'" [options]="${JSON.stringify(field.options || [])}" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ngModel]="controlValue(${this.fieldRef(field.id)})" (ngModelChange)="updateControlValue('${field.id}', $event)"></br-autocomplete>`;
+      return `<br-autocomplete [id]="'${field.id}'" [label]="'${field.label}'" [placeholder]="'${field.placeholder || ''}'" [options]="${JSON.stringify(field.options || [])}" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [ngModel]="controlValue(${this.fieldRef(field.id)})" (ngModelChange)="updateControlValue('${field.id}', $event)"></br-autocomplete>`;
     }
 
-    if (this.isDirectInputField(field) && field.type === 'text') {
-      return `<br-text [id]="'${field.id}'" [name]="'${field.name || ''}'" [className]="'${field.className || ''}'" [label]="'${field.label}'" [placeholder]="'${field.placeholder || ''}'" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [value]="controlValue(${this.fieldRef(field.id)})" (valueChange)="updateControlValue('${field.id}', $event)" (controlEvent)="onControlEvent($event)"></br-text>`;
+    if (this.isDirectInputField(field)) {
+      const valueRef = this.directInputValueRef(field);
+      const optionsRef = this.directInputOptionsRef(field);
+      if (field.type === 'text') {
+        return `<br-text [id]="'${field.id}'" [name]="'${field.name || ''}'" [className]="'${field.className || ''}'" [label]="'${field.label}'" [placeholder]="'${field.placeholder || ''}'" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [value]="${valueRef}" (valueChange)="updateDirectInputValue($event)" (controlEvent)="onControlEvent($event)"></br-text>`;
+      }
+      if (field.type === 'text-area') {
+        return `<br-text-area [id]="'${field.id}'" [name]="'${field.name || ''}'" [className]="'${field.className || ''}'" [label]="'${field.label}'" [placeholder]="'${field.placeholder || ''}'" [rows]="${field.rows ?? 4}" [maxLength]="${field.maxLength ?? 'null'}" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [value]="${valueRef}" (valueChange)="updateDirectInputValue($event)" (controlEvent)="onControlEvent($event)"></br-text-area>`;
+      }
+      if (field.type === 'single-select') {
+        return `<br-single-select [id]="'${field.id}'" [name]="'${field.name || ''}'" [className]="'${field.className || ''}'" [label]="'${field.label}'" [options]="${optionsRef}" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [value]="${valueRef}" (valueChange)="updateDirectInputValue($event)" (controlEvent)="onControlEvent($event)"></br-single-select>`;
+      }
+      if (field.type === 'multi-select') {
+        return `<br-multi-select [id]="'${field.id}'" [name]="'${field.name || ''}'" [className]="'${field.className || ''}'" [label]="'${field.label}'" [options]="${optionsRef}" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [value]="${valueRef}" (valueChange)="updateDirectInputValue($event)" (controlEvent)="onControlEvent($event)"></br-multi-select>`;
+      }
+      if (field.type === 'checkbox') {
+        return `<br-checkbox [id]="'${field.id}'" [name]="'${field.name || ''}'" [className]="'${field.className || ''}'" [label]="'${field.label}'" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [value]="${valueRef}" (valueChange)="updateDirectInputValue($event)" (controlEvent)="onControlEvent($event)"></br-checkbox>`;
+      }
+      if (field.type === 'radio') {
+        return `<br-radio [id]="'${field.id}'" [name]="'${field.name || ''}'" [className]="'${field.className || ''}'" [label]="'${field.label}'" [options]="${optionsRef}" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [value]="${valueRef}" (valueChange)="updateDirectInputValue($event)" (controlEvent)="onControlEvent($event)"></br-radio>`;
+      }
+      if (field.type === 'date') {
+        return `<br-date [id]="'${field.id}'" [name]="'${field.name || ''}'" [className]="'${field.className || ''}'" [label]="'${field.label}'" [placeholder]="'${field.placeholder || 'Select date'}'" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [value]="${valueRef}" (dateChange)="updateDirectInputValue($event)" (controlEvent)="onControlEvent($event)"></br-date>`;
+      }
+      return `<br-autocomplete [id]="'${field.id}'" [name]="'${field.name || ''}'" [className]="'${field.className || ''}'" [label]="'${field.label}'" [placeholder]="'${field.placeholder || ''}'" [options]="${optionsRef}" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [value]="${valueRef}" (valueChange)="updateDirectInputValue($event)" (controlEvent)="onControlEvent($event)"></br-autocomplete>`;
     }
 
     if (field.type === 'text') {
@@ -2512,17 +2525,89 @@ ${helperBlock}
     return `controlsConfig.fields.find(f => f.id === '${fieldId}')!`;
   }
 
-  private applyDirectInputTextFormCode(): void {
+  private directInputValueRef(field: BrFormField): string {
+    return this.toIdentifier(field.id) + 'Value';
+  }
+
+  private directInputOptionsRef(field: BrFormField): string {
+    return this.toIdentifier(field.id) + 'Options';
+  }
+
+  private toIdentifier(value: string): string {
+    return value.replace(/[^a-zA-Z0-9]+(.)/g, (_match, chr: string) => chr.toUpperCase()).replace(/^[^a-zA-Z_]+/, '');
+  }
+
+  private buildDirectInputFormTsCode(field: BrFormField, config: BrFormConfig): string {
+    const componentImport = this.directInputComponentImport(field.type);
+    const optionImport = this.directInputNeedsOptions(field.type) ? ', BrOption' : '';
+    const valueVar = this.directInputValueRef(field);
+    const optionsVar = this.directInputOptionsRef(field);
+    const currentValue = (config.value || {})[field.id];
+    const valueLiteral = this.directInputValueLiteral(field, currentValue);
+    const optionsLiteral = this.directInputNeedsOptions(field.type) ? `
+  ${optionsVar}: BrOption[] = ${JSON.stringify(field.options || [], null, 2)};` : '';
+
+    return `import { ${componentImport}${optionImport} } from '@sriharshavarada/br-ui-wrapper';
+
+export class YourFeatureComponent {
+  ${valueVar} = ${valueLiteral};${optionsLiteral}
+
+  updateDirectInputValue(value: any): void {
+    this.${valueVar} = value;
+    console.log('valueChange', value);
+  }
+
+  onControlEvent(event: any): void {
+    console.log('controlEvent', event);
+  }
+
+  onControlsAction(action: 'reset' | 'submit'): void {
+    console.log('control action', action, this.${valueVar});
+  }
+}`;
+  }
+
+  private directInputComponentImport(type: BrFormField['type']): string {
+    switch (type) {
+      case 'text': return 'BrTextComponent';
+      case 'text-area': return 'BrTextAreaComponent';
+      case 'single-select': return 'BrSingleSelectComponent';
+      case 'multi-select': return 'BrMultiSelectComponent';
+      case 'checkbox': return 'BrCheckboxComponent';
+      case 'radio': return 'BrRadioComponent';
+      case 'date': return 'BrDateComponent';
+      case 'autocomplete': return 'BrAutocompleteComponent';
+      default: return 'BrTextComponent';
+    }
+  }
+
+  private directInputNeedsOptions(type: BrFormField['type']): boolean {
+    return type === 'single-select' || type === 'multi-select' || type === 'radio' || type === 'autocomplete';
+  }
+
+  private directInputValueLiteral(field: BrFormField, value: any): string {
+    if (field.type === 'checkbox') {
+      return value ? 'true' : 'false';
+    }
+
+    if (field.type === 'multi-select') {
+      return JSON.stringify(Array.isArray(value) ? value : []);
+    }
+
+    return JSON.stringify(value ?? '');
+  }
+
+  private applyDirectInputFormCode(): void {
     this.validateTsShape('form', this.formCode.ts);
     this.validateScss(this.formCode.scss);
     const htmlSegments = this.extractControlsHtmlSegments(this.formCode.html);
     const field = this.formConfig.fields[0];
-    if (!field || field.type !== 'text') {
-      throw new Error('Direct input text variant requires exactly one text field.');
+    if (!field) {
+      throw new Error('Direct input variant requires exactly one field.');
     }
 
-    const nextField = this.parseDirectInputTextField(this.formCode.html, field);
-    const nextValue = this.parseStringAssignmentFromTs(this.formCode.ts, 'employeeName') ?? String((this.formConfig.value || {})[field.id] ?? '');
+    const nextField = this.parseDirectInputField(this.formCode.html, field);
+    const nextValue = this.parseDirectInputValueFromTs(this.formCode.ts, nextField) ?? (this.formConfig.value || {})[field.id];
 
     this.formConfig = {
       ...this.formConfig,
@@ -2537,10 +2622,11 @@ ${helperBlock}
     this.pushLog('Applied Controls TS/HTML/SCSS code');
   }
 
-  private parseDirectInputTextField(html: string, fallback: BrFormField): BrFormField {
-    const match = html.match(/<br-text\b([\s\S]*?)><\/br-text>/i);
+  private parseDirectInputField(html: string, fallback: BrFormField): BrFormField {
+    const tagName = this.directInputTagName(fallback.type);
+    const match = html.match(new RegExp(`<${tagName}\\b([\\s\\S]*?)><\\/${tagName}>`, 'i'));
     if (!match) {
-      throw new Error('HTML must include <br-text>...</br-text> for the direct input variant.');
+      throw new Error(`HTML must include <${tagName}>...</${tagName}> for the direct input variant.`);
     }
 
     const attrs = match[1];
@@ -2576,7 +2662,25 @@ ${helperBlock}
       placeholder: stringBinding('placeholder') || fallback.placeholder,
       required: booleanBinding('required', fallback.required),
       disabled: booleanBinding('disabled', fallback.disabled),
+      ariaLabel: stringBinding('ariaLabel') || fallback.ariaLabel,
+      ariaLabelledBy: stringBinding('ariaLabelledBy') || fallback.ariaLabelledBy,
+      ariaDescribedBy: stringBinding('ariaDescribedBy') || fallback.ariaDescribedBy,
     };
+  }
+
+  private directInputTagName(type: BrFormField['type']): string {
+    switch (type) {
+      case 'text-area': return 'br-text-area';
+      case 'single-select': return 'br-single-select';
+      case 'multi-select': return 'br-multi-select';
+      case 'checkbox': return 'br-checkbox';
+      case 'radio': return 'br-radio';
+      case 'date': return 'br-date';
+      case 'autocomplete': return 'br-autocomplete';
+      case 'text':
+      default:
+        return 'br-text';
+    }
   }
 
   private parseStringAssignmentFromTs(tsCode: string, variableName: string): string | null {
@@ -2594,6 +2698,42 @@ ${helperBlock}
     }
 
     return null;
+  }
+
+  private parseDirectInputValueFromTs(tsCode: string, field: BrFormField): any {
+    const variableName = this.directInputValueRef(field);
+
+    if (field.type === 'checkbox') {
+      return this.parseBooleanAssignmentFromTs(tsCode, variableName);
+    }
+
+    if (field.type === 'multi-select') {
+      return this.parseJsonAssignmentFromTs(tsCode, variableName);
+    }
+
+    return this.parseStringAssignmentFromTs(tsCode, variableName)
+      ?? this.parseJsonAssignmentFromTs(tsCode, variableName);
+  }
+
+  private parseBooleanAssignmentFromTs(tsCode: string, variableName: string): boolean | null {
+    const match = tsCode.match(new RegExp(`${variableName}\\s*=\\s*(true|false)`));
+    if (!match?.[1]) {
+      return null;
+    }
+    return match[1] === 'true';
+  }
+
+  private parseJsonAssignmentFromTs(tsCode: string, variableName: string): any {
+    const match = tsCode.match(new RegExp(`${variableName}\\s*=\\s*(\\[[\\s\\S]*?\\]|\\{[\\s\\S]*?\\}|"(?:[^"\\\\]|\\\\.)*")`, 'm'));
+    if (!match?.[1]) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(match[1]);
+    } catch {
+      return null;
+    }
   }
 
   private defaultGridScssCode(): string {
@@ -2951,10 +3091,11 @@ export class YourFeatureComponent {
       throw new Error('TS validation failed: missing `export class ...` declaration.');
     }
 
-    if (tab === 'form' && this.isDirectInputVariant() && this.activeControlPlayground === 'text') {
-      const directInputImportRegex = /import\s*\{[^}]*BrTextComponent[^}]*\}\s*from\s*['"]@sriharshavarada\/br-ui-wrapper['"]/;
+    if (tab === 'form' && this.isDirectInputVariant() && this.formConfig.fields?.length === 1) {
+      const requiredImport = this.directInputComponentImport(this.formConfig.fields[0].type);
+      const directInputImportRegex = new RegExp(`import\\s*\\{[^}]*${requiredImport}[^}]*\\}\\s*from\\s*['"]@sriharshavarada\\/br-ui-wrapper['"]`);
       if (!directInputImportRegex.test(tsCode)) {
-        throw new Error('TS validation failed: required import for BrTextComponent from @sriharshavarada/br-ui-wrapper is missing.');
+        throw new Error(`TS validation failed: required import for ${requiredImport} from @sriharshavarada/br-ui-wrapper is missing.`);
       }
       return;
     }
@@ -3005,13 +3146,13 @@ export class YourFeatureComponent {
 
   private extractControlsHtmlSegments(html: string): { before: string; after: string } {
     this.validateHtml(html);
-    const openMatch = html.match(/<br-(text|single-select|multi-select|checkbox|radio|date|autocomplete)\b/i);
+    const openMatch = html.match(/<br-(text|text-area|single-select|multi-select|checkbox|radio|date|autocomplete)\b/i);
     if (!openMatch || openMatch.index === undefined) {
       throw new Error('HTML must include at least one control wrapper tag (for example <br-text ...></br-text>).');
     }
 
     let closeEnd = -1;
-    const closeRegex = /<\/br-(text|single-select|multi-select|checkbox|radio|date|autocomplete)\s*>/gi;
+    const closeRegex = /<\/br-(text|text-area|single-select|multi-select|checkbox|radio|date|autocomplete)\s*>/gi;
     let m: RegExpExecArray | null = null;
     while ((m = closeRegex.exec(html)) !== null) {
       closeEnd = closeRegex.lastIndex;

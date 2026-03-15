@@ -10,7 +10,7 @@
   <div class="editor-grid">
     <div class="panel">
       <div class="panel-title">Raw JSON</div>
-      <textarea class="raw-editor" [value]="editorText" (input)="onRawInput($any($event.target).value)"
+      <textarea class="raw-editor" wrap="off" [value]="editorText" (input)="onRawInput($any($event.target).value)"
         (blur)="onRawBlur()"></textarea>
       <p class="error" *ngIf="parseError">Invalid JSON: {{ parseError }}</p>
     </div>

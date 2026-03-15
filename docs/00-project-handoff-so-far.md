@@ -101,6 +101,39 @@ Latest local commit before these changes:
   - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/scripts/restart-app-clean.sh`
   - Script now accepts host/port arguments and clears `.angular/cache`, `out-tsc`, and `dist/br-ui-framework` before restart
 
+### Additional app-side rollout after `3e59e05` (local `yalc` validation, not checked in yet)
+- Playground direct-input variants were expanded beyond text-only usage so consumers can validate wrapper-attribute usage directly for:
+  - text
+  - text-area
+  - single-select
+  - multi-select
+  - checkbox
+  - radio
+  - autocomplete
+  - date
+- Direct-input Code Studio output was simplified so generated consumer examples no longer lean on large config objects for these variants:
+  - generated HTML now shows direct wrapper attributes/bindings
+  - generated TS now keeps only small local properties/option arrays where needed
+  - `Apply Code`/preview logic was updated accordingly
+- Playground accessibility exposure was also tightened for direct-input usage:
+  - direct-input examples now visibly show the same ARIA-style wrapper inputs consumers are expected to pass
+  - this keeps accessibility discoverable in both config-driven and direct-input demos instead of hiding it in internal defaults
+- Code editor / JSON workbench usability was improved for long snippets:
+  - horizontal overflow was enabled for long generated code/config
+  - textareas were switched to non-wrapping behavior
+  - direct-input snippet rendering now preserves long lines so horizontal scrolling works instead of forced wrapping
+- Date control verification was continued in playground across variants:
+  - `CUSTOM` date keyboard behavior was improved locally for popup focus trapping and single active day focus
+  - `MATERIAL` date header/month synchronization was improved locally so the dropdown reflects keyboard-driven month changes
+  - `PRIMENG` date received multiple local keyboard-navigation attempts, but it is still not reliable enough to call accessibility-ready
+  - current practical conclusion:
+    - `CUSTOM`: workable baseline
+    - `MATERIAL`: workable baseline
+    - `PRIMENG`: still a known keyboard accessibility gap and should not be treated as signoff-ready
+- Important implementation constraint confirmed during this work:
+  - do not rely on document-level listeners for library popup/date behavior
+  - keep keyboard/focus handling scoped to the component/overlay itself so consumer apps do not inherit unexpected document-level side effects
+
 ### Library repo changes after `0447bed`
 - `br-accordion` now supports projected child items through:
   - `ContentChildren(BrAccordionItemComponent)`
@@ -191,6 +224,38 @@ Latest local commit before these changes:
 - Regression tests were added for the new accessibility behavior:
   - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/grid/shell/grid-shell.component.spec.ts`
   - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/modal/custom/custom-modal.component.spec.ts`
+
+### Additional library-side rollout after `83b545f` (local `yalc` validation, not checked in yet)
+- Direct-input accessibility gaps were reduced at the wrapper level so consumers can pass ARIA-style inputs as wrapper attributes instead of only through config objects:
+  - text
+  - text-area
+  - single-select
+  - multi-select
+  - checkbox
+  - radio
+  - autocomplete
+  - date
+  - button was extended beyond `ariaLabel`
+  - accordion / projected `br-accordion-item`
+  - modal accessibility override inputs
+- This means consumer usage is now intended to support both patterns:
+  - config-driven accessibility
+  - direct wrapper attributes such as `[ariaLabel]`, `[ariaLabelledBy]`, and `[ariaDescribedBy]`
+- Grid remains config-driven by design:
+  - there is no equivalent direct-attribute consumer mode for grid
+  - consumers should keep passing grid accessibility through the grid config/accessibility contract
+- Date-control accessibility/local keyboard work continued after the earlier accessibility commit:
+  - `CUSTOM` date:
+    - popup focus trapping was tightened
+    - active-day/tab-order behavior was reduced to a single active date cell instead of tabbing every date
+    - month/year dropdown binding was corrected so header selection matches the visible month
+  - `MATERIAL` date:
+    - month/year header binding was corrected
+    - header synchronization was improved so keyboard month navigation updates the visible dropdown state
+  - `PRIMENG` date:
+    - several local attempts were made to improve popup close behavior, arrow navigation, disabled-date skipping, and month crossover behavior
+    - despite that iteration, PrimeNG date keyboard navigation is still not stable enough for accessibility signoff
+    - treat PrimeNG date as a known limitation until a deeper rework or variant-specific replacement is done
 
 ### Validation already performed for this local state
 - library build passed locally

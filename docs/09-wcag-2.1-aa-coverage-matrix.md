@@ -49,6 +49,10 @@ Current realistic position:
 - Grid, modal, button, and several control wrappers have meaningful accessibility support work already applied.
 - We cannot currently claim full WCAG 2.1 A/AA compliance across all controls and all consuming screens.
 - Several criteria are fundamentally app/content/process owned, not library owned.
+- Date-picker support is currently mixed by variant:
+  - `CUSTOM`: improved and locally workable
+  - `MATERIAL`: improved and locally workable
+  - `PRIMENG`: still not reliable enough for keyboard accessibility signoff
 
 ## Matrix
 
@@ -63,15 +67,15 @@ Current realistic position:
 | 1.3.3 | Sensory Characteristics | App-owned | Needs verification | Mostly content/instruction wording responsibility in forms and app screens. |
 | 1.4.1 | Use of Color | Shared | Needs verification | UI states should not rely on color only, but this has not been systematically audited across all variants/themes. |
 | 1.4.2 | Audio Control | App-owned | App-owned | Only relevant if the consumer app includes auto-playing audio. |
-| 2.1.1 | Keyboard | Shared | Partial | Major work started for grid menus/dialogs and modal focus behavior, but not yet fully validated across all controls and variants. |
-| 2.1.2 | No Keyboard Trap | Shared | Partial | Focus trap behavior exists in dialogs/menus, but needs final end-to-end verification in real runtime paths. |
+| 2.1.1 | Keyboard | Shared | Partial | Major work started for grid menus/dialogs, modal focus behavior, and date-picker variants. Custom/material date are in a better state locally, but PrimeNG date keyboard navigation is still a known gap. |
+| 2.1.2 | No Keyboard Trap | Shared | Partial | Focus trap behavior exists in dialogs/menus and parts of date behavior, but needs final end-to-end verification in real runtime paths. |
 | 2.1.4 | Character Key Shortcuts | App-owned | Needs verification | No intentional character shortcuts are part of the library contract today; app-level review still needed. |
 | 2.2.1 | Timing Adjustable | App-owned | App-owned | Timing/session behavior belongs to app workflows. |
 | 2.2.2 | Pause, Stop, Hide | App-owned | App-owned | Depends on consumer content and motion/timer behavior. |
 | 2.3.1 | Three Flashes or Below Threshold | Shared | Needs verification | No known flashing UI, but not formally audited. |
 | 2.4.1 | Bypass Blocks | App-owned | Not started | Requires app-level skip links / page structure. |
 | 2.4.2 | Page Titled | App-owned | Not started | App routing/page title responsibility. |
-| 2.4.3 | Focus Order | Shared | Partial | Improved in grid/menu/modal areas, but still requires complete verification across controls and pages. |
+| 2.4.3 | Focus Order | Shared | Partial | Improved in grid/menu/modal areas and parts of date navigation, but still requires complete verification across controls and pages. PrimeNG date remains unstable here. |
 | 2.4.4 | Link Purpose (In Context) | Shared | Needs verification | Applies where links are rendered by app content or custom templates; not fully audited. |
 | 2.5.1 | Pointer Gestures | Shared | Needs verification | Library does not intentionally require complex gestures, but this is not formally verified across all variants. |
 | 2.5.2 | Pointer Cancellation | Shared | Needs verification | Needs review for any pointer-down/pointer-up specific interactions; most controls are standard click/button today. |
@@ -83,7 +87,7 @@ Current realistic position:
 | 3.3.1 | Error Identification | Shared | Partial | Some form infrastructure exists, but consistent accessible error messaging is not fully standardized across all controls. |
 | 3.3.2 | Labels or Instructions | Shared | Partial | Labels exist for many controls, but completeness and consistency across all wrappers still need audit. |
 | 4.1.1 | Parsing | Shared | Needs verification | Modern Angular output is usually structurally safe, but full validation is not documented for every render path. |
-| 4.1.2 | Name, Role, Value | Shared | Partial | Significant work exists for grid/menu/dialog/button semantics, but this is not complete across every control and variant. |
+| 4.1.2 | Name, Role, Value | Shared | Partial | Significant work exists for grid/menu/dialog/button semantics and ARIA threading, but this is not complete across every control and variant. Date behavior is still mixed by variant. |
 | 1.2.4 | Captions (Live) | App-owned | App-owned | Consumer media/content responsibility. |
 | 1.2.5 | Audio Description (Prerecorded) | App-owned | App-owned | Consumer media/content responsibility. |
 | 1.4.3 | Contrast (Minimum) | Shared | Needs verification | Theme/token system exists, but contrast compliance has not been systematically measured across variants/states. |
@@ -95,7 +99,7 @@ Current realistic position:
 | 1.4.13 | Content on Hover or Focus | Shared | Partial | Menus/dialogs/tool surfaces need broader review for dismissibility and persistence behavior. |
 | 2.4.5 | Multiple Ways | App-owned | Not started | App navigation and information architecture responsibility. |
 | 2.4.6 | Headings and Labels | Shared | Partial | Many headings/labels exist, but consistency across all screens and generated examples needs review. |
-| 2.4.7 | Focus Visible | Shared | Partial | Improved for grid popups and related controls, but a full library-wide visible focus audit is still required. |
+| 2.4.7 | Focus Visible | Shared | Partial | Improved for grid popups, related controls, and some date popup states, but a full library-wide visible focus audit is still required. |
 | 3.1.2 | Language of Parts | App-owned | Not started | Mostly consumer content responsibility. |
 | 3.2.3 | Consistent Navigation | App-owned | Not started | App shell/navigation responsibility. |
 | 3.2.4 | Consistent Identification | Shared | Partial | Naming and action patterns are improving, but consistency is not fully guaranteed across all variants. |
@@ -172,6 +176,10 @@ Current state:
 - public accessibility contract is improving
 - dynamic ARIA support exists in some areas and is being expanded
 - consistent validation/error/help semantics are not yet fully standardized
+- date support is not uniform by variant:
+  - `CUSTOM`: improved popup focus and active-day behavior locally
+  - `MATERIAL`: improved header/month sync locally
+  - `PRIMENG`: still a known keyboard-navigation limitation and should not be treated as WCAG-ready yet
 
 Main criteria:
 

@@ -5,7 +5,7 @@
 
   <div class="editor-col">
     <pre #highlightArea class="highlight-layer" [innerHTML]="highlightedCode + '\n'"></pre>
-    <textarea #inputArea class="input-layer" [value]="value" (input)="onInput($any($event.target).value)"
+    <textarea #inputArea class="input-layer" wrap="off" [value]="value" (input)="onInput($any($event.target).value)"
       (scroll)="onScroll()" spellcheck="false"></textarea>
   </div>
 </div>

@@ -509,7 +509,8 @@
                 (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-text>
               <br-text *ngIf="field.type === 'text' && isDirectInputField(field)" [id]="field.id" [name]="field.name"
                 [className]="field.className" [label]="field.label" [placeholder]="field.placeholder"
-                [required]="!!field.required" [disabled]="!!field.disabled" [value]="controlValue(field)"
+                [required]="!!field.required" [disabled]="!!field.disabled" [ariaLabel]="field.ariaLabel"
+                [ariaLabelledBy]="field.ariaLabelledBy" [ariaDescribedBy]="field.ariaDescribedBy" [value]="controlValue(field)"
                 (valueChange)="updateControlValue(field.id, $event)"
                 (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-text>
               <br-text *ngIf="field.type === 'text' && isNgModelOnlyField(field)" [id]="field.id" [label]="field.label"
@@ -517,8 +518,15 @@
                 [ngModel]="controlValue(field)" (ngModelChange)="updateControlValue(field.id, $event)"
                 (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-text>
 
-              <br-text-area *ngIf="field.type === 'text-area' && !isNgModelOnlyField(field)"
+              <br-text-area *ngIf="field.type === 'text-area' && !isNgModelOnlyField(field) && !isDirectInputField(field)"
                 [config]="getTextAreaConfig(field)" (valueChange)="updateControlValue(field.id, $event)"
+                (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-text-area>
+              <br-text-area *ngIf="field.type === 'text-area' && isDirectInputField(field)" [id]="field.id"
+                [name]="field.name" [className]="field.className" [label]="field.label" [placeholder]="field.placeholder"
+                [rows]="field.rows || 4" [maxLength]="field.maxLength || undefined" [required]="!!field.required"
+                [disabled]="!!field.disabled" [ariaLabel]="field.ariaLabel" [ariaLabelledBy]="field.ariaLabelledBy"
+                [ariaDescribedBy]="field.ariaDescribedBy" [value]="controlValue(field)"
+                (valueChange)="updateControlValue(field.id, $event)"
                 (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-text-area>
               <br-text-area *ngIf="field.type === 'text-area' && isNgModelOnlyField(field)" [id]="field.id"
                 [label]="field.label" [placeholder]="field.placeholder" [rows]="field.rows || 4"
@@ -526,8 +534,14 @@
                 [ngModel]="controlValue(field)" (ngModelChange)="updateControlValue(field.id, $event)"
                 (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-text-area>
 
-              <br-single-select *ngIf="field.type === 'single-select' && !isNgModelOnlyField(field)"
+              <br-single-select *ngIf="field.type === 'single-select' && !isNgModelOnlyField(field) && !isDirectInputField(field)"
                 [config]="getSingleSelectConfig(field)" (valueChange)="updateControlValue(field.id, $event)"
+                (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-single-select>
+              <br-single-select *ngIf="field.type === 'single-select' && isDirectInputField(field)" [id]="field.id"
+                [name]="field.name" [className]="field.className" [label]="field.label" [options]="field.options || []"
+                [required]="!!field.required" [disabled]="!!field.disabled" [ariaLabel]="field.ariaLabel"
+                [ariaLabelledBy]="field.ariaLabelledBy" [ariaDescribedBy]="field.ariaDescribedBy"
+                [value]="controlValue(field)" (valueChange)="updateControlValue(field.id, $event)"
                 (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-single-select>
               <br-single-select *ngIf="field.type === 'single-select' && isNgModelOnlyField(field)" [id]="field.id"
                 [label]="field.label" [options]="field.options || []" [required]="!!field.required"
@@ -535,8 +549,14 @@
                 (ngModelChange)="updateControlValue(field.id, $event)"
                 (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-single-select>
 
-              <br-multi-select *ngIf="field.type === 'multi-select' && !isNgModelOnlyField(field)"
+              <br-multi-select *ngIf="field.type === 'multi-select' && !isNgModelOnlyField(field) && !isDirectInputField(field)"
                 [config]="getMultiSelectConfig(field)" (valueChange)="updateControlValue(field.id, $event)"
+                (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-multi-select>
+              <br-multi-select *ngIf="field.type === 'multi-select' && isDirectInputField(field)" [id]="field.id"
+                [name]="field.name" [className]="field.className" [label]="field.label" [options]="field.options || []"
+                [required]="!!field.required" [disabled]="!!field.disabled" [ariaLabel]="field.ariaLabel"
+                [ariaLabelledBy]="field.ariaLabelledBy" [ariaDescribedBy]="field.ariaDescribedBy"
+                [value]="controlValue(field)" (valueChange)="updateControlValue(field.id, $event)"
                 (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-multi-select>
               <br-multi-select *ngIf="field.type === 'multi-select' && isNgModelOnlyField(field)" [id]="field.id"
                 [label]="field.label" [options]="field.options || []" [required]="!!field.required"
@@ -544,16 +564,28 @@
                 (ngModelChange)="updateControlValue(field.id, $event)"
                 (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-multi-select>
 
-              <br-checkbox *ngIf="field.type === 'checkbox' && !isNgModelOnlyField(field)"
+              <br-checkbox *ngIf="field.type === 'checkbox' && !isNgModelOnlyField(field) && !isDirectInputField(field)"
                 [config]="getCheckboxConfig(field)" (valueChange)="updateControlValue(field.id, $event)"
+                (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-checkbox>
+              <br-checkbox *ngIf="field.type === 'checkbox' && isDirectInputField(field)" [id]="field.id"
+                [name]="field.name" [className]="field.className" [label]="field.label" [required]="!!field.required"
+                [disabled]="!!field.disabled" [ariaLabel]="field.ariaLabel" [ariaLabelledBy]="field.ariaLabelledBy"
+                [ariaDescribedBy]="field.ariaDescribedBy" [value]="!!controlValue(field)"
+                (valueChange)="updateControlValue(field.id, $event)"
                 (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-checkbox>
               <br-checkbox *ngIf="field.type === 'checkbox' && isNgModelOnlyField(field)" [id]="field.id"
                 [label]="field.label" [required]="!!field.required" [disabled]="!!field.disabled"
                 [ngModel]="controlValue(field)" (ngModelChange)="updateControlValue(field.id, $event)"
                 (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-checkbox>
 
-              <br-radio *ngIf="field.type === 'radio' && !isNgModelOnlyField(field)" [config]="getRadioConfig(field)"
+              <br-radio *ngIf="field.type === 'radio' && !isNgModelOnlyField(field) && !isDirectInputField(field)" [config]="getRadioConfig(field)"
                 (valueChange)="updateControlValue(field.id, $event)"
+                (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-radio>
+              <br-radio *ngIf="field.type === 'radio' && isDirectInputField(field)" [id]="field.id"
+                [name]="field.name" [className]="field.className" [label]="field.label" [options]="field.options || []"
+                [required]="!!field.required" [disabled]="!!field.disabled" [ariaLabel]="field.ariaLabel"
+                [ariaLabelledBy]="field.ariaLabelledBy" [ariaDescribedBy]="field.ariaDescribedBy"
+                [value]="controlValue(field)" (valueChange)="updateControlValue(field.id, $event)"
                 (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-radio>
               <br-radio *ngIf="field.type === 'radio' && isNgModelOnlyField(field)" [id]="field.id"
                 [label]="field.label" [options]="field.options || []" [required]="!!field.required"
@@ -561,8 +593,14 @@
                 (ngModelChange)="updateControlValue(field.id, $event)"
                 (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-radio>
 
-              <br-date *ngIf="field.type === 'date' && !isNgModelOnlyField(field)" [config]="getDateConfig(field)"
+              <br-date *ngIf="field.type === 'date' && !isNgModelOnlyField(field) && !isDirectInputField(field)" [config]="getDateConfig(field)"
                 (dateChange)="updateControlValue(field.id, $event)"
+                (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-date>
+              <br-date *ngIf="field.type === 'date' && isDirectInputField(field)" [id]="field.id" [name]="field.name"
+                [className]="field.className" [label]="field.label" [placeholder]="field.placeholder || 'Select date'"
+                [required]="!!field.required" [disabled]="!!field.disabled" [ariaLabel]="field.ariaLabel"
+                [ariaLabelledBy]="field.ariaLabelledBy" [ariaDescribedBy]="field.ariaDescribedBy"
+                [value]="controlValue(field)" (dateChange)="updateControlValue(field.id, $event)"
                 (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-date>
               <br-date *ngIf="field.type === 'date' && isNgModelOnlyField(field)" [id]="field.id" [label]="field.label"
                 [placeholder]="field.placeholder || 'Select date'" [required]="!!field.required"
@@ -570,8 +608,15 @@
                 (ngModelChange)="updateControlValue(field.id, $event)"
                 (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-date>
 
-              <br-autocomplete *ngIf="field.type === 'autocomplete' && !isNgModelOnlyField(field)"
+              <br-autocomplete *ngIf="field.type === 'autocomplete' && !isNgModelOnlyField(field) && !isDirectInputField(field)"
                 [config]="getAutocompleteConfig(field)" (valueChange)="updateControlValue(field.id, $event)"
+                (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-autocomplete>
+              <br-autocomplete *ngIf="field.type === 'autocomplete' && isDirectInputField(field)" [id]="field.id"
+                [name]="field.name" [className]="field.className" [label]="field.label"
+                [placeholder]="field.placeholder" [options]="field.options || []" [required]="!!field.required"
+                [disabled]="!!field.disabled" [ariaLabel]="field.ariaLabel"
+                [ariaLabelledBy]="field.ariaLabelledBy" [ariaDescribedBy]="field.ariaDescribedBy"
+                [value]="controlValue(field)" (valueChange)="updateControlValue(field.id, $event)"
                 (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-autocomplete>
               <br-autocomplete *ngIf="field.type === 'autocomplete' && isNgModelOnlyField(field)" [id]="field.id"
                 [label]="field.label" [placeholder]="field.placeholder" [options]="field.options || []"

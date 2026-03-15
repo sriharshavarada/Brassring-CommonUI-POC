@@ -250,6 +250,8 @@
   border-radius: 10px;
   padding: 10px;
   background: #f8fafc;
+  min-width: 0;
+  overflow-x: auto;
 }
 
 .inline-collapse {
@@ -305,6 +307,8 @@
 
 .inline-collapse-body {
   padding: 0 10px 10px;
+  min-width: 0;
+  overflow-x: auto;
 }
 
 .config-empty-state {
@@ -357,6 +361,8 @@
   gap: 8px;
   margin-top: 10px;
   margin-bottom: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
 }
 
 .file-tab {
@@ -541,7 +547,7 @@
   font-family: 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
   font-size: 12px;
   line-height: 1.45;
-  white-space: pre-wrap;
+  white-space: pre;
   overflow-x: auto;
 }
 
