@@ -60,7 +60,7 @@ import { CodeEditorComponent, CodeLanguage } from './components/code-editor/code
 type PlaygroundTab = 'grid' | 'date' | 'modal' | 'accordion' | 'form' | 'button';
 type CodeFile = 'ts' | 'html' | 'scss';
 
-type GridPreset = 'complex' | 'moderate' | 'rich' | 'simple' | 'remote';
+type GridPreset = 'complex' | 'moderate' | 'rich' | 'simple' | 'remote' | 'frozen-scroll';
 type DatePreset = 'default' | 'compact' | 'disabled';
 type ModalPreset = 'custom' | 'info' | 'confirm' | 'delete' | 'form';
 type FormPreset = 'all-controls' | 'simple';
@@ -274,6 +274,7 @@ export class PlaygroundComponent {
     rich: 'Rich Cells Grid',
     simple: 'Simple Grid',
     remote: 'Remote Grid',
+    'frozen-scroll': 'Frozen Columns + Horizontal Scroll',
   };
 
   readonly datePresetLabels: Record<DatePreset, string> = {
@@ -474,7 +475,7 @@ export class PlaygroundComponent {
   }
 
   get gridPresets(): GridPreset[] {
-    return ['complex', 'moderate', 'rich', 'simple', 'remote'];
+    return ['complex', 'moderate', 'rich', 'simple', 'remote', 'frozen-scroll'];
   }
 
   get datePresets(): DatePreset[] {
@@ -727,6 +728,8 @@ export class PlaygroundComponent {
       this.gridConfig = this.clone(this.remoteGridConfig());
     } else if (preset === 'rich') {
       this.gridConfig = this.clone(this.richGridConfig());
+    } else if (preset === 'frozen-scroll') {
+      this.gridConfig = this.clone(this.frozenScrollGridConfig());
     } else if (preset === 'moderate') {
       this.gridConfig = this.clone(this.moderateGridConfig());
     } else {
@@ -3171,9 +3174,9 @@ export class YourFeatureComponent {
     return {
       title: 'Simple Grid Demo',
       columns: [
-        { field: 'id', header: 'ID', sortable: true },
-        { field: 'name', header: 'Name', sortable: true },
-        { field: 'status', header: 'Status', sortable: true },
+        { field: 'id', header: 'ID', sortable: true, frozen: true, width: '96px' },
+        { field: 'name', header: 'Name', sortable: true, frozen: true, width: '220px' },
+        { field: 'status', header: 'Status', sortable: true, width: '150px' },
       ],
       data: this.sampleUsers(18).map((x) => ({ id: x.id, name: x.name, status: x.status })),
       pagination: true,
@@ -3225,11 +3228,11 @@ export class YourFeatureComponent {
       title: 'Remote Grid Demo',
       dataMode: 'remote',
       columns: [
-        { field: 'id', header: 'ID', sortable: true },
-        { field: 'name', header: 'Name', sortable: true },
-        { field: 'team', header: 'Team', sortable: true },
-        { field: 'role', header: 'Role', sortable: true },
-        { field: 'status', header: 'Status', sortable: true },
+        { field: 'id', header: 'ID', sortable: true, frozen: true, width: '96px' },
+        { field: 'name', header: 'Name', sortable: true, frozen: true, width: '220px' },
+        { field: 'team', header: 'Team', sortable: true, width: '180px' },
+        { field: 'role', header: 'Role', sortable: true, width: '180px' },
+        { field: 'status', header: 'Status', sortable: true, width: '150px' },
       ],
       data: [],
       result: {
@@ -3302,15 +3305,128 @@ export class YourFeatureComponent {
     };
   }
 
+  private frozenScrollGridConfig(): BrGridConfig {
+    return {
+      title: 'Frozen Columns + Horizontal Scroll',
+      columns: [
+        { field: 'id', header: 'ID', sortable: true, frozen: true, width: '96px' },
+        { field: 'name', header: 'Name', sortable: true, frozen: true, width: '220px' },
+        { field: 'team', header: 'Team', sortable: true, width: '180px' },
+        { field: 'role', header: 'Role', sortable: true, width: '180px' },
+        { field: 'location', header: 'Location', sortable: true, width: '180px' },
+        { field: 'status', header: 'Status', sortable: true, width: '150px' },
+        { field: 'manager', header: 'Manager', sortable: true, width: '190px' },
+        { field: 'startDate', header: 'Start Date', sortable: true, width: '150px' },
+        { field: 'region', header: 'Region', sortable: true, width: '160px' },
+        { field: 'employmentType', header: 'Employment Type', sortable: true, width: '190px' },
+        { field: 'businessUnit', header: 'Business Unit', sortable: true, width: '190px' },
+        { field: 'project', header: 'Project', sortable: true, width: '220px' },
+        { field: 'officePhone', header: 'Office Phone', sortable: true, width: '170px' },
+        { field: 'costCenter', header: 'Cost Center', sortable: true, width: '170px' },
+        { field: 'deskLocation', header: 'Desk Location', sortable: true, width: '180px' },
+        { field: 'supervisor', header: 'Supervisor', sortable: true, width: '190px' },
+        { field: 'jobLevel', header: 'Job Level', sortable: true, width: '150px' },
+        { field: 'workShift', header: 'Work Shift', sortable: true, width: '170px' },
+        { field: 'supportGroup', header: 'Support Group', sortable: true, width: '200px' },
+        { field: 'lastReviewDate', header: 'Last Review Date', sortable: true, width: '180px' },
+      ],
+      data: this.sampleUsers(28).map((user, index) => ({
+        ...user,
+        manager: ['Alicia Stone', 'Marcus Reed', 'Nina Patel', 'Owen Brooks'][index % 4],
+        startDate: `2026-${String((index % 9) + 1).padStart(2, '0')}-${String((index % 20) + 1).padStart(2, '0')}`,
+        region: ['North America', 'EMEA', 'APAC', 'LATAM'][index % 4],
+        employmentType: ['Full Time', 'Contract', 'Temporary'][index % 3],
+        businessUnit: ['Platform', 'Operations', 'Finance Systems', 'Talent'][index % 4],
+        project: ['Apollo Modernization', 'Campus Hiring', 'Global Mobility', 'Internal Tools'][index % 4],
+        officePhone: '555-22000',
+        costCenter: 'CC-' + String(4100 + index).padStart(4, '0'),
+        deskLocation: ['Tower A - 4F', 'Tower B - 8F', 'Remote', 'Hub - 2F'][index % 4],
+        supervisor: ['Rachel Green', 'Dev Patel', 'Monica Cruz', 'Sam Irving'][index % 4],
+        jobLevel: ['L1', 'L2', 'L3', 'L4'][index % 4],
+        workShift: ['General', 'Morning', 'Evening'][index % 3],
+        supportGroup: ['HR Ops', 'Platform Support', 'Finance Ops', 'Talent Systems'][index % 4],
+        lastReviewDate: '2025-' + String((index % 9) + 1).padStart(2, '0') + '-' + String((index % 20) + 1).padStart(2, '0'),
+      })),
+      pagination: true,
+      pageSize: 5,
+      sorting: true,
+      accessibility: {
+        gridLabel: 'Grid with frozen columns and horizontal scroll',
+        searchInputLabel: 'Search frozen columns grid',
+        columnsDialogLabel: 'Frozen columns personalization dialog',
+      },
+      uiConfig: {
+        maxHeight: '500px',
+      },
+      toolbar: {
+        showSort: true,
+        showFilter: true,
+        showSearch: true,
+        showRefresh: true,
+        showColumnSettings: true,
+        showShare: false,
+        showViewMode: false,
+      },
+      personalization: {
+        availableColumns: [
+          { field: 'id', label: 'Employee ID', group: 'Core' },
+          { field: 'name', label: 'Name', group: 'Core' },
+          { field: 'team', label: 'Team', group: 'Org' },
+          { field: 'role', label: 'Role', group: 'Org' },
+          { field: 'location', label: 'Location', group: 'Org' },
+          { field: 'status', label: 'Status', group: 'State' },
+          { field: 'manager', label: 'Manager', group: 'Hierarchy' },
+          { field: 'startDate', label: 'Start Date', group: 'Timeline' },
+          { field: 'region', label: 'Region', group: 'Org' },
+          { field: 'employmentType', label: 'Employment Type', group: 'Work' },
+          { field: 'businessUnit', label: 'Business Unit', group: 'Work' },
+          { field: 'project', label: 'Project', group: 'Delivery' },
+          { field: 'officePhone', label: 'Office Phone', group: 'Contact' },
+          { field: 'costCenter', label: 'Cost Center', group: 'Finance' },
+          { field: 'deskLocation', label: 'Desk Location', group: 'Workplace' },
+          { field: 'supervisor', label: 'Supervisor', group: 'Hierarchy' },
+          { field: 'jobLevel', label: 'Job Level', group: 'Work' },
+          { field: 'workShift', label: 'Work Shift', group: 'Work' },
+          { field: 'supportGroup', label: 'Support Group', group: 'Ops' },
+          { field: 'lastReviewDate', label: 'Last Review Date', group: 'Timeline' },
+        ],
+        selectedColumns: ['id', 'name', 'team', 'role', 'location', 'status', 'manager', 'startDate', 'region', 'employmentType', 'businessUnit', 'project', 'officePhone', 'costCenter', 'deskLocation', 'supervisor', 'jobLevel', 'workShift', 'supportGroup', 'lastReviewDate'],
+      },
+      features: {
+        enableTopBar: true,
+        enableRowSelection: true,
+        enableSelectionActions: false,
+        enableContextMenu: false,
+        enableRowActionButton: false,
+        enableColumnPersonalization: true,
+        enableColumnVisibilityToggle: true,
+        enableColumnReorder: true,
+        enableSorting: true,
+        sortLevels: 2,
+        enableFiltering: true,
+        filterLevels: 2,
+        enableSearch: true,
+        enableRefresh: true,
+        enableShare: false,
+        enableViewMode: false,
+        enablePrimaryAction: false,
+        enablePrimaryActionMenu: false,
+        showPaginationSizeSelector: true,
+        showPaginationSummary: true,
+        showPaginationNavigation: true,
+      },
+    };
+  }
+
   private moderateGridConfig(): BrGridConfig {
     return {
       title: 'Moderate Grid Demo',
       columns: [
-        { field: 'id', header: 'ID', sortable: true },
-        { field: 'name', header: 'Name', sortable: true },
-        { field: 'team', header: 'Team', sortable: true },
-        { field: 'role', header: 'Role', sortable: true },
-        { field: 'status', header: 'Status', sortable: true },
+        { field: 'id', header: 'ID', sortable: true, frozen: true, width: '96px' },
+        { field: 'name', header: 'Name', sortable: true, frozen: true, width: '220px' },
+        { field: 'team', header: 'Team', sortable: true, width: '180px' },
+        { field: 'role', header: 'Role', sortable: true, width: '180px' },
+        { field: 'status', header: 'Status', sortable: true, width: '150px' },
       ],
       data: this.sampleUsers(32),
       pagination: true,
@@ -3377,7 +3493,7 @@ export class YourFeatureComponent {
     return {
       title: 'Rich Cells Grid Demo',
       columns: [
-        { field: 'id', header: 'ID', sortable: true },
+        { field: 'id', header: 'ID', sortable: true, frozen: true, width: '96px' },
         {
           field: 'candidateName',
           header: 'Candidate',
@@ -3529,12 +3645,12 @@ export class YourFeatureComponent {
     return {
       title: 'Complex Grid Demo (All Features)',
       columns: [
-        { field: 'id', header: 'ID', sortable: true },
-        { field: 'name', header: 'Name', sortable: true },
-        { field: 'team', header: 'Team', sortable: true },
-        { field: 'role', header: 'Role', sortable: true },
-        { field: 'location', header: 'Location', sortable: true },
-        { field: 'status', header: 'Status', sortable: true },
+        { field: 'id', header: 'ID', sortable: true, frozen: true, width: '96px' },
+        { field: 'name', header: 'Name', sortable: true, frozen: true, width: '220px' },
+        { field: 'team', header: 'Team', sortable: true, width: '180px' },
+        { field: 'role', header: 'Role', sortable: true, width: '180px' },
+        { field: 'location', header: 'Location', sortable: true, width: '180px' },
+        { field: 'status', header: 'Status', sortable: true, width: '150px' },
       ],
       data: this.sampleUsers(60),
       pagination: true,
@@ -4705,3 +4821,9 @@ export class YourFeatureComponent {
     return JSON.parse(JSON.stringify(value)) as T;
   }
 }
+
+
+
+
+
+

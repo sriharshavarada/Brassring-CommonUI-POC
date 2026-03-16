@@ -70,6 +70,25 @@ Latest local commit before these changes:
   - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/playground/playground.component.html`
   - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/playground/playground.component.scss`
 
+- Grid playground and library were extended for frozen-column testing and delivery:
+  - dedicated `Frozen Columns + Horizontal Scroll` preset was added in Playground
+  - preset now uses a wider dense column set so horizontal movement is easy to validate
+  - `Columns` panel now supports `Pin` / `Unpin`
+  - pinned columns show a `Frozen` badge
+  - frozen columns were tested and aligned across:
+    - `CUSTOM`
+    - `MATERIAL`
+    - `PRIMENG`
+    - `CANVAS`
+  - final expected behavior is:
+    - only the inner grid table area scrolls horizontally
+    - pinned columns and their headers stay fixed on the left
+    - toolbar / sort / filter / pagination do not slide as one outer block
+- Files:
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/playground/playground.component.ts`
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/playground/playground.component.html`
+  - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/playground/playground.component.scss`
+
 ### App repo accessibility/demo changes after `054fd39`
 - Playground consumer config/code generation now preserves field-level accessibility inputs for wrapper controls:
   - `ariaLabel`
@@ -183,6 +202,26 @@ Latest local commit before these changes:
   - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/form/controls/accordion/custom/custom-accordion-control.component.html`
   - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/form/controls/accordion/material/material-accordion-control.component.html`
   - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/form/controls/accordion/primeng/prime-accordion-control.component.html`
+
+- Grid layout behavior was extended beyond scaffolding and is now working in local validation mode:
+  - horizontal scrolling is implemented inside the actual grid table area
+  - leading columns can be frozen with `frozen: true`
+  - column layout state now supports user pin/unpin flows through the shared Columns panel
+  - sticky left offsets are computed per frozen column so headers and body cells stay aligned
+  - shell sizing was corrected so the whole grid container does not slide during horizontal movement
+  - sticky/z-index layering was corrected so frozen headers stay above regular scrolling cells
+  - variant-specific fixes were required for:
+    - `MATERIAL` frozen header offsets
+    - `PRIMENG` frozen sticky header behavior
+- Main files touched during this rollout:
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/grid/shell/grid-shell.component.ts`
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/grid/shell/grid-shell.component.html`
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/grid/shell/grid-shell.component.scss`
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/grid/engine/grid-layout.utils.ts`
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/grid/custom/engine/*`
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/grid/canvas/engine/*`
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/grid/material/engine/*`
+  - `/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper/projects/br-ui-wrapper/src/lib/common/implementations/grid/primeng-grid/engine/*`
 
 ### Library repo accessibility changes after `0447bed`
 - A shared accessibility contract was added across public models and adapters so consumer config can carry accessibility data consistently through all implementations:
@@ -1408,3 +1447,4 @@ Use `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/docs/00-project-hand
 - App repo should use the published package version `0.0.4` for freeze/CI/GitHub Pages readiness instead of local `file:.yalc/...`.
 
 - Grid wishlist and future capability target is now documented in [docs/08-grid-wishlist.md](docs/08-grid-wishlist.md).
+

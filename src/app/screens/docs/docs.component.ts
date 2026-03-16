@@ -1205,6 +1205,51 @@ loadUsers(query: BrGridQueryState): void {
           ],
         },
         {
+          id: 'frozen-columns-horizontal-scroll',
+          title: 'Frozen Columns + Horizontal Scroll',
+          blocks: [
+            {
+              kind: 'text',
+              text: 'Use frozen columns when the grid has many fields and you want key identifiers like ID or Name to stay visible while the rest of the table scrolls horizontally.',
+            },
+            {
+              kind: 'callout',
+              title: 'Expected behavior',
+              text: 'Only the inner grid column area should scroll horizontally. Frozen columns and their headers stay pinned on the left. Toolbar, sort, filter, and pagination should not slide as one large block.',
+            },
+            {
+              kind: 'code',
+              language: 'typescript',
+              code: "gridConfig: BrGridConfig = {\n  title: 'Employees',\n  columns: [\n    { field: 'id', header: 'ID', frozen: true, width: '96px', sortable: true },\n    { field: 'name', header: 'Name', frozen: true, width: '220px', sortable: true },\n    { field: 'team', header: 'Team', width: '180px', sortable: true, filterable: true },\n    { field: 'role', header: 'Role', width: '180px', sortable: true, filterable: true },\n    { field: 'location', header: 'Location', width: '180px' },\n    { field: 'status', header: 'Status', width: '160px' },\n    { field: 'manager', header: 'Manager', width: '200px' },\n    { field: 'project', header: 'Project', width: '200px' },\n    { field: 'costCenter', header: 'Cost Center', width: '180px' }\n  ],\n  data: rows,\n  showColumnSettings: true,\n  pagination: true,\n  pageSize: 10\n};",
+            },
+            {
+              kind: 'list',
+              items: [
+                'Set frozen: true on the columns that must stay pinned.',
+                'Always give frozen columns an explicit width so sticky offsets stay predictable.',
+                'Add enough total column width to create real horizontal overflow inside the table area.',
+                'Use showColumnSettings: true if you want users to pin or unpin columns from the Columns panel.',
+              ],
+            },
+            {
+              kind: 'callout',
+              title: 'User pin and unpin support',
+              text: 'The Columns panel now supports Pin and Unpin actions. Pinned columns show a Frozen badge and remain grouped on the left side of the grid.',
+            },
+            {
+              kind: 'list',
+              items: [
+                'Open Playground -> Grid Playground.',
+                'Choose the preset Frozen Columns + Horizontal Scroll.',
+                'Scroll horizontally inside the grid table area.',
+                'Verify ID and Name stay fixed while only unpinned columns move.',
+                'Open Columns and try Pin or Unpin to verify the layout updates correctly.',
+                'Repeat the same check in CUSTOM, MATERIAL, PRIMENG, and CANVAS modes.',
+              ],
+            },
+          ],
+        },
+        {
           id: 'template-override',
           title: 'Template Override (Only When Config Is Not Enough)',
           blocks: [
@@ -2240,3 +2285,4 @@ ngOnInit(): void {
     return { group, pages: nodes };
   }
 }
+

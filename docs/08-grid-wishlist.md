@@ -24,6 +24,8 @@ The following are already started or partially implemented:
 - loading / empty / error state support
 - sticky header support
 - `maxHeight` support for constrained grid height with internal scrolling
+- working frozen leading columns + horizontal scroll flow in local validation builds
+- Columns panel pin/unpin support with `Frozen` state in shared shell
 
 ## Core Wishlist
 
@@ -128,13 +130,18 @@ Later wishlist:
 - column reorder drag-drop if needed
 
 ### 10. Frozen Columns and Horizontal Scroll
-The grid should support:
-- freezing some leading columns
-- horizontal scrolling for the rest
-- correct behavior in all engines
+This is now implemented in local validation mode and should remain a supported product rule.
 
-This is especially important for denser enterprise grids.
+Current delivered behavior:
+- freezing some leading columns with `frozen: true`
+- horizontal scrolling for the rest inside the grid body region
+- pin/unpin support from the Columns panel
+- correct validated behavior across `CUSTOM`, `MATERIAL`, `PRIMENG`, and `CANVAS`
 
+Still worth future polish:
+- right-side frozen columns if product needs them later
+- persistence of frozen layout choices
+- tighter engine-native polish where an implementation can do even better
 ### 11. Sorting and Filtering
 The grid should support:
 - local sort/filter
@@ -207,10 +214,10 @@ Recommended next execution order:
 1. server-side pagination, sorting, and search as one working vertical slice
 2. row/cell meta-state feedback for inline actions
 3. remote filtering
-4. frozen columns / horizontal scroll
-5. deeper native engine integration where needed
-6. accessibility pass
-
+4. deeper native engine integration where needed
+5. accessibility pass
+6. later polish such as right-frozen columns and persisted layout state
 ## Notes
 
 Not everything in this document is implemented today. This is the target wishlist and planning reference for future grid work.
+

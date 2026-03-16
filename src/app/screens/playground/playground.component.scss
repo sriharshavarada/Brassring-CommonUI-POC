@@ -671,3 +671,22 @@
     display: none;
   }
 }
+
+.preview-hint {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border: 1px solid #bfdbfe;
+  background: #eff6ff;
+  color: #1e3a8a;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.frozen-scroll-preview {
+  background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+}
+
+
+
+

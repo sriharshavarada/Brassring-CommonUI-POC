@@ -111,10 +111,11 @@
         </section>
       </section>
 
-      <div class="preview full-preview grid-live-preview">
+                  <div class="preview full-preview grid-live-preview" [class.frozen-scroll-preview]="activeGridPreset === 'frozen-scroll'">
         <style [textContent]="gridCode.appliedScss"></style>
         <ng-container *ngIf="!codeError.grid; else gridPreviewError">
           <div [innerHTML]="gridCode.htmlBefore"></div>
+          <p class="preview-hint" *ngIf="activeGridPreset === 'frozen-scroll'">Only the table columns area should scroll. Pinned columns stay fixed inside the grid.</p>
           <br-grid [config]="gridConfig" (action)="onGridAction($event)"></br-grid>
           <div [innerHTML]="gridCode.htmlAfter"></div>
         </ng-container>
@@ -808,3 +809,8 @@
     </section>
   </div>
 </div>
+
+
+
+
+
