@@ -1220,7 +1220,7 @@ loadUsers(query: BrGridQueryState): void {
             {
               kind: 'code',
               language: 'typescript',
-              code: "gridConfig: BrGridConfig = {\n  title: 'Employees',\n  columns: [\n    { field: 'id', header: 'ID', frozen: true, width: '96px', sortable: true },\n    { field: 'name', header: 'Name', frozen: true, width: '220px', sortable: true },\n    { field: 'team', header: 'Team', width: '180px', sortable: true, filterable: true },\n    { field: 'role', header: 'Role', width: '180px', sortable: true, filterable: true },\n    { field: 'location', header: 'Location', width: '180px' },\n    { field: 'status', header: 'Status', width: '160px' },\n    { field: 'manager', header: 'Manager', width: '200px' },\n    { field: 'project', header: 'Project', width: '200px' },\n    { field: 'costCenter', header: 'Cost Center', width: '180px' }\n  ],\n  data: rows,\n  showColumnSettings: true,\n  pagination: true,\n  pageSize: 10\n};",
+              code: "gridConfig: BrGridConfig = {\n  title: 'Employees',\n  columns: [\n    { field: 'id', header: 'ID', frozen: true, width: '96px', sortable: true, infoTooltip: 'Unique employee identifier.' },\n    { field: 'name', header: 'Name', frozen: true, width: '220px', sortable: true, infoTooltip: 'Pinned identity column for the employee.' },\n    { field: 'team', header: 'Team', width: '180px', sortable: true, filterable: true, infoTooltip: 'Owning team for the employee record.' },\n    { field: 'role', header: 'Role', width: '180px', sortable: true, filterable: true, infoTooltip: 'Current assignment or job role.' },\n    { field: 'location', header: 'Location', width: '180px', infoTooltip: 'Office or region for the employee.' },\n    { field: 'status', header: 'Status', width: '160px', infoTooltip: 'Current user state shown in the grid.' },\n    { field: 'manager', header: 'Manager', width: '200px' },\n    { field: 'project', header: 'Project', width: '200px' },\n    { field: 'costCenter', header: 'Cost Center', width: '180px' }\n  ],\n  data: rows,\n  showColumnSettings: true,\n  pagination: true,\n  pageSize: 10\n};",
             },
             {
               kind: 'list',
@@ -1229,12 +1229,14 @@ loadUsers(query: BrGridQueryState): void {
                 'Always give frozen columns an explicit width so sticky offsets stay predictable.',
                 'Add enough total column width to create real horizontal overflow inside the table area.',
                 'Use showColumnSettings: true if you want users to pin or unpin columns from the Columns panel.',
+                'Column width is now adjusted directly from the header edge by drag-resize, not from the Columns dialog.',
+                'Columns and actions can expose infoTooltip text; the grid renders a small inline info icon and shows the helper text on hover.',
               ],
             },
             {
               kind: 'callout',
               title: 'User pin and unpin support',
-              text: 'The Columns panel now supports Pin and Unpin actions. Pinned columns show a Frozen badge and remain grouped on the left side of the grid.',
+              text: 'The Columns panel now supports Pin and Unpin actions. Pinned columns show a Frozen badge and remain grouped on the left side of the grid. Header info icons and action info icons also respect the same shared grid config contract.',
             },
             {
               kind: 'list',
@@ -1244,6 +1246,7 @@ loadUsers(query: BrGridQueryState): void {
                 'Scroll horizontally inside the grid table area.',
                 'Verify ID and Name stay fixed while only unpinned columns move.',
                 'Open Columns and try Pin or Unpin to verify the layout updates correctly.',
+                'Hover a header info icon or action info icon to confirm helper text appears without the old help-cursor question mark.',
                 'Repeat the same check in CUSTOM, MATERIAL, PRIMENG, and CANVAS modes.',
               ],
             },
@@ -2285,4 +2288,8 @@ ngOnInit(): void {
     return { group, pages: nodes };
   }
 }
+
+
+
+
 

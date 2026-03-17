@@ -26,6 +26,7 @@ The following are already started or partially implemented:
 - `maxHeight` support for constrained grid height with internal scrolling
 - working frozen leading columns + horizontal scroll flow in local validation builds
 - Columns panel pin/unpin support with `Frozen` state in shared shell
+- header drag-resize behavior for column width adjustment in the live grid
 
 ## Core Wishlist
 
@@ -136,11 +137,13 @@ Current delivered behavior:
 - freezing some leading columns with `frozen: true`
 - horizontal scrolling for the rest inside the grid body region
 - pin/unpin support from the Columns panel
+- header drag-resize support for column width adjustment
 - correct validated behavior across `CUSTOM`, `MATERIAL`, `PRIMENG`, and `CANVAS`
 
 Still worth future polish:
 - right-side frozen columns if product needs them later
 - persistence of frozen layout choices
+- saved column width personalization if product wants persistence later
 - tighter engine-native polish where an implementation can do even better
 ### 11. Sorting and Filtering
 The grid should support:
@@ -167,12 +170,21 @@ The grid should support:
 - future richer inline editing patterns
 
 ### 14. Expandable / Hierarchical Rows
-Future requirement:
-- expandable rows
-- sub-rows / master-detail
-- plus icon to expand
+This is now implemented in local validation mode as a tree-structure grid flow.
 
-This should be treated as a grid capability, not a separate control, unless the contract becomes fundamentally different later.
+Current delivered behavior:
+- hierarchical rows configured through `config.tree`
+- expand/collapse icons rendered in the configured tree column
+- indentation per tree level
+- shared wrapper/controller flow across `CUSTOM`, `MATERIAL`, `CANVAS`, and `PRIMENG`
+- `row-expand` / `row-collapse` action events emitted from the grid
+
+Still worth future polish:
+- expand-all / collapse-all shell actions
+- remote tree-data contract examples
+- tree-aware filtering/sorting rules for deeper server-side scenarios
+
+This should continue to be treated as a grid capability, not a separate control, unless the contract becomes fundamentally different later.
 
 ### 15. Accessibility
 Future requirement across the entire library, including grids:
@@ -220,4 +232,6 @@ Recommended next execution order:
 ## Notes
 
 Not everything in this document is implemented today. This is the target wishlist and planning reference for future grid work.
+
+
 

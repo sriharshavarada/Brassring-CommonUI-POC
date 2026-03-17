@@ -61,7 +61,7 @@ import { CodeEditorComponent, CodeLanguage } from './components/code-editor/code
 type PlaygroundTab = 'grid' | 'date' | 'modal' | 'accordion' | 'form' | 'button';
 type CodeFile = 'ts' | 'html' | 'scss';
 
-type GridPreset = 'complex' | 'moderate' | 'rich' | 'simple' | 'remote' | 'frozen-scroll';
+type GridPreset = 'complex' | 'moderate' | 'rich' | 'simple' | 'remote' | 'frozen-scroll' | 'tree';
 type DatePreset = 'default' | 'compact' | 'disabled';
 type ModalPreset = 'custom' | 'info' | 'confirm' | 'delete' | 'form';
 type FormPreset = 'all-controls' | 'simple';
@@ -295,6 +295,7 @@ export class PlaygroundComponent {
     simple: 'Simple Grid',
     remote: 'Remote Grid',
     'frozen-scroll': 'Frozen Columns + Horizontal Scroll',
+    tree: 'Tree Structure',
   };
 
   readonly datePresetLabels: Record<DatePreset, string> = {
@@ -496,7 +497,7 @@ export class PlaygroundComponent {
   }
 
   get gridPresets(): GridPreset[] {
-    return ['complex', 'moderate', 'rich', 'simple', 'remote', 'frozen-scroll'];
+    return ['complex', 'moderate', 'rich', 'simple', 'remote', 'frozen-scroll', 'tree'];
   }
 
   get datePresets(): DatePreset[] {
@@ -751,6 +752,8 @@ export class PlaygroundComponent {
       this.gridConfig = this.clone(this.richGridConfig());
     } else if (preset === 'frozen-scroll') {
       this.gridConfig = this.clone(this.frozenScrollGridConfig());
+    } else if (preset === 'tree') {
+      this.gridConfig = this.clone(this.treeGridConfig());
     } else if (preset === 'moderate') {
       this.gridConfig = this.clone(this.moderateGridConfig());
     } else {
@@ -3372,9 +3375,9 @@ export class YourFeatureComponent {
     return {
       title: 'Simple Grid Demo',
       columns: [
-        { field: 'id', header: 'ID', sortable: true, frozen: true, width: '96px' },
-        { field: 'name', header: 'Name', sortable: true, frozen: true, width: '220px' },
-        { field: 'status', header: 'Status', sortable: true, width: '150px' },
+        { field: 'id', header: 'ID', sortable: true, frozen: true, width: '96px', infoTooltip: 'Unique candidate identifier used in downstream integrations.' },
+        { field: 'name', header: 'Name', sortable: true, frozen: true, width: '220px', infoTooltip: 'Primary person name shown as the pinned identity column.' },
+        { field: 'status', header: 'Status', sortable: true, width: '150px', infoTooltip: 'Current state for the displayed record.' },
       ],
       data: this.sampleUsers(18).map((x) => ({ id: x.id, name: x.name, status: x.status })),
       pagination: true,
@@ -3426,11 +3429,11 @@ export class YourFeatureComponent {
       title: 'Remote Grid Demo',
       dataMode: 'remote',
       columns: [
-        { field: 'id', header: 'ID', sortable: true, frozen: true, width: '96px' },
-        { field: 'name', header: 'Name', sortable: true, frozen: true, width: '220px' },
-        { field: 'team', header: 'Team', sortable: true, width: '180px' },
-        { field: 'role', header: 'Role', sortable: true, width: '180px' },
-        { field: 'status', header: 'Status', sortable: true, width: '150px' },
+        { field: 'id', header: 'ID', sortable: true, frozen: true, width: '96px', infoTooltip: 'Unique candidate identifier used in downstream integrations.' },
+        { field: 'name', header: 'Name', sortable: true, frozen: true, width: '220px', infoTooltip: 'Primary person name shown as the pinned identity column.' },
+        { field: 'team', header: 'Team', sortable: true, width: '180px', infoTooltip: 'Owning team for the record currently shown in the row.' },
+        { field: 'role', header: 'Role', sortable: true, width: '180px', infoTooltip: 'Current role or assignment associated with the record.' },
+        { field: 'status', header: 'Status', sortable: true, width: '150px', infoTooltip: 'Current state for the displayed record.' },
       ],
       data: [],
       result: {
@@ -3497,22 +3500,148 @@ export class YourFeatureComponent {
         showPaginationNavigation: true,
       },
       selectionActions: [
-        { id: 'activate-selected', label: 'Activate' },
-        { id: 'deactivate-selected', label: 'Deactivate' },
+        { id: 'activate-selected', label: 'Activate', infoTooltip: 'Bulk activate the selected candidates.' },
+        { id: 'deactivate-selected', label: 'Deactivate', infoTooltip: 'Bulk deactivate the selected candidates.' },
       ],
     };
+  }
+
+
+  private treeGridConfig(): BrGridConfig {
+    return {
+      title: 'Tree Structure Demo',
+      emptyMessage: 'No hierarchy available',
+      pagination: false,
+      sorting: false,
+      striped: true,
+      columns: [
+        { field: 'name', header: 'Name', width: '280px', infoTooltip: 'Hierarchy label shown with expand and collapse controls.' },
+        { field: 'type', header: 'Type', width: '150px' },
+        { field: 'owner', header: 'Owner', width: '170px' },
+        { field: 'status', header: 'Status', type: 'badge', width: '140px', infoTooltip: 'Current lifecycle state for this node.' },
+      ],
+      data: this.sampleTreeGridRows(),
+      tree: {
+        enabled: true,
+        childrenField: 'children',
+        treeColumnField: 'name',
+        expandByDefault: true,
+        indentSize: 18,
+      },
+      toolbar: {
+        showSort: false,
+        showFilter: false,
+        showSearch: true,
+        showRefresh: true,
+        showColumnSettings: false,
+        showShare: false,
+        showViewMode: false,
+        primaryActionLabel: 'Add Node',
+        primaryActions: [],
+      },
+      features: {
+        enableTopBar: true,
+        enableRowSelection: false,
+        enableSelectionActions: false,
+        enableContextMenu: false,
+        enableRowActionButton: false,
+        enableColumnPersonalization: false,
+        enableColumnVisibilityToggle: false,
+        enableColumnReorder: false,
+        enableSorting: false,
+        sortLevels: 1,
+        enableFiltering: false,
+        filterLevels: 1,
+        enableSearch: true,
+        enableRefresh: true,
+        enableShare: false,
+        enableViewMode: false,
+        enablePrimaryAction: false,
+        enablePrimaryActionMenu: false,
+        showPaginationSizeSelector: false,
+        showPaginationSummary: false,
+        showPaginationNavigation: false,
+      },
+      uiConfig: {
+        density: 'comfortable',
+        size: 'md',
+        borderStyle: 'soft',
+        showBadge: true,
+        stickyHeader: true,
+      },
+      accessibility: {
+        gridLabel: 'Tree structure grid',
+        searchInputLabel: 'Search hierarchy rows',
+      },
+    };
+  }
+
+  private sampleTreeGridRows(): any[] {
+    return [
+      {
+        id: 'org-platform',
+        name: 'Platform Organization',
+        type: 'Organization',
+        owner: 'Anya Ross',
+        status: 'Active',
+        children: [
+          {
+            id: 'dept-foundation',
+            name: 'Foundation Services',
+            type: 'Department',
+            owner: 'Ravi Singh',
+            status: 'Active',
+            children: [
+              { id: 'team-api', name: 'API Gateway Team', type: 'Team', owner: 'Mia Chen', status: 'Active' },
+              { id: 'team-identity', name: 'Identity Team', type: 'Team', owner: 'Noah Lee', status: 'Pending' },
+            ],
+          },
+          {
+            id: 'dept-experience',
+            name: 'Developer Experience',
+            type: 'Department',
+            owner: 'Emma Brown',
+            status: 'Active',
+            children: [
+              { id: 'team-cli', name: 'CLI Tooling', type: 'Team', owner: 'Ava Nguyen', status: 'Active' },
+              { id: 'team-observability', name: 'Observability', type: 'Team', owner: 'Lucas Walker', status: 'On Track' },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'org-data',
+        name: 'Data Organization',
+        type: 'Organization',
+        owner: 'Olivia Clark',
+        status: 'Active',
+        children: [
+          {
+            id: 'dept-analytics',
+            name: 'Analytics',
+            type: 'Department',
+            owner: 'Ethan Davis',
+            status: 'Pending',
+            children: [
+              { id: 'team-bi', name: 'Business Intelligence', type: 'Team', owner: 'Liam Patel', status: 'Pending' },
+              { id: 'team-ml', name: 'ML Platform', type: 'Team', owner: 'Sophia Turner', status: 'Active' },
+            ],
+          },
+        ],
+      },
+    ];
   }
 
   private frozenScrollGridConfig(): BrGridConfig {
     return {
       title: 'Frozen Columns + Horizontal Scroll',
       columns: [
-        { field: 'id', header: 'ID', sortable: true, frozen: true, width: '96px' },
-        { field: 'name', header: 'Name', sortable: true, frozen: true, width: '220px' },
-        { field: 'team', header: 'Team', sortable: true, width: '180px' },
-        { field: 'role', header: 'Role', sortable: true, width: '180px' },
-        { field: 'location', header: 'Location', sortable: true, width: '180px' },
-        { field: 'status', header: 'Status', sortable: true, width: '150px' },
+        { field: 'id', header: 'ID', sortable: true, frozen: true, width: '96px', infoTooltip: 'Unique candidate identifier used in downstream integrations.' },
+        { field: 'name', header: 'Name', sortable: true, frozen: true, width: '220px', infoTooltip: 'Primary person name shown as the pinned identity column.' },
+        { field: 'team', header: 'Team', sortable: true, width: '180px', infoTooltip: 'Owning team for the record currently shown in the row.' },
+        { field: 'role', header: 'Role', sortable: true, width: '180px', infoTooltip: 'Current role or assignment associated with the record.' },
+        { field: 'location', header: 'Location', sortable: true, width: '180px', infoTooltip: 'Office or region tied to the row data.' },
+        { field: 'status', header: 'Status', sortable: true, width: '150px', infoTooltip: 'Current state for the displayed record.' },
         { field: 'manager', header: 'Manager', sortable: true, width: '190px' },
         { field: 'startDate', header: 'Start Date', sortable: true, width: '150px' },
         { field: 'region', header: 'Region', sortable: true, width: '160px' },
@@ -3620,11 +3749,11 @@ export class YourFeatureComponent {
     return {
       title: 'Moderate Grid Demo',
       columns: [
-        { field: 'id', header: 'ID', sortable: true, frozen: true, width: '96px' },
-        { field: 'name', header: 'Name', sortable: true, frozen: true, width: '220px' },
-        { field: 'team', header: 'Team', sortable: true, width: '180px' },
-        { field: 'role', header: 'Role', sortable: true, width: '180px' },
-        { field: 'status', header: 'Status', sortable: true, width: '150px' },
+        { field: 'id', header: 'ID', sortable: true, frozen: true, width: '96px', infoTooltip: 'Unique candidate identifier used in downstream integrations.' },
+        { field: 'name', header: 'Name', sortable: true, frozen: true, width: '220px', infoTooltip: 'Primary person name shown as the pinned identity column.' },
+        { field: 'team', header: 'Team', sortable: true, width: '180px', infoTooltip: 'Owning team for the record currently shown in the row.' },
+        { field: 'role', header: 'Role', sortable: true, width: '180px', infoTooltip: 'Current role or assignment associated with the record.' },
+        { field: 'status', header: 'Status', sortable: true, width: '150px', infoTooltip: 'Current state for the displayed record.' },
       ],
       data: this.sampleUsers(32),
       pagination: true,
@@ -3681,8 +3810,8 @@ export class YourFeatureComponent {
         showPaginationNavigation: true,
       },
       selectionActions: [
-        { id: 'activate', label: 'Activate' },
-        { id: 'deactivate', label: 'Deactivate' },
+        { id: 'activate', label: 'Activate', infoTooltip: 'Enable access for all selected users.' },
+        { id: 'deactivate', label: 'Deactivate', infoTooltip: 'Disable access for all selected users.' },
       ],
     };
   }
@@ -3691,20 +3820,22 @@ export class YourFeatureComponent {
     return {
       title: 'Rich Cells Grid Demo',
       columns: [
-        { field: 'id', header: 'ID', sortable: true, frozen: true, width: '96px' },
+        { field: 'id', header: 'ID', sortable: true, frozen: true, width: '96px', infoTooltip: 'Unique candidate identifier used in downstream integrations.' },
         {
           field: 'candidateName',
           header: 'Candidate',
           sortable: true,
+          infoTooltip: 'Primary candidate record with profile navigation.',
           type: 'link',
           cellConfig: {
-            actions: [{ id: 'open-profile', label: 'Open Profile', variant: 'link' }],
+            actions: [{ id: 'open-profile', label: 'Open Profile', variant: 'link', infoTooltip: 'Open the full candidate profile view.' }],
           },
         },
         {
           field: 'status',
           header: 'Status',
           sortable: true,
+          infoTooltip: 'Overall candidate lifecycle state shown as a badge.',
           type: 'badge',
           cellConfig: {
             badgeVariant: 'neutral',
@@ -3714,16 +3845,18 @@ export class YourFeatureComponent {
           field: 'pin',
           header: 'Pin',
           align: 'center',
+          infoTooltip: 'Pin high-priority candidates to keep them visible for recruiters.',
           type: 'icon',
           cellConfig: {
             icon: 'pin',
-            actions: [{ id: 'toggle-pin', label: 'Toggle Pin', icon: 'pin', variant: 'ghost' }],
+            actions: [{ id: 'toggle-pin', label: 'Toggle Pin', icon: 'pin', variant: 'ghost', infoTooltip: 'Marks or removes this candidate from the pinned list.' }],
           },
         },
         {
           field: 'hrStatus',
           header: 'HR Status',
           type: 'dropdown-action',
+          infoTooltip: 'Recruiting workflow stage that can be updated inline.',
           cellConfig: {
             buttonLabel: 'Update',
             submitActionId: 'update-stage',
@@ -3740,6 +3873,7 @@ export class YourFeatureComponent {
           field: 'team',
           header: 'Team',
           sortable: true,
+          infoTooltip: 'Hiring team currently associated with the candidate.',
           type: 'route-link',
           cellConfig: {
             route: '/users',
@@ -3749,11 +3883,12 @@ export class YourFeatureComponent {
           field: 'actions',
           header: 'Actions',
           type: 'button-group',
+          infoTooltip: 'Common record actions available directly in the row.',
           cellConfig: {
             actions: [
-              { id: 'edit-user', label: 'Edit', variant: 'secondary' },
-              { id: 'send-reminder', label: 'Remind', variant: 'ghost' },
-              { id: 'delete-user', label: 'Delete', variant: 'danger' },
+              { id: 'edit-user', label: 'Edit', variant: 'secondary', infoTooltip: 'Update candidate profile details.' },
+              { id: 'send-reminder', label: 'Remind', variant: 'ghost', infoTooltip: 'Send a recruiter follow-up reminder.' },
+              { id: 'delete-user', label: 'Delete', variant: 'danger', infoTooltip: 'Remove the candidate from the current list.' },
             ],
           },
         },
@@ -3793,13 +3928,13 @@ export class YourFeatureComponent {
         primaryActionLabel: 'Add Candidate',
       },
       contextMenuActions: [
-        { id: 'view-candidate', label: 'View Candidate' },
-        { id: 'move-stage', label: 'Move Stage' },
-        { id: 'delete-user', label: 'Delete Candidate' },
+        { id: 'view-candidate', label: 'View Candidate', infoTooltip: 'Open the candidate details workspace.' },
+        { id: 'move-stage', label: 'Move Stage', infoTooltip: 'Advance the candidate to the next hiring stage.' },
+        { id: 'delete-user', label: 'Delete Candidate', infoTooltip: 'Permanently remove the candidate record.' },
       ],
       selectionActions: [
-        { id: 'activate-selected', label: 'Activate' },
-        { id: 'deactivate-selected', label: 'Deactivate' },
+        { id: 'activate-selected', label: 'Activate', infoTooltip: 'Bulk activate the selected candidates.' },
+        { id: 'deactivate-selected', label: 'Deactivate', infoTooltip: 'Bulk deactivate the selected candidates.' },
       ],
       personalization: {
         availableColumns: [
@@ -3843,12 +3978,12 @@ export class YourFeatureComponent {
     return {
       title: 'Complex Grid Demo (All Features)',
       columns: [
-        { field: 'id', header: 'ID', sortable: true, frozen: true, width: '96px' },
-        { field: 'name', header: 'Name', sortable: true, frozen: true, width: '220px' },
-        { field: 'team', header: 'Team', sortable: true, width: '180px' },
-        { field: 'role', header: 'Role', sortable: true, width: '180px' },
-        { field: 'location', header: 'Location', sortable: true, width: '180px' },
-        { field: 'status', header: 'Status', sortable: true, width: '150px' },
+        { field: 'id', header: 'ID', sortable: true, frozen: true, width: '96px', infoTooltip: 'Unique candidate identifier used in downstream integrations.' },
+        { field: 'name', header: 'Name', sortable: true, frozen: true, width: '220px', infoTooltip: 'Primary person name shown as the pinned identity column.' },
+        { field: 'team', header: 'Team', sortable: true, width: '180px', infoTooltip: 'Owning team for the record currently shown in the row.' },
+        { field: 'role', header: 'Role', sortable: true, width: '180px', infoTooltip: 'Current role or assignment associated with the record.' },
+        { field: 'location', header: 'Location', sortable: true, width: '180px', infoTooltip: 'Office or region tied to the row data.' },
+        { field: 'status', header: 'Status', sortable: true, width: '150px', infoTooltip: 'Current state for the displayed record.' },
       ],
       data: this.sampleUsers(60),
       pagination: true,
@@ -3881,21 +4016,21 @@ export class YourFeatureComponent {
         showViewMode: true,
         primaryActionLabel: 'Create User',
         primaryActions: [
-          { id: 'create-single', label: 'Create User' },
-          { id: 'import-users', label: 'Import Users' },
+          { id: 'create-single', label: 'Create User', infoTooltip: 'Create a single user record from the grid toolbar.' },
+          { id: 'import-users', label: 'Import Users', infoTooltip: 'Bulk import users from a prepared file.' },
         ],
       },
       contextMenuActions: [
-        { id: 'view', label: 'View Profile' },
-        { id: 'edit', label: 'Edit User' },
-        { id: 'reset-password', label: 'Reset Password' },
-        { id: 'archive', label: 'Archive' },
+        { id: 'view', label: 'View Profile', infoTooltip: 'Open the selected user profile.' },
+        { id: 'edit', label: 'Edit User', infoTooltip: 'Change user attributes and assignments.' },
+        { id: 'reset-password', label: 'Reset Password', infoTooltip: 'Trigger a password reset flow for this user.' },
+        { id: 'archive', label: 'Archive', infoTooltip: 'Move the user record into archived state.' },
       ],
       selectionActions: [
-        { id: 'activate', label: 'Activate' },
-        { id: 'deactivate', label: 'Deactivate' },
-        { id: 'export', label: 'Export' },
-        { id: 'notify', label: 'Send Notification' },
+        { id: 'activate', label: 'Activate', infoTooltip: 'Enable access for all selected users.' },
+        { id: 'deactivate', label: 'Deactivate', infoTooltip: 'Disable access for all selected users.' },
+        { id: 'export', label: 'Export', infoTooltip: 'Export the selected users into a file.' },
+        { id: 'notify', label: 'Send Notification', infoTooltip: 'Send a notification to all selected users.' },
       ],
       personalization: {
         availableColumns: [
@@ -5109,3 +5244,8 @@ export class YourFeatureComponent {
     return JSON.parse(JSON.stringify(value)) as T;
   }
 }
+
+
+
+
+

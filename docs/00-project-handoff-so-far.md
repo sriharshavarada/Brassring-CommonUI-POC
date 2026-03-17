@@ -71,9 +71,16 @@ Latest local commit before these changes:
   - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/playground/playground.component.scss`
 
 - Grid playground and library were extended for frozen-column testing and delivery:
+- Grid playground and library were extended with a tree-structure flow:
+  - dedicated `Tree Structure` preset was added in Playground
+  - tree rows are rendered through the same shared `br-grid` wrapper path
+  - consumers configure hierarchy with `config.tree` instead of using a separate control
+  - expand/collapse state is handled inside the shared grid shell and emitted through grid action flow (`row-expand` / `row-collapse`)
+  - tree affordance is rendered in the configured tree column with per-level indentation
   - dedicated `Frozen Columns + Horizontal Scroll` preset was added in Playground
   - preset now uses a wider dense column set so horizontal movement is easy to validate
   - `Columns` panel now supports `Pin` / `Unpin`
+  - column width is adjusted from the header edge by drag-resize on the live grid
   - pinned columns show a `Frozen` badge
   - frozen columns were tested and aligned across:
     - `CUSTOM`
@@ -84,6 +91,7 @@ Latest local commit before these changes:
     - only the inner grid table area scrolls horizontally
     - pinned columns and their headers stay fixed on the left
     - toolbar / sort / filter / pagination do not slide as one outer block
+    - column width is resized directly from the header like Excel, not from a separate width editor
 - Files:
   - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/playground/playground.component.ts`
   - `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/src/app/screens/playground/playground.component.html`
@@ -207,6 +215,7 @@ Latest local commit before these changes:
   - horizontal scrolling is implemented inside the actual grid table area
   - leading columns can be frozen with `frozen: true`
   - column layout state now supports user pin/unpin flows through the shared Columns panel
+  - column width can be resized from the live header edge and is pushed back into layout state
   - sticky left offsets are computed per frozen column so headers and body cells stay aligned
   - shell sizing was corrected so the whole grid container does not slide during horizontal movement
   - sticky/z-index layering was corrected so frozen headers stay above regular scrolling cells
@@ -1526,3 +1535,5 @@ What changed:
   - `docs/project-architecture.drawio`
   - `docs/project-architecture.excalidraw`
 - During this pass, testing was primarily targeted at wrapper/playground interaction parity rather than a new docs or CI sweep.
+
+
