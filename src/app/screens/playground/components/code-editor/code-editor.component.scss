@@ -28,6 +28,7 @@
 .editor-col {
   position: relative;
   height: 360px;
+  overflow: hidden;
 }
 
 .highlight-layer,
@@ -38,7 +39,8 @@
   font-size: 12px;
   line-height: 20px;
   white-space: pre;
-  overflow: auto;
+  overflow-x: scroll;
+  overflow-y: auto;
   min-height: 360px;
   max-height: 360px;
   height: 360px;

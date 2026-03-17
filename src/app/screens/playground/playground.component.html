@@ -465,6 +465,9 @@
             <div class="config-empty-state">
               <h3>Direct Input Variant</h3>
               <p>This preview is driven by wrapper inputs and attributes, not by a config object.</p>
+              <p *ngIf="activeControlPlayground === 'multi-select'">This direct-input preset includes `maxSelections="2"` so the wrapper API shows the selection cap without extra setup.</p>
+              <p *ngIf="activeControlPlayground === 'autocomplete'">This gallery shows all autocomplete direct-input variants together: default, multi local, remote, and remote multi.</p>
+              <p *ngIf="activeControlPlayground === 'autocomplete'">The multi autocomplete examples include `maxSelections="2"` so the cap is visible in both local and remote usage.</p>
               <p>Use Code Studio to change the real consumer API for this variant.</p>
             </div>
           </ng-template>
@@ -555,12 +558,13 @@
                 (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-multi-select>
               <br-multi-select *ngIf="field.type === 'multi-select' && isDirectInputField(field)" [id]="field.id"
                 [name]="field.name" [className]="field.className" [label]="field.label" [options]="field.options || []"
+                [maxSelections]="field.maxSelections"
                 [required]="!!field.required" [disabled]="!!field.disabled" [ariaLabel]="field.ariaLabel"
                 [ariaLabelledBy]="field.ariaLabelledBy" [ariaDescribedBy]="field.ariaDescribedBy"
                 [value]="controlValue(field)" (valueChange)="updateControlValue(field.id, $event)"
                 (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-multi-select>
               <br-multi-select *ngIf="field.type === 'multi-select' && isNgModelOnlyField(field)" [id]="field.id"
-                [label]="field.label" [options]="field.options || []" [required]="!!field.required"
+                [label]="field.label" [options]="field.options || []" [maxSelections]="field.maxSelections" [required]="!!field.required"
                 [disabled]="!!field.disabled" [ngModel]="controlValue(field)"
                 (ngModelChange)="updateControlValue(field.id, $event)"
                 (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-multi-select>
@@ -611,18 +615,27 @@
 
               <br-autocomplete *ngIf="field.type === 'autocomplete' && !isNgModelOnlyField(field) && !isDirectInputField(field)"
                 [config]="getAutocompleteConfig(field)" (valueChange)="updateControlValue(field.id, $event)"
+                (queryChange)="onAutocompleteQuery(field.id, $event)"
                 (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-autocomplete>
               <br-autocomplete *ngIf="field.type === 'autocomplete' && isDirectInputField(field)" [id]="field.id"
                 [name]="field.name" [className]="field.className" [label]="field.label"
                 [placeholder]="field.placeholder" [options]="field.options || []" [required]="!!field.required"
+                [selectionMode]="field.selectionMode || 'single'" [maxSelections]="field.maxSelections" [dataMode]="field.dataMode || 'local'"
+                [loading]="!!field.loading" [minChars]="field.minChars" [debounceMs]="field.debounceMs"
+                [noResultsText]="field.noResultsText"
                 [disabled]="!!field.disabled" [ariaLabel]="field.ariaLabel"
                 [ariaLabelledBy]="field.ariaLabelledBy" [ariaDescribedBy]="field.ariaDescribedBy"
                 [value]="controlValue(field)" (valueChange)="updateControlValue(field.id, $event)"
+                (queryChange)="onAutocompleteQuery(field.id, $event)"
                 (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-autocomplete>
               <br-autocomplete *ngIf="field.type === 'autocomplete' && isNgModelOnlyField(field)" [id]="field.id"
                 [label]="field.label" [placeholder]="field.placeholder" [options]="field.options || []"
+                [selectionMode]="field.selectionMode || 'single'" [maxSelections]="field.maxSelections" [dataMode]="field.dataMode || 'local'"
+                [loading]="!!field.loading" [minChars]="field.minChars" [debounceMs]="field.debounceMs"
+                [noResultsText]="field.noResultsText"
                 [required]="!!field.required" [disabled]="!!field.disabled" [ngModel]="controlValue(field)"
                 (ngModelChange)="updateControlValue(field.id, $event)"
+                (queryChange)="onAutocompleteQuery(field.id, $event)"
                 (controlEvent)="onWrapperControlEvent(field.id, $event)"></br-autocomplete>
             </div>
           </div>
@@ -809,8 +822,4 @@
     </section>
   </div>
 </div>
-
-
-
-
 

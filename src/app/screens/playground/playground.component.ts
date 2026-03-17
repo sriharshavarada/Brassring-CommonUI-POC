@@ -25,6 +25,7 @@ import {
   BrAccordionToggleEvent,
   BrAutocompleteComponent,
   BrAutocompleteConfig,
+  BrAutocompleteQueryEvent,
   BrButtonComponent,
   BrButtonConfig,
   BrCheckboxComponent,
@@ -235,6 +236,25 @@ const LIBRARY_BRANDING_SAMPLE: BrBrandingConfig = {
   },
 };
 
+const AUTOCOMPLETE_DEMO_OPTIONS = [
+  'Austin',
+  'Boston',
+  'Chicago',
+  'Dallas',
+  'Denver',
+  'London',
+  'Los Angeles',
+  'New York',
+  'San Francisco',
+  'Seattle',
+  'Singapore',
+  'Toronto',
+].map((label) => ({ label, value: label }));
+
+const AUTOCOMPLETE_REMOTE_DEFAULT_OPTIONS = AUTOCOMPLETE_DEMO_OPTIONS.slice(0, 5);
+
+const AUTOCOMPLETE_REMOTE_DELAY_MS = 350;
+
 @Component({
   selector: 'app-playground',
   standalone: true,
@@ -338,6 +358,7 @@ export class PlaygroundComponent {
   remoteDemoDelayMs = 3000;
   remoteDemoForceError = false;
   remoteDemoReturnEmpty = false;
+  private readonly autocompleteRemoteTimers = new Map<string, ReturnType<typeof setTimeout>>();
   activeControlPlayground: ControlPlayground = 'all';
   activeControlVariant = 'default';
 
@@ -665,7 +686,7 @@ export class PlaygroundComponent {
       case 'radio':
         return ['default-config', 'preselected-config', 'disabled-config', 'events-demo', 'registry-demo', 'direct-input', 'ngmodel-simple'];
       case 'autocomplete':
-        return ['default-config', 'prefilled-config', 'disabled-config', 'events-demo', 'registry-demo', 'direct-input', 'ngmodel-simple'];
+        return ['default-config', 'multi-local-config', 'remote-config', 'remote-multi-config', 'prefilled-config', 'disabled-config', 'events-demo', 'registry-demo', 'direct-input', 'ngmodel-simple'];
       default:
         return ['default'];
     }
@@ -1202,7 +1223,7 @@ export class PlaygroundComponent {
       for (const field of this.formConfig.fields) {
         if (field.type === 'checkbox') {
           resetValues[field.id] = false;
-        } else if (field.type === 'multi-select') {
+        } else if (field.type === 'multi-select' || (field.type === 'autocomplete' && field.selectionMode === 'multiple')) {
           resetValues[field.id] = [];
         } else {
           resetValues[field.id] = '';
@@ -1236,6 +1257,44 @@ export class PlaygroundComponent {
     });
   }
 
+  onAutocompleteQuery(fieldId: string, event: BrAutocompleteQueryEvent): void {
+    const field = this.formConfig.fields.find((entry) => entry.id === fieldId && entry.type === 'autocomplete');
+    if (!field || field.dataMode !== 'remote') {
+      return;
+    }
+
+    const term = (event.term || '').trim();
+    const minChars = field.minChars ?? 1;
+    const existingTimer = this.autocompleteRemoteTimers.get(fieldId);
+    if (existingTimer) {
+      clearTimeout(existingTimer);
+      this.autocompleteRemoteTimers.delete(fieldId);
+    }
+
+    this.pushLog(`Autocomplete query [${fieldId}]: ${JSON.stringify(term)}`);
+
+    if (term.length < minChars) {
+      this.patchAutocompleteField(fieldId, {
+        loading: false,
+        options: AUTOCOMPLETE_REMOTE_DEFAULT_OPTIONS,
+      });
+      return;
+    }
+
+    this.patchAutocompleteField(fieldId, { loading: true, options: [] });
+
+    const timer = setTimeout(() => {
+      const normalized = term.toLowerCase();
+      const options = AUTOCOMPLETE_DEMO_OPTIONS.filter((option) =>
+        option.label.toLowerCase().includes(normalized),
+      );
+      this.patchAutocompleteField(fieldId, { loading: false, options });
+      this.autocompleteRemoteTimers.delete(fieldId);
+    }, AUTOCOMPLETE_REMOTE_DELAY_MS);
+
+    this.autocompleteRemoteTimers.set(fieldId, timer);
+  }
+
   onWrapperControlEvent(fieldId: string, event: { type?: string; value?: unknown }): void {
     const valueText = JSON.stringify(event?.value ?? '');
     this.pushLog(`Control event [${fieldId}]: ${event?.type || 'unknown'} -> ${valueText}`);
@@ -1256,6 +1315,18 @@ export class PlaygroundComponent {
     this.pushLog(`Registry valueById('${sampleId}') => ${JSON.stringify(byId)}`);
     this.pushLog(`Registry valuesByName('${sampleName}') => ${JSON.stringify(byName)}`);
     this.pushLog(`Registry valuesByClass('${sampleClass}') => ${JSON.stringify(byClass)}`);
+  }
+
+  private patchAutocompleteField(fieldId: string, patch: Partial<BrFormField>): void {
+    this.formConfig = {
+      ...this.formConfig,
+      fields: this.formConfig.fields.map((field) =>
+        field.id === fieldId && field.type === 'autocomplete'
+          ? { ...field, ...patch }
+          : field,
+      ),
+    };
+    this.rebuildFormControlConfigs();
   }
 
   asTextConfig(field: BrFormField): BrTextConfig {
@@ -1324,6 +1395,7 @@ export class PlaygroundComponent {
       label: field.label,
       value: Array.isArray(this.controlValue(field)) ? this.controlValue(field) : [],
       options: field.options || [],
+      maxSelections: field.maxSelections,
       disabled: field.disabled,
       required: field.required,
       ariaLabel: field.ariaLabel,
@@ -1369,6 +1441,8 @@ export class PlaygroundComponent {
   }
 
   asAutocompleteConfig(field: BrFormField): BrAutocompleteConfig {
+    const selectionMode = field.selectionMode ?? 'single';
+    const value = this.controlValue(field);
     return {
       id: field.id,
       controlId: field.controlId,
@@ -1376,11 +1450,20 @@ export class PlaygroundComponent {
       className: field.className,
       meta: field.meta,
       label: field.label,
-      value: String(this.controlValue(field) ?? ''),
+      value: selectionMode === 'multiple'
+        ? (Array.isArray(value) ? value : [])
+        : (value ?? ''),
       options: field.options || [],
       placeholder: field.placeholder,
       disabled: field.disabled,
       required: field.required,
+      selectionMode,
+      maxSelections: field.maxSelections,
+      dataMode: field.dataMode,
+      loading: field.loading,
+      minChars: field.minChars,
+      debounceMs: field.debounceMs,
+      noResultsText: field.noResultsText,
       ariaLabel: field.ariaLabel,
       ariaLabelledBy: field.ariaLabelledBy,
       ariaDescribedBy: field.ariaDescribedBy,
@@ -1464,7 +1547,7 @@ export class PlaygroundComponent {
   }
 
   isDirectInputField(field: BrFormField): boolean {
-    return this.isDirectInputVariant() && this.formConfig.fields.length === 1 && this.formConfig.fields[0].id === field.id;
+    return this.isDirectInputVariant() && this.formConfig.fields.some((entry) => entry.id === field.id);
   }
 
   isRegistryDemoVariant(): boolean {
@@ -2093,11 +2176,12 @@ export class YourFeatureComponent {
   }
 
   private buildFormTsCode(config: BrFormConfig): string {
-    if (this.isDirectInputVariant() && config.fields?.length === 1) {
-      return this.buildDirectInputFormTsCode(config.fields[0], config);
+    if (this.isDirectInputVariant() && config.fields?.length) {
+      return this.buildDirectInputFormTsCode(config);
     }
 
     const fieldTypes = new Set((config.fields || []).map((f: BrFormField) => f.type));
+    const hasRemoteAutocomplete = (config.fields || []).some((field: BrFormField) => field.type === 'autocomplete' && field.dataMode === 'remote');
     const isRegistryDemo = this.isRegistryDemoConfig(config);
     const commonTypeImports: string[] = ['BrControlsConfig', 'BrControlActionEvent'];
     const libraryTypeImports: string[] = [];
@@ -2112,6 +2196,7 @@ export class YourFeatureComponent {
     if (fieldTypes.has('checkbox')) libraryTypeImports.push('BrCheckboxConfig');
     if (fieldTypes.has('radio')) libraryTypeImports.push('BrRadioConfig');
     if (fieldTypes.has('autocomplete')) libraryTypeImports.push('BrAutocompleteConfig');
+    if (hasRemoteAutocomplete) libraryTypeImports.push('BrAutocompleteQueryEvent');
     if (fieldTypes.has('date')) libraryTypeImports.push('BrDateConfig');
 
     const helperMethods: string[] = [];
@@ -2194,6 +2279,7 @@ export class YourFeatureComponent {
       label: field.label,
       value: Array.isArray(this.controlValue(field)) ? this.controlValue(field) : [],
       options: field.options || [],
+      maxSelections: field.maxSelections,
       disabled: field.disabled,
       required: field.required,
       ariaLabel: field.ariaLabel,
@@ -2245,6 +2331,8 @@ export class YourFeatureComponent {
 
     if (fieldTypes.has('autocomplete')) {
       helperMethods.push(`  asAutocompleteConfig(field: BrControlField): BrAutocompleteConfig {
+    const selectionMode = field.selectionMode ?? 'single';
+    const value = this.controlValue(field);
     return {
       id: field.id,
       controlId: field.controlId,
@@ -2252,11 +2340,20 @@ export class YourFeatureComponent {
       className: field.className,
       meta: field.meta,
       label: field.label,
-      value: String(this.controlValue(field) ?? ''),
+      value: selectionMode === 'multiple'
+        ? (Array.isArray(value) ? value : [])
+        : (value ?? ''),
       options: field.options || [],
       placeholder: field.placeholder,
       disabled: field.disabled,
       required: field.required,
+      selectionMode,
+      maxSelections: field.maxSelections,
+      dataMode: field.dataMode,
+      loading: field.loading,
+      minChars: field.minChars,
+      debounceMs: field.debounceMs,
+      noResultsText: field.noResultsText,
       ariaLabel: field.ariaLabel,
       ariaLabelledBy: field.ariaLabelledBy,
       ariaDescribedBy: field.ariaDescribedBy,
@@ -2281,6 +2378,38 @@ export class YourFeatureComponent {
       ariaLabelledBy: field.ariaLabelledBy,
       ariaDescribedBy: field.ariaDescribedBy,
     };
+  }`);
+    }
+
+    if (hasRemoteAutocomplete) {
+      helperMethods.push(`  onAutocompleteQuery(fieldId: string, event: BrAutocompleteQueryEvent): void {
+    console.log('remote autocomplete query', fieldId, event.term);
+
+    this.controlsConfig = {
+      ...this.controlsConfig,
+      fields: this.controlsConfig.fields.map((field) =>
+        field.id === fieldId && field.type === 'autocomplete'
+          ? { ...field, loading: true, options: [] }
+          : field,
+      ),
+    };
+
+    // Replace this mock with your service/API call.
+    setTimeout(() => {
+      const allOptions = ${JSON.stringify(AUTOCOMPLETE_DEMO_OPTIONS, null, 6)};
+      const options = allOptions.filter((option) =>
+        option.label.toLowerCase().includes((event.term || '').trim().toLowerCase()),
+      );
+
+      this.controlsConfig = {
+        ...this.controlsConfig,
+        fields: this.controlsConfig.fields.map((field) =>
+          field.id === fieldId && field.type === 'autocomplete'
+            ? { ...field, loading: false, options }
+            : field,
+        ),
+      };
+    }, ${AUTOCOMPLETE_REMOTE_DELAY_MS});
   }`);
     }
 
@@ -2459,7 +2588,7 @@ ${helperBlock}
         return `<br-single-select [id]="'${field.id}'" [label]="'${field.label}'" [options]="${JSON.stringify(field.options || [])}" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [ngModel]="controlValue(${this.fieldRef(field.id)})" (ngModelChange)="updateControlValue('${field.id}', $event)"></br-single-select>`;
       }
       if (field.type === 'multi-select') {
-        return `<br-multi-select [id]="'${field.id}'" [label]="'${field.label}'" [options]="${JSON.stringify(field.options || [])}" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [ngModel]="controlValue(${this.fieldRef(field.id)})" (ngModelChange)="updateControlValue('${field.id}', $event)"></br-multi-select>`;
+        return `<br-multi-select [id]="'${field.id}'" [label]="'${field.label}'" [options]="${JSON.stringify(field.options || [])}" [maxSelections]="${field.maxSelections ?? 'null'}" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [ngModel]="controlValue(${this.fieldRef(field.id)})" (ngModelChange)="updateControlValue('${field.id}', $event)"></br-multi-select>`;
       }
       if (field.type === 'checkbox') {
         return `<br-checkbox [id]="'${field.id}'" [label]="'${field.label}'" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [ngModel]="controlValue(${this.fieldRef(field.id)})" (ngModelChange)="updateControlValue('${field.id}', $event)"></br-checkbox>`;
@@ -2470,34 +2599,34 @@ ${helperBlock}
       if (field.type === 'date') {
         return `<br-date [id]="'${field.id}'" [label]="'${field.label}'" [placeholder]="'${field.placeholder || 'Select date'}'" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [ngModel]="controlValue(${this.fieldRef(field.id)})" (ngModelChange)="updateControlValue('${field.id}', $event)"></br-date>`;
       }
-      return `<br-autocomplete [id]="'${field.id}'" [label]="'${field.label}'" [placeholder]="'${field.placeholder || ''}'" [options]="${JSON.stringify(field.options || [])}" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [ngModel]="controlValue(${this.fieldRef(field.id)})" (ngModelChange)="updateControlValue('${field.id}', $event)"></br-autocomplete>`;
+      return `<br-autocomplete [id]="'${field.id}'" [label]="'${field.label}'" [placeholder]="'${field.placeholder || ''}'" [options]="${JSON.stringify(field.options || [])}" [selectionMode]="'${field.selectionMode || 'single'}'" [maxSelections]="${field.maxSelections ?? 'null'}" [dataMode]="'${field.dataMode || 'local'}'" [loading]="${!!field.loading}" [minChars]="${field.minChars ?? 1}" [debounceMs]="${field.debounceMs ?? 250}" [noResultsText]="'${field.noResultsText || 'No matches found'}'" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [ngModel]="controlValue(${this.fieldRef(field.id)})" (ngModelChange)="updateControlValue('${field.id}', $event)" (queryChange)="onAutocompleteQuery('${field.id}', $event)"></br-autocomplete>`;
     }
 
     if (this.isDirectInputField(field)) {
       const valueRef = this.directInputValueRef(field);
       const optionsRef = this.directInputOptionsRef(field);
       if (field.type === 'text') {
-        return `<br-text [id]="'${field.id}'" [name]="'${field.name || ''}'" [className]="'${field.className || ''}'" [label]="'${field.label}'" [placeholder]="'${field.placeholder || ''}'" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [value]="${valueRef}" (valueChange)="updateDirectInputValue($event)" (controlEvent)="onControlEvent($event)"></br-text>`;
+      return `<br-text [id]="'${field.id}'" [name]="'${field.name || ''}'" [className]="'${field.className || ''}'" [label]="'${field.label}'" [placeholder]="'${field.placeholder || ''}'" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [value]="${valueRef}" (valueChange)="updateDirectInputValue('${field.id}', $event)" (controlEvent)="onControlEvent($event)"></br-text>`;
       }
       if (field.type === 'text-area') {
-        return `<br-text-area [id]="'${field.id}'" [name]="'${field.name || ''}'" [className]="'${field.className || ''}'" [label]="'${field.label}'" [placeholder]="'${field.placeholder || ''}'" [rows]="${field.rows ?? 4}" [maxLength]="${field.maxLength ?? 'null'}" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [value]="${valueRef}" (valueChange)="updateDirectInputValue($event)" (controlEvent)="onControlEvent($event)"></br-text-area>`;
+        return `<br-text-area [id]="'${field.id}'" [name]="'${field.name || ''}'" [className]="'${field.className || ''}'" [label]="'${field.label}'" [placeholder]="'${field.placeholder || ''}'" [rows]="${field.rows ?? 4}" [maxLength]="${field.maxLength ?? 'null'}" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [value]="${valueRef}" (valueChange)="updateDirectInputValue('${field.id}', $event)" (controlEvent)="onControlEvent($event)"></br-text-area>`;
       }
       if (field.type === 'single-select') {
-        return `<br-single-select [id]="'${field.id}'" [name]="'${field.name || ''}'" [className]="'${field.className || ''}'" [label]="'${field.label}'" [options]="${optionsRef}" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [value]="${valueRef}" (valueChange)="updateDirectInputValue($event)" (controlEvent)="onControlEvent($event)"></br-single-select>`;
+        return `<br-single-select [id]="'${field.id}'" [name]="'${field.name || ''}'" [className]="'${field.className || ''}'" [label]="'${field.label}'" [options]="${optionsRef}" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [value]="${valueRef}" (valueChange)="updateDirectInputValue('${field.id}', $event)" (controlEvent)="onControlEvent($event)"></br-single-select>`;
       }
       if (field.type === 'multi-select') {
-        return `<br-multi-select [id]="'${field.id}'" [name]="'${field.name || ''}'" [className]="'${field.className || ''}'" [label]="'${field.label}'" [options]="${optionsRef}" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [value]="${valueRef}" (valueChange)="updateDirectInputValue($event)" (controlEvent)="onControlEvent($event)"></br-multi-select>`;
+        return `<br-multi-select [id]="'${field.id}'" [name]="'${field.name || ''}'" [className]="'${field.className || ''}'" [label]="'${field.label}'" [options]="${optionsRef}" [maxSelections]="${field.maxSelections ?? 'null'}" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [value]="${valueRef}" (valueChange)="updateDirectInputValue('${field.id}', $event)" (controlEvent)="onControlEvent($event)"></br-multi-select>`;
       }
       if (field.type === 'checkbox') {
-        return `<br-checkbox [id]="'${field.id}'" [name]="'${field.name || ''}'" [className]="'${field.className || ''}'" [label]="'${field.label}'" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [value]="${valueRef}" (valueChange)="updateDirectInputValue($event)" (controlEvent)="onControlEvent($event)"></br-checkbox>`;
+        return `<br-checkbox [id]="'${field.id}'" [name]="'${field.name || ''}'" [className]="'${field.className || ''}'" [label]="'${field.label}'" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [value]="${valueRef}" (valueChange)="updateDirectInputValue('${field.id}', $event)" (controlEvent)="onControlEvent($event)"></br-checkbox>`;
       }
       if (field.type === 'radio') {
-        return `<br-radio [id]="'${field.id}'" [name]="'${field.name || ''}'" [className]="'${field.className || ''}'" [label]="'${field.label}'" [options]="${optionsRef}" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [value]="${valueRef}" (valueChange)="updateDirectInputValue($event)" (controlEvent)="onControlEvent($event)"></br-radio>`;
+        return `<br-radio [id]="'${field.id}'" [name]="'${field.name || ''}'" [className]="'${field.className || ''}'" [label]="'${field.label}'" [options]="${optionsRef}" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [value]="${valueRef}" (valueChange)="updateDirectInputValue('${field.id}', $event)" (controlEvent)="onControlEvent($event)"></br-radio>`;
       }
       if (field.type === 'date') {
-        return `<br-date [id]="'${field.id}'" [name]="'${field.name || ''}'" [className]="'${field.className || ''}'" [label]="'${field.label}'" [placeholder]="'${field.placeholder || 'Select date'}'" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [value]="${valueRef}" (dateChange)="updateDirectInputValue($event)" (controlEvent)="onControlEvent($event)"></br-date>`;
+        return `<br-date [id]="'${field.id}'" [name]="'${field.name || ''}'" [className]="'${field.className || ''}'" [label]="'${field.label}'" [placeholder]="'${field.placeholder || 'Select date'}'" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [value]="${valueRef}" (dateChange)="updateDirectInputValue('${field.id}', $event)" (controlEvent)="onControlEvent($event)"></br-date>`;
       }
-      return `<br-autocomplete [id]="'${field.id}'" [name]="'${field.name || ''}'" [className]="'${field.className || ''}'" [label]="'${field.label}'" [placeholder]="'${field.placeholder || ''}'" [options]="${optionsRef}" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [value]="${valueRef}" (valueChange)="updateDirectInputValue($event)" (controlEvent)="onControlEvent($event)"></br-autocomplete>`;
+      return `<br-autocomplete [id]="'${field.id}'" [name]="'${field.name || ''}'" [className]="'${field.className || ''}'" [label]="'${field.label}'" [placeholder]="'${field.placeholder || ''}'" [options]="${optionsRef}" [selectionMode]="'${field.selectionMode || 'single'}'" [maxSelections]="${field.maxSelections ?? 'null'}" [dataMode]="'${field.dataMode || 'local'}'" [loading]="${!!field.loading}" [minChars]="${field.minChars ?? 1}" [debounceMs]="${field.debounceMs ?? 250}" [noResultsText]="'${field.noResultsText || 'No matches found'}'" [required]="${!!field.required}" [disabled]="${!!field.disabled}" [ariaLabel]="'${field.ariaLabel || field.label}'" [ariaLabelledBy]="${field.ariaLabelledBy ? "'" + field.ariaLabelledBy + "'" : 'null'}" [ariaDescribedBy]="${field.ariaDescribedBy ? "'" + field.ariaDescribedBy + "'" : 'null'}" [value]="${valueRef}" (valueChange)="updateDirectInputValue('${field.id}', $event)" (queryChange)="onAutocompleteQuery('${field.id}', $event)" (controlEvent)="onControlEvent($event)"></br-autocomplete>`;
     }
 
     if (field.type === 'text') {
@@ -2521,7 +2650,7 @@ ${helperBlock}
     if (field.type === 'date') {
       return `<br-date [config]="asDateConfig(${this.fieldRef(field.id)})" (dateChange)="updateControlValue('${field.id}', $event)"></br-date>`;
     }
-    return `<br-autocomplete [config]="asAutocompleteConfig(${this.fieldRef(field.id)})" (valueChange)="updateControlValue('${field.id}', $event)"></br-autocomplete>`;
+    return `<br-autocomplete [config]="asAutocompleteConfig(${this.fieldRef(field.id)})" (valueChange)="updateControlValue('${field.id}', $event)" (queryChange)="onAutocompleteQuery('${field.id}', $event)"></br-autocomplete>`;
   }
 
   private fieldRef(fieldId: string): string {
@@ -2540,23 +2669,51 @@ ${helperBlock}
     return value.replace(/[^a-zA-Z0-9]+(.)/g, (_match, chr: string) => chr.toUpperCase()).replace(/^[^a-zA-Z_]+/, '');
   }
 
-  private buildDirectInputFormTsCode(field: BrFormField, config: BrFormConfig): string {
-    const componentImport = this.directInputComponentImport(field.type);
-    const optionImport = this.directInputNeedsOptions(field.type) ? ', BrOption' : '';
-    const valueVar = this.directInputValueRef(field);
-    const optionsVar = this.directInputOptionsRef(field);
-    const currentValue = (config.value || {})[field.id];
-    const valueLiteral = this.directInputValueLiteral(field, currentValue);
-    const optionsLiteral = this.directInputNeedsOptions(field.type) ? `
-  ${optionsVar}: BrOption[] = ${JSON.stringify(field.options || [], null, 2)};` : '';
+  private buildDirectInputFormTsCode(config: BrFormConfig): string {
+    const fields = config.fields || [];
+    const componentImports = Array.from(new Set(fields.map((field) => this.directInputComponentImport(field.type))));
+    const needsOptions = fields.some((field) => this.directInputNeedsOptions(field.type));
+    const hasRemoteAutocomplete = fields.some((field) => field.type === 'autocomplete' && field.dataMode === 'remote');
+    const importParts = [...componentImports];
+    if (needsOptions) {
+      importParts.push('BrOption');
+    }
+    if (hasRemoteAutocomplete) {
+      importParts.push('BrAutocompleteQueryEvent');
+    }
 
-    return `import { ${componentImport}${optionImport} } from '@sriharshavarada/br-ui-wrapper';
+    const members = fields.map((field) => {
+      const valueVar = this.directInputValueRef(field);
+      const optionsVar = this.directInputOptionsRef(field);
+      const currentValue = (config.value || {})[field.id];
+      const valueLiteral = this.directInputValueLiteral(field, currentValue);
+      const optionsLiteral = this.directInputNeedsOptions(field.type)
+        ? `\n  ${optionsVar}: BrOption[] = ${JSON.stringify(field.options || [], null, 2)};`
+        : '';
+      return `  ${valueVar} = ${valueLiteral};${optionsLiteral}`;
+    }).join('\n\n');
+
+    const valueAssignments = fields.map((field) => {
+      const valueVar = this.directInputValueRef(field);
+      return `      case '${field.id}': this.${valueVar} = value; break;`;
+    }).join('\n');
+
+    const actionPayload = fields.map((field) => {
+      const valueVar = this.directInputValueRef(field);
+      return `      ${field.id}: this.${valueVar}`;
+    }).join(',\n');
+
+    return `import { ${importParts.join(', ')} } from '@sriharshavarada/br-ui-wrapper';
 
 export class YourFeatureComponent {
-  ${valueVar} = ${valueLiteral};${optionsLiteral}
+${members}
 
-  updateDirectInputValue(value: any): void {
-    this.${valueVar} = value;
+  updateDirectInputValue(fieldId: string, value: any): void {
+    switch (fieldId) {
+${valueAssignments}
+      default:
+        break;
+    }
     console.log('valueChange', value);
   }
 
@@ -2564,8 +2721,14 @@ export class YourFeatureComponent {
     console.log('controlEvent', event);
   }
 
-  onControlsAction(action: 'reset' | 'submit'): void {
-    console.log('control action', action, this.${valueVar});
+  ${hasRemoteAutocomplete ? `onAutocompleteQuery(fieldId: string, event: BrAutocompleteQueryEvent): void {
+    console.log('remote autocomplete query', fieldId, event.term);
+  }
+
+  ` : ''}onControlsAction(action: 'reset' | 'submit'): void {
+    console.log('control action', action, {
+${actionPayload}
+    });
   }
 }`;
   }
@@ -2593,7 +2756,7 @@ export class YourFeatureComponent {
       return value ? 'true' : 'false';
     }
 
-    if (field.type === 'multi-select') {
+    if (field.type === 'multi-select' || (field.type === 'autocomplete' && field.selectionMode === 'multiple')) {
       return JSON.stringify(Array.isArray(value) ? value : []);
     }
 
@@ -2604,18 +2767,24 @@ export class YourFeatureComponent {
     this.validateTsShape('form', this.formCode.ts);
     this.validateScss(this.formCode.scss);
     const htmlSegments = this.extractControlsHtmlSegments(this.formCode.html);
-    const field = this.formConfig.fields[0];
-    if (!field) {
-      throw new Error('Direct input variant requires exactly one field.');
+    const fields = this.formConfig.fields || [];
+    if (!fields.length) {
+      throw new Error('Direct input variant requires at least one field.');
     }
 
-    const nextField = this.parseDirectInputField(this.formCode.html, field);
-    const nextValue = this.parseDirectInputValueFromTs(this.formCode.ts, nextField) ?? (this.formConfig.value || {})[field.id];
+    const nextFields = this.parseDirectInputFields(this.formCode.html, fields);
+    const nextValueEntries = nextFields.map((field) => {
+      const nextValue = this.parseDirectInputValueFromTs(this.formCode.ts, field) ?? (this.formConfig.value || {})[field.id];
+      return [field.id, nextValue] as const;
+    });
 
     this.formConfig = {
       ...this.formConfig,
-      fields: [nextField],
-      value: { ...(this.formConfig.value || {}), [field.id]: nextValue },
+      fields: nextFields,
+      value: {
+        ...(this.formConfig.value || {}),
+        ...Object.fromEntries(nextValueEntries),
+      },
     };
     this.rebuildFormControlConfigs();
     this.formCode.htmlBefore = htmlSegments.before;
@@ -2625,14 +2794,25 @@ export class YourFeatureComponent {
     this.pushLog('Applied Controls TS/HTML/SCSS code');
   }
 
-  private parseDirectInputField(html: string, fallback: BrFormField): BrFormField {
-    const tagName = this.directInputTagName(fallback.type);
-    const match = html.match(new RegExp(`<${tagName}\\b([\\s\\S]*?)><\\/${tagName}>`, 'i'));
-    if (!match) {
+  private parseDirectInputFields(html: string, fallbacks: BrFormField[]): BrFormField[] {
+    if (!fallbacks.length) {
+      return [];
+    }
+
+    const tagName = this.directInputTagName(fallbacks[0].type);
+    const matches = Array.from(html.matchAll(new RegExp(`<${tagName}\\b([\\s\\S]*?)><\\/${tagName}>`, 'ig')));
+    if (!matches.length) {
       throw new Error(`HTML must include <${tagName}>...</${tagName}> for the direct input variant.`);
     }
 
-    const attrs = match[1];
+    return fallbacks.map((fallback, index) => this.parseDirectInputFieldAttributes(matches[index]?.[1], fallback));
+  }
+
+  private parseDirectInputFieldAttributes(attrs: string | undefined, fallback: BrFormField): BrFormField {
+    const tagName = this.directInputTagName(fallback.type);
+    if (!attrs) {
+      throw new Error(`HTML must include <${tagName}>...</${tagName}> for the direct input variant.`);
+    }
     const stringBinding = (name: string): string | undefined => {
       const patterns = [
         new RegExp(`\\[${name}\\]="['"]([^'"]*)['"]`, 'i'),
@@ -2656,6 +2836,15 @@ export class YourFeatureComponent {
       return current;
     };
 
+    const numberBinding = (name: string, current: number | undefined): number | undefined => {
+      const pattern = new RegExp(`\\[${name}\\]="(\\d+)"`, 'i');
+      const result = attrs.match(pattern);
+      if (result?.[1] !== undefined) {
+        return Number(result[1]);
+      }
+      return current;
+    };
+
     return {
       ...fallback,
       id: stringBinding('id') || fallback.id,
@@ -2665,6 +2854,13 @@ export class YourFeatureComponent {
       placeholder: stringBinding('placeholder') || fallback.placeholder,
       required: booleanBinding('required', fallback.required),
       disabled: booleanBinding('disabled', fallback.disabled),
+      selectionMode: (stringBinding('selectionMode') as 'single' | 'multiple' | undefined) || fallback.selectionMode,
+      maxSelections: numberBinding('maxSelections', fallback.maxSelections),
+      dataMode: (stringBinding('dataMode') as 'local' | 'remote' | undefined) || fallback.dataMode,
+      loading: booleanBinding('loading', fallback.loading),
+      minChars: numberBinding('minChars', fallback.minChars),
+      debounceMs: numberBinding('debounceMs', fallback.debounceMs),
+      noResultsText: stringBinding('noResultsText') || fallback.noResultsText,
       ariaLabel: stringBinding('ariaLabel') || fallback.ariaLabel,
       ariaLabelledBy: stringBinding('ariaLabelledBy') || fallback.ariaLabelledBy,
       ariaDescribedBy: stringBinding('ariaDescribedBy') || fallback.ariaDescribedBy,
@@ -2710,7 +2906,7 @@ export class YourFeatureComponent {
       return this.parseBooleanAssignmentFromTs(tsCode, variableName);
     }
 
-    if (field.type === 'multi-select') {
+    if (field.type === 'multi-select' || (field.type === 'autocomplete' && field.selectionMode === 'multiple')) {
       return this.parseJsonAssignmentFromTs(tsCode, variableName);
     }
 
@@ -3094,11 +3290,13 @@ export class YourFeatureComponent {
       throw new Error('TS validation failed: missing `export class ...` declaration.');
     }
 
-    if (tab === 'form' && this.isDirectInputVariant() && this.formConfig.fields?.length === 1) {
-      const requiredImport = this.directInputComponentImport(this.formConfig.fields[0].type);
-      const directInputImportRegex = new RegExp(`import\\s*\\{[^}]*${requiredImport}[^}]*\\}\\s*from\\s*['"]@sriharshavarada\\/br-ui-wrapper['"]`);
-      if (!directInputImportRegex.test(tsCode)) {
-        throw new Error(`TS validation failed: required import for ${requiredImport} from @sriharshavarada/br-ui-wrapper is missing.`);
+    if (tab === 'form' && this.isDirectInputVariant() && this.formConfig.fields?.length) {
+      const requiredImports = Array.from(new Set(this.formConfig.fields.map((field) => this.directInputComponentImport(field.type))));
+      for (const requiredImport of requiredImports) {
+        const directInputImportRegex = new RegExp(`import\\s*\\{[^}]*${requiredImport}[^}]*\\}\\s*from\\s*['"]@sriharshavarada\\/br-ui-wrapper['"]`);
+        if (!directInputImportRegex.test(tsCode)) {
+          throw new Error(`TS validation failed: required import for ${requiredImport} from @sriharshavarada/br-ui-wrapper is missing.`);
+        }
       }
       return;
     }
@@ -3927,6 +4125,10 @@ export class YourFeatureComponent {
       return this.buildControlRegistryDemoVariantConfig(control);
     }
 
+    if (control === 'autocomplete' && directInputOnly) {
+      return this.buildAutocompleteDirectInputGalleryConfig();
+    }
+
     if (control === 'date') {
       return this.singleControlConfig(
         {
@@ -4005,12 +4207,14 @@ export class YourFeatureComponent {
     }
 
     if (control === 'multi-select') {
+      const enableMaxSelections = variantKey === 'default' || variantKey === 'preselected' || directInputOnly;
       return this.singleControlConfig(
         {
           id: 'multiSelectControl',
           type: 'multi-select',
-          label: 'Skills',
+          label: enableMaxSelections ? 'Skills (Max 2)' : 'Skills',
           disabled: variantKey === 'disabled',
+          maxSelections: enableMaxSelections ? 2 : undefined,
           options: [
             { label: 'Angular', value: 'angular' },
             { label: 'Java', value: 'java' },
@@ -4020,7 +4224,7 @@ export class YourFeatureComponent {
         },
         variantKey === 'preselected' ? ['angular', 'aws'] : [],
         `${this.controlPlaygroundLabels[control]} Playground`,
-        `Variant: ${this.controlVariantLabel(variant)}${ngModelOnly ? ' (No Config)' : ''}`,
+        `${enableMaxSelections ? 'Max selections: 2. ' : ''}Variant: ${this.controlVariantLabel(variant)}${ngModelOnly ? ' (No Config)' : directInputOnly ? ' (Direct Inputs)' : ''}`,
       );
     }
 
@@ -4052,24 +4256,35 @@ export class YourFeatureComponent {
       );
     }
 
+    const isRemote = variantKey === 'remote' || variantKey === 'remote-multi';
+    const isMultiple = variantKey === 'multi-local' || variantKey === 'remote-multi';
+    const enableAutocompleteMaxSelections = isMultiple;
+    const autocompleteInitialValue = isMultiple
+      ? []
+      : (variantKey === 'prefilled' || variantKey === 'disabled' ? 'Seattle' : '');
+
     return this.singleControlConfig(
       {
         id: 'autocompleteControl',
         type: 'autocomplete',
-        label: 'Location',
-        placeholder: 'Search location',
+        label: isMultiple && enableAutocompleteMaxSelections ? 'Locations (Max 2)' : isMultiple ? 'Locations' : 'Location',
+        placeholder: isRemote ? 'Type to search remote locations' : 'Search location',
         disabled: variantKey === 'disabled',
-        options: [
-          { label: 'Austin', value: 'Austin' },
-          { label: 'Seattle', value: 'Seattle' },
-          { label: 'New York', value: 'New York' },
-          { label: 'Chicago', value: 'Chicago' },
-          { label: 'Denver', value: 'Denver' },
-        ],
+        options: isRemote
+          ? AUTOCOMPLETE_REMOTE_DEFAULT_OPTIONS
+          : AUTOCOMPLETE_DEMO_OPTIONS.filter((option) =>
+            ['Austin', 'Seattle', 'New York', 'Chicago', 'Denver'].includes(option.value),
+          ),
+        selectionMode: isMultiple ? 'multiple' : 'single',
+        maxSelections: enableAutocompleteMaxSelections ? 2 : undefined,
+        dataMode: isRemote ? 'remote' : 'local',
+        minChars: isRemote ? 2 : 1,
+        debounceMs: 250,
+        noResultsText: isRemote ? 'No remote locations found' : 'No matching locations found',
       },
-      variantKey === 'prefilled' ? 'Seattle' : '',
+      autocompleteInitialValue,
       `${this.controlPlaygroundLabels[control]} Playground`,
-      `Variant: ${this.controlVariantLabel(variant)}${ngModelOnly ? ' (No Config)' : ''}`,
+      `${enableAutocompleteMaxSelections ? 'Max selections: 2. ' : ''}Variant: ${this.controlVariantLabel(variant)}${ngModelOnly ? ' (No Config)' : directInputOnly ? ' (Direct Inputs)' : ''}`,
     );
   }
 
@@ -4412,6 +4627,79 @@ export class YourFeatureComponent {
         ariaLabel: title,
       },
     }, title);
+  }
+
+  private buildAutocompleteDirectInputGalleryConfig(): BrFormConfig {
+    const localOptions = AUTOCOMPLETE_DEMO_OPTIONS.filter((option) =>
+      ['Austin', 'Seattle', 'New York', 'Chicago', 'Denver', 'Toronto'].includes(option.value),
+    );
+
+    return this.withFormAccessibility({
+      title: 'Autocomplete Playground',
+      description: 'Direct input gallery: compare local, multi, remote, and remote multi wrapper inputs in one place.',
+      fields: [
+        {
+          id: 'autocompleteDirectDefault',
+          type: 'autocomplete',
+          label: 'Location (Default)',
+          name: 'locationDefault',
+          className: 'autocomplete-direct-default',
+          placeholder: 'Search location',
+          options: localOptions,
+        },
+        {
+          id: 'autocompleteDirectMultiLocal',
+          type: 'autocomplete',
+          label: 'Location (Multi Local, Max 2)',
+          name: 'locationMultiLocal',
+          className: 'autocomplete-direct-multi-local',
+          placeholder: 'Add multiple local locations',
+          options: localOptions,
+          selectionMode: 'multiple',
+          maxSelections: 2,
+        },
+        {
+          id: 'autocompleteDirectRemote',
+          type: 'autocomplete',
+          label: 'Location (Remote)',
+          name: 'locationRemote',
+          className: 'autocomplete-direct-remote',
+          placeholder: 'Type to search remote locations',
+          options: AUTOCOMPLETE_REMOTE_DEFAULT_OPTIONS,
+          dataMode: 'remote',
+          minChars: 2,
+          debounceMs: 250,
+          noResultsText: 'No remote locations found',
+        },
+        {
+          id: 'autocompleteDirectRemoteMulti',
+          type: 'autocomplete',
+          label: 'Location (Remote Multi, Max 2)',
+          name: 'locationRemoteMulti',
+          className: 'autocomplete-direct-remote-multi',
+          placeholder: 'Type to search and add multiple remote locations',
+          options: AUTOCOMPLETE_REMOTE_DEFAULT_OPTIONS,
+          selectionMode: 'multiple',
+          maxSelections: 2,
+          dataMode: 'remote',
+          minChars: 2,
+          debounceMs: 250,
+          noResultsText: 'No remote locations found',
+        },
+      ],
+      value: {
+        autocompleteDirectDefault: '',
+        autocompleteDirectMultiLocal: ['Austin'],
+        autocompleteDirectRemote: '',
+        autocompleteDirectRemoteMulti: ['Seattle'],
+      },
+      showActions: true,
+      submitLabel: 'Apply',
+      resetLabel: 'Clear',
+      accessibility: {
+        ariaLabel: 'Autocomplete direct input gallery',
+      },
+    }, 'Autocomplete direct input gallery');
   }
 
   private withFieldAccessibility(field: BrFormField): BrFormField {
@@ -4821,9 +5109,3 @@ export class YourFeatureComponent {
     return JSON.parse(JSON.stringify(value)) as T;
   }
 }
-
-
-
-
-
-

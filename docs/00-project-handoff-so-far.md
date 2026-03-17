@@ -1448,3 +1448,81 @@ Use `/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC/docs/00-project-hand
 
 - Grid wishlist and future capability target is now documented in [docs/08-grid-wishlist.md](docs/08-grid-wishlist.md).
 
+## March 16, 2026 autocomplete stabilization + playground follow-up
+
+This pass focused on closing the remaining autocomplete inconsistencies across `CUSTOM`, `MATERIAL`, and `PRIMENG`, then surfacing the newer API features directly in the Playground so they are testable without manual JSON edits.
+
+### Library repo changes (`/Users/sriharshavinfinite.com/Desktop/br-ui-wrapper`)
+
+Primary areas touched:
+- adapters/contracts:
+  - `projects/br-ui-wrapper/src/lib/common/adapters/autocomplete.adapter.ts`
+  - `projects/br-ui-wrapper/src/lib/common/adapters/multi-select.adapter.ts`
+- wrapper/public inputs:
+  - `projects/br-ui-wrapper/src/lib/common/components/br-autocomplete/br-autocomplete.component.ts`
+  - `projects/br-ui-wrapper/src/lib/common/components/br-autocomplete/br-autocomplete.component.html`
+  - `projects/br-ui-wrapper/src/lib/common/components/br-multi-select/br-multi-select.component.ts`
+- models:
+  - `projects/br-ui-wrapper/src/lib/common/models/controls-config.model.ts`
+  - `projects/br-ui-wrapper/src/lib/common/models/form-config.model.ts`
+  - `projects/br-ui-wrapper/src/lib/common/models/control-event.model.ts`
+- implementations:
+  - custom/material/primeng autocomplete controls
+  - custom/material/primeng multi-select controls
+
+What changed:
+- Added shared `maxSelections` support for:
+  - `br-multi-select`
+  - `br-autocomplete` when `selectionMode="multiple"`
+- Fixed remote autocomplete behavior where async option updates could wipe or fight with the user’s in-progress query text.
+- Fixed PrimeNG remote single-select suggestion refresh so matches appear on the first valid term instead of only after an extra keystroke.
+- Fixed Material multi-autocomplete floating label overlap when chips exist and focus leaves the field.
+- Fixed Material remote single-select backspace/re-edit behavior so a previously selected value does not get forced back into the input while the user is clearing/retyping.
+- Fixed PrimeNG max-selection behavior:
+  - removed the transient empty chip / lone close-icon artifact after hitting the limit,
+  - disabled remaining options once the selection cap is reached,
+  - normalized emitted multi-value payloads so the limit is enforced cleanly.
+- Added clearer disabled styling for custom/material multi-autocomplete option rows once `maxSelections` is reached so the blocked state is obvious visually, not only behaviorally.
+
+### App repo changes (`/Users/sriharshavinfinite.com/Desktop/CommonUIForBRPOC`)
+
+Primary files:
+- `src/app/screens/playground/playground.component.ts`
+- `src/app/screens/playground/playground.component.html`
+- `src/app/screens/playground/components/code-editor/code-editor.component.scss`
+
+What changed:
+- Playground autocomplete debug/demo coverage expanded across:
+  - `default-config`
+  - `multi-local-config`
+  - `remote-config`
+  - `remote-multi-config`
+- Reset handling was corrected so multi-value autocomplete variants reset to `[]` instead of `''`.
+- Remote autocomplete demo behavior improved:
+  - default suggestion set now appears on open for remote variants,
+  - empty-state timing is less misleading for below-min-chars scenarios.
+- `Direct Input` autocomplete was turned into a gallery showing all key variants together:
+  - local single
+  - local multi
+  - remote single
+  - remote multi
+- Code Studio generation was expanded so direct-input autocomplete examples emit the corresponding multiple-wrapper setup instead of a single isolated field.
+- Added horizontal scroll to the black Code Studio/editor area for long generated lines.
+- Playground presets now expose `maxSelections` without manual config editing:
+  - multi-select default/preselected/direct-input demos use `maxSelections: 2`
+  - autocomplete multi-local/remote-multi/direct-input demos use `maxSelections: 2`
+  - labels/descriptions in the UI now call out that the cap exists
+
+### Local validation done during this pass
+- Library:
+  - `npm run build:lib`
+  - `npm run dev:yalc:push`
+- App:
+  - `./node_modules/.bin/tsc -p tsconfig.app.json --noEmit`
+  - restart via `./scripts/restart-app-clean.sh 127.0.0.1 4200`
+
+### Notes for next handoff / continuation
+- The app repo also contains untracked architecture diagram sources:
+  - `docs/project-architecture.drawio`
+  - `docs/project-architecture.excalidraw`
+- During this pass, testing was primarily targeted at wrapper/playground interaction parity rather than a new docs or CI sweep.
